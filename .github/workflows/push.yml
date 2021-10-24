@@ -1,0 +1,13 @@
+on: push
+name: gym-mapf test
+jobs:
+  UT:
+    name: unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: ashutoshvarma/action-cmake-build@master
+        with:
+          build-dir: ${{ runner.workspace }}/build
+          build-type: Debug
+      - run: ${{ runner.workspace }}/ut

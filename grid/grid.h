@@ -16,30 +16,32 @@ public:
 
 class Location {
 public:
-    std::size_t row;
-    std::size_t col;
+    int row;
+    int col;
 
-    Location(std::size_t row, std::size_t col);
+    Location(int row, int col);
 
     bool operator==(const Location &other_loc) const;
+    bool operator!=(const Location &other_loc) const;
+
 };
 
 enum Action {
-    STAY, UP, RIGHT, LEFT, DOWN
+    STAY, UP, RIGHT, DOWN, LEFT
 };
 
 class Grid {
 private:
-    Location _execute_aux(const Location &l, Action a);
+    Location _execute_aux(const Location &l, Action a) const;
 
 
-    Location _execute_up(const Location &l);
+    Location _execute_up(const Location &l) const;
 
-    Location _execute_right(const Location &l);
+    Location _execute_right(const Location &l) const;
 
-    Location _execute_down(const Location &l);
+    Location _execute_down(const Location &l) const;
 
-    Location _execute_left(const Location &l);
+    Location _execute_left(const Location &l) const;
 
 
 public:
@@ -48,8 +50,10 @@ public:
     std::size_t max_col;
 
     Grid(std::vector<std::vector<char>> &map_lines);
+    Grid(const Grid& g);
 
-    Location execute(const Location &l, Action a);
+
+    Location execute(const Location &l, Action a) const;
 };
 
 

@@ -31,7 +31,7 @@ Grid::Grid(std::vector<std::vector<char>> &map_lines) {
 }
 
 
-Location Grid::execute(const Location& l, Action a) {
+Location Grid::execute(const Location &l, Action a) const {
     Location new_loc{0, 0};
 
     new_loc = this->_execute_aux(l, a);
@@ -42,7 +42,7 @@ Location Grid::execute(const Location& l, Action a) {
     return new_loc;
 }
 
-std::size_t max(const std::size_t &val1, const std::size_t &val2) {
+int max(const int &val1, const int &val2) {
     if (val2 > val1) {
         return val2;
     }
@@ -50,7 +50,7 @@ std::size_t max(const std::size_t &val1, const std::size_t &val2) {
     return val1;
 }
 
-std::size_t min(const std::size_t &val1, const std::size_t &val2) {
+int min(const int &val1, const int &val2) {
     if (val2 < val1) {
         return val2;
     }
@@ -58,7 +58,7 @@ std::size_t min(const std::size_t &val1, const std::size_t &val2) {
     return val1;
 }
 
-Location Grid::_execute_aux(const Location &l, Action a) {
+Location Grid::_execute_aux(const Location &l, Action a) const {
     switch (a) {
         case STAY:
             return l;
@@ -73,27 +73,32 @@ Location Grid::_execute_aux(const Location &l, Action a) {
     }
 }
 
-Location Grid::_execute_up(const Location &l) {
+Location Grid::_execute_up(const Location &l) const {
     return Location{max(0, l.row - 1), l.col};
 }
 
-Location Grid::_execute_right(const Location &l) {
+Location Grid::_execute_right(const Location &l) const {
     return Location{l.row, min(this->max_col, l.col + 1)};
 }
 
-Location Grid::_execute_down(const Location &l) {
+Location Grid::_execute_down(const Location &l) const {
     return Location{min(this->max_row, l.row + 1), l.col};
 }
 
-Location Grid::_execute_left(const Location &l) {
+Location Grid::_execute_left(const Location &l) const {
     return Location{l.row, max(0, l.col - 1)};
 }
+
 
 bool Location::operator==(const Location &other_loc) const {
     return (this->row == other_loc.row) && (this->col == other_loc.col);
 }
 
-Location::Location(std::size_t row, std::size_t col) {
+Location::Location(int row, int col) {
     this->row = row;
     this->col = col;
+}
+
+bool Location::operator!=(const Location &other_loc) const {
+    return (this->row != other_loc.row) || (this->col != other_loc.col);
 }
