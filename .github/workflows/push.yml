@@ -10,4 +10,4 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
-      - run: ${{ runner.workspace }}/ut
+      - run: ${{ runner.workspace }}/cmake-build-debug/ut
