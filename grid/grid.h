@@ -6,6 +6,7 @@
 #define GYM_MAPF_GRID_H
 
 #include <vector>
+#include <string>
 
 class Cell {
 public:
@@ -49,8 +50,7 @@ public:
     std::size_t max_row;
     std::size_t max_col;
 
-    Grid(std::vector<std::vector<char>> &map_lines);
-    Grid(const Grid& g);
+    Grid(std::vector<std::string> &map_lines);
 
 
     Location execute(const Location &l, Action a) const;

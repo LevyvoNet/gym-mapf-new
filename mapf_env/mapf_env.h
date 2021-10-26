@@ -23,6 +23,10 @@ class MultiAgentAction {
 public:
     vector<Action> actions;
 
+    MultiAgentAction(const vector<Action> &actions);
+
+    bool operator==(const MultiAgentAction &other) const;
+
 };
 
 class Transition {
@@ -45,7 +49,7 @@ public:
                bool done,
                bool is_collision);
 
-    bool operator==(const Transition &other);
+    bool operator==(const Transition &other) const;
 };
 
 class MapfEnv {
@@ -71,13 +75,15 @@ public:
             const MultiAgentState *start_state,
             const MultiAgentState *goal_state,
             float fail_prob,
-            int reward_of_collision,
-            int reward_of_goal,
-            int reward_of_living);
+            int collision_reward,
+            int goal_reward,
+            int living_reward);
 
     list<Transition *> *get_transitions(const MultiAgentState &state, const MultiAgentAction &action);
 
     void step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done);
+
+    bool is_terminal_state(const MultiAgentState &state) const;
 };
 
 #endif //GYM_MAPF_MAPF_ENV_H

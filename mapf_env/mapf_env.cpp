@@ -44,7 +44,7 @@ Transition::Transition(double p, const MultiAgentState &next_state, int reward, 
     this->is_collision = is_collision;
 }
 
-bool Transition::operator==(const Transition &other) {
+bool Transition::operator==(const Transition &other) const {
     return ((this->p == other.p) &&
             (*this->next_state == *other.next_state) &&
             (this->reward == other.reward) &&
@@ -56,7 +56,7 @@ MultiAgentState::MultiAgentState(const vector<Location> &locations) {
     this->locations = locations;
 }
 
-bool MultiAgentState::operator==(const MultiAgentState &other) const{
+bool MultiAgentState::operator==(const MultiAgentState &other) const {
     size_t agent_idx = 0;
 
     if (this->locations.size() != other.locations.size()) {
@@ -73,6 +73,26 @@ bool MultiAgentState::operator==(const MultiAgentState &other) const{
     return true;
 }
 
+MultiAgentAction::MultiAgentAction(const vector<Action> &actions) {
+    this->actions = actions;
+}
+
+bool MultiAgentAction::operator==(const MultiAgentAction &other) const {
+    size_t agent_idx = 0;
+
+    if (this->actions.size() != other.actions.size()) {
+        return false;
+    }
+
+    for (agent_idx = 0; agent_idx < this->actions.size(); ++agent_idx) {
+
+        if (this->actions[agent_idx] != other.actions[agent_idx]) {
+            return false;
+        }
+    }
+
+    return true;
+}
 
 
 MapfEnv::MapfEnv(const Grid *grid,
@@ -80,9 +100,9 @@ MapfEnv::MapfEnv(const Grid *grid,
                  const MultiAgentState *start_state,
                  const MultiAgentState *goal_state,
                  float fail_prob,
-                 int reward_of_collision,
-                 int reward_of_goal,
-                 int reward_of_living) {
+                 int collision_reward,
+                 int goal_reward,
+                 int living_reward) {
     size_t agent_idx = 0;
 
     /* Copy constant fields */
@@ -91,9 +111,9 @@ MapfEnv::MapfEnv(const Grid *grid,
     this->start_state = new MultiAgentState(start_state->locations);
     this->goal_state = new MultiAgentState(goal_state->locations);
     this->fail_prob = fail_prob;
-    this->reward_of_collision = reward_of_collision;
-    this->reward_of_goal = reward_of_goal;
-    this->reward_of_living = reward_of_living;
+    this->reward_of_collision = collision_reward;
+    this->reward_of_goal = goal_reward;
+    this->reward_of_living = living_reward;
 
     /* Initialize the env state to the starting one */
     this->s = new MultiAgentState(start_state->locations);
@@ -101,17 +121,54 @@ MapfEnv::MapfEnv(const Grid *grid,
 }
 
 bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state) {
+    size_t i = 0;
+    size_t j = 0;
+    size_t n_agents = prev_state->locations.size();
+
+
+    for (i = 0; i < n_agents; ++i) {
+        for (j = 0; j < n_agents; j++) {
+            if (i == j) {
+                continue;
+            }
+
+            /* Vertex collision */
+            if (next_state->locations[i] == next_state->locations[j]) {
+                return true;
+            }
+
+            /* Edge collision */
+            if ((prev_state->locations[j] == next_state->locations[i])
+                && (prev_state->locations[i] == next_state->locations[j])) {
+                return true;
+            }
+        }
+    }
+
     return false;
 }
 
 int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) const {
-    return this->reward_of_living;
+    size_t agent_idx = 0;
+    int living_reward = 0;
+
+
+    for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
+        if ((prev_state->locations[agent_idx] == this->goal_state->locations[agent_idx]) &&
+            (action->actions[agent_idx] == STAY)) {
+            continue;
+        }
+
+        living_reward += this->reward_of_living;
+    }
+    return living_reward;
+
 }
 
 void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
                                      const MultiAgentState *next_state, int *reward, bool *done,
                                      bool *is_collision) const {
-    *reward = this->reward_of_living;
+    *reward = 0;
     *done = false;
     *is_collision = false;
     int living_reward = 0;
@@ -137,6 +194,30 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
     *is_collision = false;
 }
 
+bool MapfEnv::is_terminal_state(const MultiAgentState &state) const {
+    size_t i = 0;
+    size_t j = 0;
+
+    /* Collision between two agents */
+    for (i = 0; i < this->n_agents; i++) {
+        for (j = 0; j < this->n_agents; j++) {
+            if ((i != j) && (state.locations[i] == state.locations[j])) {
+                return true;
+            }
+        }
+
+    }
+
+    /* Goal state */
+    if (state == *this->goal_state) {
+        return true;
+    }
+
+    /* None of the conditions satisfied, this state is not terminal */
+    return false;
+}
+
+/* TODO: calculate next state and living reward as part of the main loop instead of helper functions (inline it) */
 /* TODO: sum all of the transitions to the same next_state to a single one with the sum of probabilities */
 list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) {
     list<Transition *> *transitions = new list<Transition *>();
@@ -212,6 +293,13 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     size_t agent_idx = 0;
     bool collision = false;
 
+    if (this->is_terminal_state(*this->s)) {
+        *next_state = *this->s;
+        *reward = 0;
+        *done = true;
+        return;
+    }
+
     /* Set the next state - for each agent sample an action and set its next location properly */
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
         noise_idx = d(gen);
@@ -220,7 +308,7 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     }
 
     /* Set the reward and done */
-    this->calc_transition_reward(this->s, nullptr, next_state, reward, done, &collision);
+    this->calc_transition_reward(this->s, &action, next_state, reward, done, &collision);
 
     /* Update the current state of the env */
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {

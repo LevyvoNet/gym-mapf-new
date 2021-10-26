@@ -12,7 +12,7 @@ Cell::Cell(bool is_obstacle) {
 }
 
 
-Grid::Grid(std::vector<std::vector<char>> &map_lines) {
+Grid::Grid(std::vector<std::string> &map_lines) {
     std::size_t i = 0;
     std::size_t j = 0;
     std::size_t n_rows = map_lines.size();

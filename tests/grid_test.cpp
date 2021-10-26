@@ -7,8 +7,8 @@
 #include <gym_mapf.h>
 
 TEST(GridTests, ObstacleCellTest) {
-    std::vector<std::vector<char>> map_lines{{'.', '.', '.'},
-                                             {'@', '.', '@'}};
+    std::vector<std::string> map_lines{{'.', '.', '.'},
+                                       {'@', '.', '@'}};
 
     Grid *g = new Grid(map_lines);
 
@@ -19,8 +19,8 @@ TEST(GridTests, ObstacleCellTest) {
 
 
 TEST(GridTests, SingleAgentAction) {
-    std::vector<std::vector<char>> map_lines{{'.', '.', '.'},
-                                             {'@', '.', '@'}};
+    std::vector<std::string> map_lines{{'.', '.', '.'},
+                                       {'@', '.', '@'}};
 
     Grid *g = new Grid(map_lines);
 

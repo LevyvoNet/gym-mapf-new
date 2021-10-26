@@ -30,6 +30,8 @@ add_library(gym_mapf SHARED
         grid/grid.cpp
         mapf_env/mapf_env.h
         mapf_env/mapf_env.cpp
+        utils/utils.h
+        utils/utils.cpp
         )
 
 add_executable(
@@ -49,6 +51,7 @@ add_executable(
 
         tests/mapf_env_tests.cpp
         tests/grid_test.cpp
+        tests/utils_tests.cpp
 )
 target_link_libraries(
         ut
