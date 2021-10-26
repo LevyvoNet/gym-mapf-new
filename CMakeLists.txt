@@ -18,20 +18,20 @@ enable_testing()
 
 include_directories(
         .
-        grid
-        mapf_env
-        tests
+        gym_mapf/grid
+        gym_mapf/mapf_env
+        gym_mapf/tests
 )
 
 add_library(gym_mapf SHARED
-        gym_mapf.h
-        gym_mapf.cpp
-        grid/grid.h
-        grid/grid.cpp
-        mapf_env/mapf_env.h
-        mapf_env/mapf_env.cpp
-        utils/utils.h
-        utils/utils.cpp
+        gym_mapf/gym_mapf.h
+        gym_mapf/gym_mapf.cpp
+        gym_mapf/grid/grid.h
+        gym_mapf/grid/grid.cpp
+        gym_mapf/mapf_env/mapf_env.h
+        gym_mapf/mapf_env/mapf_env.cpp
+        gym_mapf/utils/utils.h
+        gym_mapf/utils/utils.cpp
         )
 
 add_executable(
@@ -49,9 +49,9 @@ target_link_libraries(
 add_executable(
         ut
 
-        tests/mapf_env_tests.cpp
-        tests/grid_test.cpp
-        tests/utils_tests.cpp
+        gym_mapf/tests/mapf_env_tests.cpp
+        gym_mapf/tests/grid_test.cpp
+        gym_mapf/tests/utils_tests.cpp
 )
 target_link_libraries(
         ut

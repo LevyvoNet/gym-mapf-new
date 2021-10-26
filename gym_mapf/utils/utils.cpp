@@ -22,6 +22,15 @@ std::vector<std::string> parse_map_file(string file_path) {
     return lines;
 }
 
+std::string get_maps_dir() {
+    std::string file_path = __FILE__;
+    std::string dir_path = file_path.substr(0, file_path.find_last_of("/\\"));
+    std::ostringstream maps_dir;
+    maps_dir << dir_path << "/../maps/";
+
+    return maps_dir.str();
+}
+
 void parse_scen_file(std::string file_path,
                      size_t n_agents,
                      MultiAgentState *start_state,
@@ -91,14 +100,14 @@ MapfEnv *create_mapf_env(std::string map_name,
                          int living_reward) {
     /* Create the grid */
     std::ostringstream map_file_string_stream;
-    map_file_string_stream << "../maps/" << map_name << "/" << map_name << ".map";
+    map_file_string_stream << get_maps_dir() << "/" << map_name << "/" << map_name << ".map";
     std::vector<std::string> map_lines = parse_map_file(map_file_string_stream.str());
 
     /* Create the start and goal states */
     MultiAgentState start_state({});
     MultiAgentState goal_state({});
     std::ostringstream scen_file_string_stream;
-    scen_file_string_stream << "../maps/" << map_name << "/" << map_name << "-even-" << scen_id << ".scen";
+    scen_file_string_stream << get_maps_dir() << "/" << map_name << "/" << map_name << "-even-" << scen_id << ".scen";
     parse_scen_file(scen_file_string_stream.str(), n_agents, &start_state, &goal_state);
 
     return new MapfEnv(new Grid(map_lines),

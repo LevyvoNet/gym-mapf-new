@@ -1,7 +1,7 @@
 //
 // Created by levyvonet on 21/10/2021.
 //
-#include <gym_mapf.h>
+#include <gym_mapf/gym_mapf.h>
 #include <iostream>
 #include <string>
 

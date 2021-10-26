@@ -6,7 +6,7 @@
 #define GYM_MAPF_MAPF_ENV_H
 
 #include <list>
-#include <grid/grid.h>
+#include <gym_mapf/grid/grid.h>
 
 using namespace std;
 

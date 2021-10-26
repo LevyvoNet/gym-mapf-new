@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <gym_mapf.h>
+#include <gym_mapf/gym_mapf.h>
 
 TEST(GridTests, ObstacleCellTest) {
     std::vector<std::string> map_lines{{'.', '.', '.'},

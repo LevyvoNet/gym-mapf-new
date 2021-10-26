@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-#include <gym_mapf.h>
+#include <gym_mapf/gym_mapf.h>
 
 #define REWARD_OF_COLLISION (-1000)
 #define REWARD_OF_GOAL (100)
