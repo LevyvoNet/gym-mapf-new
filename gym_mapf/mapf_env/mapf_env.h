@@ -173,7 +173,7 @@ private:
     /* Caches */
     std::unordered_map<MultiAgentState, std::unordered_map<MultiAgentAction, list < Transition * >*>>
     transition_cache;
-//    std::unordered_map<MultiAgentState, bool> is_terminal_cache;
+    std::unordered_map<MultiAgentState, bool> is_terminal_cache;
 
 public:
     const Grid *grid_ptr;
