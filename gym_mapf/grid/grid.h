@@ -23,13 +23,29 @@ public:
     Location(int row, int col);
 
     bool operator==(const Location &other_loc) const;
+
     bool operator!=(const Location &other_loc) const;
 
 };
 
-enum Action {
-    STAY, UP, RIGHT, DOWN, LEFT
+
+template<>
+class std::hash<Location> {
+public:
+    inline size_t operator()(const Location &l) const;
 };
+
+inline size_t std::hash<Location>::operator()(const Location &l) const {
+    return l.row ^ l.col;
+}
+
+
+enum Action {
+    STAY, UP, RIGHT, DOWN, LEFT, LAST_INVALID_ACTION
+};
+
+/* Forward declaration */
+class GridIterator;
 
 class Grid {
 private:
@@ -54,7 +70,33 @@ public:
 
 
     Location execute(const Location &l, Action a) const;
+
+    GridIterator begin() const;
+
+    GridIterator end() const;
 };
 
+
+class GridIterator {
+private:
+    Location *ptr;
+    const Grid *grid;
+
+public:
+
+    GridIterator(const Grid *grid);
+
+    GridIterator(const Grid *grid, Location *loc);
+
+    Location *operator->();
+
+    Location operator*() const;
+
+    GridIterator operator++();
+
+    bool operator==(const GridIterator &other) const;
+
+    bool operator!=(const GridIterator &other) const;
+};
 
 #endif //GYM_MAPF_GRID_H

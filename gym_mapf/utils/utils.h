@@ -9,8 +9,8 @@
 #include <string>
 #include <sstream>
 
-#include <mapf_env.h>
-#include <grid.h>
+#include <gym_mapf/mapf_env/mapf_env.h>
+#include <gym_mapf/grid/grid.h>
 
 std::vector<std::string> parse_map_file(string file_path);
 

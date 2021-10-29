@@ -8,7 +8,7 @@
 #include <map>
 #include <random>
 
-#include <mapf_env.h>
+#include <gym_mapf/mapf_env/mapf_env.h>
 #include <set>
 
 
@@ -27,6 +27,8 @@ Action g_action_noise_to_action[5][3] = {
         {DOWN,  LEFT,  RIGHT},
         {LEFT,  UP,    DOWN}
 };
+
+/** Transition ***********************************************************************************************/
 
 Transition::Transition(double p, MultiAgentState *next_state, int reward, bool done, bool is_collision) {
     this->p = p;
@@ -52,6 +54,8 @@ bool Transition::operator==(const Transition &other) const {
             (this->is_collision == other.is_collision));
 }
 
+/** MultiAgentState *************************************************************************************************/
+
 MultiAgentState::MultiAgentState(const vector<Location> &locations) {
     this->locations = locations;
 }
@@ -73,6 +77,108 @@ bool MultiAgentState::operator==(const MultiAgentState &other) const {
     return true;
 }
 
+
+/** MultiAgentStateIterator ****************************************************************************************/
+
+MultiAgentStateIterator::MultiAgentStateIterator(const Grid *grid, size_t n_agents) {
+    this->grid = grid;
+    this->n_agents = n_agents;
+    vector<Location> locs;
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        this->iters.push_back(this->grid->begin());
+        locs.push_back(*(this->iters[i]));
+    }
+
+
+    this->ptr = new MultiAgentState(locs);
+}
+
+MultiAgentState *MultiAgentStateIterator::operator->() const {
+    return this->ptr;
+}
+
+MultiAgentState MultiAgentStateIterator::operator*() const {
+    return *(this->ptr);
+}
+
+MultiAgentStateIterator MultiAgentStateIterator::operator++() {
+    size_t agent_idx = 0;
+    bool carry = false;
+
+    /* Increment the first agent, then handle the "carry" */
+
+    do {
+        ++(this->iters[agent_idx]);
+        if (this->iters[agent_idx] == this->grid->end()) {
+            this->iters[agent_idx] = this->grid->begin();
+            carry = true;
+        } else {
+            carry = false;
+        }
+
+        this->ptr->locations[agent_idx] = *(this->iters[agent_idx]);
+        agent_idx++;
+
+    } while ((agent_idx < this->n_agents) && carry);
+
+
+
+    /* Check if we are out because of reaching the last state. If so, return the end */
+    if (agent_idx == this->n_agents && carry) {
+        this->reach_end();
+    }
+
+    return *this;
+
+}
+
+bool MultiAgentStateIterator::operator==(const MultiAgentStateIterator &other) const {
+    size_t i = 0;
+
+    if (this->iters.size() != other.iters.size()) {
+        return false;
+    }
+
+    for (i = 0; i < this->iters.size(); ++i) {
+        if (this->iters[i] != other.iters[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MultiAgentStateIterator::operator!=(const MultiAgentStateIterator &other) const {
+    return !(*this == other);
+}
+
+void MultiAgentStateIterator::reach_end() {
+    size_t agent_idx = 0;
+
+    for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
+        this->iters[agent_idx] = this->grid->end();
+    }
+}
+
+/** MultiAgentStateSpace ***************************************************************************************/
+MultiAgentStateIterator MultiAgentStateSpace::begin() {
+    return MultiAgentStateIterator(this->grid, this->n_agents);
+}
+
+MultiAgentStateIterator MultiAgentStateSpace::end() {
+    MultiAgentStateIterator iter = MultiAgentStateIterator(this->grid, this->n_agents);
+    iter.reach_end();
+
+    return iter;
+}
+
+MultiAgentStateSpace::MultiAgentStateSpace(const Grid *grid, size_t n_agents) {
+    this->grid = grid;
+    this->n_agents = n_agents;
+}
+
+
+/** MultiAgentAction *********************************************************************************************/
 MultiAgentAction::MultiAgentAction(const vector<Action> &actions) {
     this->actions = actions;
 }
@@ -94,6 +200,96 @@ bool MultiAgentAction::operator==(const MultiAgentAction &other) const {
     return true;
 }
 
+/** MultiAgentActionIterator *************************************************************************************/
+MultiAgentActionIterator::MultiAgentActionIterator(size_t n_agents) {
+    this->n_agents = n_agents;
+    vector<Action> all_stay(n_agents);
+
+    for (size_t i = 0; i < n_agents; ++i) {
+        all_stay[i] = STAY;
+    }
+
+    this->ptr = new MultiAgentAction(all_stay);
+}
+
+void MultiAgentActionIterator::reach_end() {
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        this->ptr->actions[i] = LAST_INVALID_ACTION;
+    }
+}
+
+MultiAgentAction *MultiAgentActionIterator::operator->() const {
+    return this->ptr;
+}
+
+MultiAgentAction MultiAgentActionIterator::operator*() const {
+    return *(this->ptr);
+}
+
+MultiAgentActionIterator MultiAgentActionIterator::operator++() {
+    size_t agent_idx = 0;
+    bool carry = false;
+
+    /* Increment the first and handle the "carry" */
+    do {
+        carry = false;
+
+        this->ptr->actions[agent_idx] = (Action) (int(this->ptr->actions[agent_idx]) + 1);
+        if (this->ptr->actions[agent_idx] == LAST_INVALID_ACTION) {
+            this->ptr->actions[agent_idx] = STAY;
+            carry = true;
+        }
+
+        agent_idx++;
+
+
+    } while (carry && (agent_idx < this->n_agents));
+
+    if (agent_idx >= this->n_agents && carry) {
+        this->reach_end();
+    }
+
+    return *this;
+}
+
+bool MultiAgentActionIterator::operator==(const MultiAgentActionIterator &other) const {
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        if (this->ptr->actions[i] != other.ptr->actions[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool MultiAgentActionIterator::operator!=(const MultiAgentActionIterator &other) const {
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        if (this->ptr->actions[i] == other.ptr->actions[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+/** MultiAgentActionSpace ****************************************************************************************/
+MultiAgentActionSpace::MultiAgentActionSpace(size_t n_agents) {
+    this->n_agents = n_agents;
+}
+
+MultiAgentActionIterator MultiAgentActionSpace::begin() {
+    return MultiAgentActionIterator(this->n_agents);
+}
+
+MultiAgentActionIterator MultiAgentActionSpace::end() {
+    MultiAgentActionIterator iter = MultiAgentActionIterator(this->n_agents);
+    iter.reach_end();
+
+    return iter;
+}
+
+
+/** MapfEnv *****************************************************************************************************/
 
 MapfEnv::MapfEnv(const Grid *grid,
                  size_t n_agents,
@@ -115,8 +311,16 @@ MapfEnv::MapfEnv(const Grid *grid,
     this->reward_of_goal = goal_reward;
     this->reward_of_living = living_reward;
 
-    /* Initialize the env state to the starting one */
-    this->s = new MultiAgentState(start_state->locations);
+    /* Set the state and action spaces for the env */
+    this->observation_space = new MultiAgentStateSpace(this->grid_ptr, this->n_agents);
+    this->action_space = new MultiAgentActionSpace(this->n_agents);
+
+
+    /* Reset the env to its starting state */
+    this->reset();
+
+    /* TODO: delete me */
+    this->hits = 0;
 
 }
 
@@ -167,7 +371,7 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
 
 void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
                                      const MultiAgentState *next_state, int *reward, bool *done,
-                                     bool *is_collision) const {
+                                     bool *is_collision) const{
     *reward = 0;
     *done = false;
     *is_collision = false;
@@ -194,14 +398,19 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
     *is_collision = false;
 }
 
-bool MapfEnv::is_terminal_state(const MultiAgentState &state) const {
+bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     size_t i = 0;
     size_t j = 0;
+
+    if (this->is_terminal_cache.find(state) != this->is_terminal_cache.end()){
+        return this->is_terminal_cache[state];
+    }
 
     /* Collision between two agents */
     for (i = 0; i < this->n_agents; i++) {
         for (j = 0; j < this->n_agents; j++) {
             if ((i != j) && (state.locations[i] == state.locations[j])) {
+                this->is_terminal_cache[state] = true;
                 return true;
             }
         }
@@ -210,10 +419,12 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) const {
 
     /* Goal state */
     if (state == *this->goal_state) {
+        this->is_terminal_cache[state] = true;
         return true;
     }
 
     /* None of the conditions satisfied, this state is not terminal */
+    this->is_terminal_cache[state] = false;
     return false;
 }
 
@@ -235,6 +446,19 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     bool t_done = false;
     bool t_collision = false;
     size_t j = 0;
+
+    /* Try to fetch from cache */
+    if (this->transition_cache.find(state) != this->transition_cache.end()) {
+        if (this->transition_cache[state].find(action) != this->transition_cache[state].end()) {
+            this->hits++;
+            return this->transition_cache[state][action];
+        }
+    }
+
+    if (this->is_terminal_state(state)) {
+        transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations), 0, true, false));
+        return transitions;
+    }
 
     /* Initialize disruptions */
     for (i = 0; i < n_agents; ++i) {
@@ -281,17 +505,19 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
 
     }
 
+
+    this->transition_cache[state][action] = transitions;
     return transitions;
 }
 
-void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done) {
+void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done,
+                   bool *is_collision) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::discrete_distribution<> d({1 - this->fail_prob, this->fail_prob / 2, this->fail_prob / 2});
     int noise_idx = 0;
     Action noised_action = STAY;
     size_t agent_idx = 0;
-    bool collision = false;
 
     if (this->is_terminal_state(*this->s)) {
         *next_state = *this->s;
@@ -308,12 +534,18 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     }
 
     /* Set the reward and done */
-    this->calc_transition_reward(this->s, &action, next_state, reward, done, &collision);
+    this->calc_transition_reward(this->s, &action, next_state, reward, done, is_collision);
 
     /* Update the current state of the env */
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
         this->s->locations[agent_idx] = next_state->locations[agent_idx];
     }
+}
+
+MultiAgentState *MapfEnv::reset() {
+    this->s = new MultiAgentState(start_state->locations);
+
+    return this->s;
 }
 
 

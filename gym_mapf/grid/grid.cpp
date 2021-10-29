@@ -12,6 +12,90 @@ Cell::Cell(bool is_obstacle) {
 }
 
 
+/** GridIterator************************************************************/
+GridIterator::GridIterator(const Grid *grid) {
+    this->grid = grid;
+
+    /* 'Guess' the first valid location of the map, if it is not valid, increment to next valid one */
+    this->ptr = new Location(0, 0);
+
+    if ((this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) ||
+        (this->ptr->col >= this->grid->max_col) ||
+        (this->ptr->row >= this->grid->max_row)) {
+        ++(*this);
+    }
+}
+
+Location *GridIterator::operator->() {
+    return this->ptr;
+}
+
+Location GridIterator::operator*() const {
+    return *(this->ptr);
+}
+
+GridIterator GridIterator::operator++() {
+
+    /* Advance at least one time */
+    if (this->ptr->col < this->grid->max_col) {
+        this->ptr->col++;
+    } else {
+        this->ptr->col = 0;
+        this->ptr->row++;
+    }
+
+    /* If we have exhausted all of the locations, return the end */
+    if (this->ptr->row > this->grid->max_row) {
+       this->ptr = NULL;
+       return *this;
+    }
+
+    /* Keep advance until the next non-obstacle cell (a valid one) or until we reach the end of the grid */
+    while (this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) {
+
+        /* Advance again */
+        if (this->ptr->col < this->grid->max_col) {
+            this->ptr->col++;
+        } else {
+            this->ptr->col = 0;
+            this->ptr->row++;
+        }
+
+        /* Check again if we have reached the end of the grid */
+        if (this->ptr->row > this->grid->max_row) {
+            this->ptr = NULL;
+        }
+
+    }
+
+    return *this;
+
+}
+
+bool GridIterator::operator==(const GridIterator &other) const {
+    if (!(this->ptr)) {
+        if (!(other.ptr)) {
+            return this->grid == other.grid;
+        }
+    }
+
+    if (!other.ptr) {
+        return false;
+    }
+
+    return *(this->ptr) == *(other.ptr);
+}
+
+bool GridIterator::operator!=(const GridIterator &other) const {
+    return !((*this) == other);
+}
+
+GridIterator::GridIterator(const Grid *grid, Location *loc) {
+    this->grid = grid;
+    this->ptr = loc;
+}
+
+
 Grid::Grid(std::vector<std::string> &map_lines) {
     std::size_t i = 0;
     std::size_t j = 0;
@@ -90,6 +174,16 @@ Location Grid::_execute_left(const Location &l) const {
 }
 
 
+GridIterator Grid::begin() const {
+    return GridIterator(this);
+
+}
+
+GridIterator Grid::end() const {
+    return GridIterator(this, NULL);
+}
+
+
 bool Location::operator==(const Location &other_loc) const {
     return (this->row == other_loc.row) && (this->col == other_loc.col);
 }
@@ -102,3 +196,5 @@ Location::Location(int row, int col) {
 bool Location::operator!=(const Location &other_loc) const {
     return (this->row != other_loc.row) || (this->col != other_loc.col);
 }
+
+

@@ -18,9 +18,6 @@ enable_testing()
 
 include_directories(
         .
-        gym_mapf/grid
-        gym_mapf/mapf_env
-        gym_mapf/tests
 )
 
 add_library(gym_mapf SHARED
@@ -34,27 +31,40 @@ add_library(gym_mapf SHARED
         gym_mapf/utils/utils.cpp
         )
 
+add_library(gym_mapf_solvers SHARED
+        solvers/utils/policy/policy.h
+        solvers/utils/policy/policy.cpp
+        solvers/value_iteartion/value_iteration.h
+        solvers/value_iteartion/value_iteration.cpp
+        solvers/utils/value_table/value_table.h
+        solvers/utils/value_table/value_table.cpp
+        )
+
 add_executable(
         main
 
         main.cpp
+        gym_mapf/gym_mapf.h
+        solvers/value_iteartion/value_iteration.h
 )
 target_link_libraries(
         main
 
         $<TARGET_OBJECTS:gym_mapf>
+        $<TARGET_OBJECTS:gym_mapf_solvers>
 )
 
 # unit tests
 add_executable(
-        ut
+        gym_mapf_ut
 
+        gym_mapf/gym_mapf.h
         gym_mapf/tests/mapf_env_tests.cpp
         gym_mapf/tests/grid_test.cpp
         gym_mapf/tests/utils_tests.cpp
 )
 target_link_libraries(
-        ut
+        gym_mapf_ut
 
         gtest_main
         $<TARGET_OBJECTS:gym_mapf>
