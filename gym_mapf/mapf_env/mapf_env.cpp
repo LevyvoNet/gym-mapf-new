@@ -402,15 +402,15 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     size_t i = 0;
     size_t j = 0;
 
-    if (this->is_terminal_cache.find(state) != this->is_terminal_cache.end()){
-        return this->is_terminal_cache[state];
-    }
+//    if (this->is_terminal_cache.find(state) != this->is_terminal_cache.end()){
+//        return this->is_terminal_cache[state];
+//    }
 
     /* Collision between two agents */
     for (i = 0; i < this->n_agents; i++) {
         for (j = 0; j < this->n_agents; j++) {
             if ((i != j) && (state.locations[i] == state.locations[j])) {
-                this->is_terminal_cache[state] = true;
+//                this->is_terminal_cache[state] = true;
                 return true;
             }
         }
@@ -419,12 +419,12 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
     /* Goal state */
     if (state == *this->goal_state) {
-        this->is_terminal_cache[state] = true;
+//        this->is_terminal_cache[state] = true;
         return true;
     }
 
     /* None of the conditions satisfied, this state is not terminal */
-    this->is_terminal_cache[state] = false;
+//    this->is_terminal_cache[state] = false;
     return false;
 }
 
