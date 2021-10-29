@@ -8,14 +8,14 @@
 #include <solvers/value_iteartion/value_iteration.h>
 
 int main(int argc, char **argv) {
-    std::vector<std::string> asymmetrical_bottleneck{{'.', '.', '@', '.', '.', '.'},
-                                                     {'.', '.', '@', '.', '.', '.'},
-                                                     {'.', '.', '.', '.', '.', '.'},
-                                                     {'.', '.', '@', '.', '.', '.'},
-                                                     {'.', '.', '@', '.', '.', '.'}};
-    Grid g(asymmetrical_bottleneck);
-    MultiAgentState start_state = MultiAgentState({Location(2, 0), Location(2, 5)});
-    MultiAgentState goal_state = MultiAgentState({Location(2, 5), Location(2, 0)});
+    std::vector<std::string> symmetrical_bottleneck{{'.', '.', '@', '.', '.'},
+                                                    {'.', '.', '@', '.', '.'},
+                                                    {'.', '.', '.', '.', '.'},
+                                                    {'.', '.', '@', '.', '.'},
+                                                    {'.', '.', '@', '.', '.'}};
+    Grid g(symmetrical_bottleneck);
+    MultiAgentState start_state = MultiAgentState({Location(2, 0), Location(2, 4)});
+    MultiAgentState goal_state = MultiAgentState({Location(2, 4), Location(2, 0)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0.2, -1000, 100, -1);
 
