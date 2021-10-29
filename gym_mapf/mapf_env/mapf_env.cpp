@@ -352,10 +352,13 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
     return false;
 }
 
-int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) const {
+int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
     size_t agent_idx = 0;
     int living_reward = 0;
 
+    if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
+        return this->living_reward_cache[*prev_state][*action];
+    }
 
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
         if ((prev_state->locations[agent_idx] == this->goal_state->locations[agent_idx]) &&
@@ -365,6 +368,8 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
 
         living_reward += this->reward_of_living;
     }
+
+    this->living_reward_cache[*prev_state][*action] = living_reward;
     return living_reward;
 
 }
@@ -377,22 +382,12 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
     *is_collision = false;
     int living_reward = 0;
 
-    if (this->transition_outcome_cache[*prev_state][*action].find(*next_state) !=
-        transition_outcome_cache[*prev_state][*action].end()) {
-        TransitionOutcome *outcome = &(this->transition_outcome_cache[*prev_state][*action][*next_state]);
-        *reward = outcome->reward;
-        *done = outcome->done;
-        *is_collision = outcome->is_collision;
-        return;
-    }
-
     living_reward = this->calc_living_reward(prev_state, action);
 
     if (is_collision_transition(prev_state, next_state)) {
         *reward = living_reward + this->reward_of_collision;
         *done = true;
         *is_collision = true;
-        this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(*reward, true, true);
         return;
     }
 
@@ -400,11 +395,8 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
         *reward = living_reward + this->reward_of_goal;
         *done = true;
         *is_collision = false;
-        this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(*reward, true, false);
         return;
     }
-
-    this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(living_reward, false, false);
 
     *reward = living_reward;
     *done = false;
@@ -560,10 +552,3 @@ MultiAgentState *MapfEnv::reset() {
 
     return this->s;
 }
-
-
-TransitionOutcome::TransitionOutcome(int reward, bool done, bool is_collision) : reward(reward),
-                                                                                 done(done),
-                                                                                 is_collision(is_collision) {}
-
-TransitionOutcome::TransitionOutcome() : reward(0), done(false), is_collision(false) {}
