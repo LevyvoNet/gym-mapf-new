@@ -1,8 +1,8 @@
 on: push
-name: gym-mapf test
+name: tests
 jobs:
-  UT:
-    name: unit tests
+  gym_mapf_ut:
+    name: gym_mapf unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
@@ -10,7 +10,7 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
-      - run: ${{ runner.workspace }}/build/ut
+      - run: ${{ runner.workspace }}/build/gym_mapf_ut
 
   benchmark:
     name: benchmark
