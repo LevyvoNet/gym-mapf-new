@@ -356,9 +356,10 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
     size_t agent_idx = 0;
     int living_reward = 0;
 
-//    if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
-//        return this->living_reward_cache[*prev_state][*action];
-//    }
+    if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
+        this->hits++;
+        return this->living_reward_cache[*prev_state][*action];
+    }
 
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
         if ((prev_state->locations[agent_idx] == this->goal_state->locations[agent_idx]) &&
@@ -369,7 +370,7 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
         living_reward += this->reward_of_living;
     }
 
-//    this->living_reward_cache[*prev_state][*action] = living_reward;
+    this->living_reward_cache[*prev_state][*action] = living_reward;
     return living_reward;
 
 }
