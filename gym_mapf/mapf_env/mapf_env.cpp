@@ -371,11 +371,20 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
 
 void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
                                      const MultiAgentState *next_state, int *reward, bool *done,
-                                     bool *is_collision) const{
+                                     bool *is_collision) {
     *reward = 0;
     *done = false;
     *is_collision = false;
     int living_reward = 0;
+
+    if (this->transition_outcome_cache[*prev_state][*action].find(*next_state) !=
+        transition_outcome_cache[*prev_state][*action].end()) {
+        TransitionOutcome *outcome = &(this->transition_outcome_cache[*prev_state][*action][*next_state]);
+        *reward = outcome->reward;
+        *done = outcome->done;
+        *is_collision = outcome->is_collision;
+        return;
+    }
 
     living_reward = this->calc_living_reward(prev_state, action);
 
@@ -383,6 +392,7 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
         *reward = living_reward + this->reward_of_collision;
         *done = true;
         *is_collision = true;
+        this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(*reward, true, true);
         return;
     }
 
@@ -390,8 +400,11 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
         *reward = living_reward + this->reward_of_goal;
         *done = true;
         *is_collision = false;
+        this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(*reward, true, false);
         return;
     }
+
+    this->transition_outcome_cache[*prev_state][*action][*next_state] = TransitionOutcome(living_reward, false, false);
 
     *reward = living_reward;
     *done = false;
@@ -549,3 +562,8 @@ MultiAgentState *MapfEnv::reset() {
 }
 
 
+TransitionOutcome::TransitionOutcome(int reward, bool done, bool is_collision) : reward(reward),
+                                                                                 done(done),
+                                                                                 is_collision(is_collision) {}
+
+TransitionOutcome::TransitionOutcome() : reward(0), done(false), is_collision(false) {}

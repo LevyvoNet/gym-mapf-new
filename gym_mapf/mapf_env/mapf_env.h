@@ -163,10 +163,21 @@ public:
     bool operator==(const Transition &other) const;
 };
 
+class TransitionOutcome {
+public:
+    TransitionOutcome();
+    TransitionOutcome(int reward, bool done, bool is_collision);
+
+
+    int reward;
+    bool done;
+    bool is_collision;
+};
+
 class MapfEnv {
 private:
     void calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
-                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision) const;
+                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision);
 
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) const;
 
@@ -174,6 +185,7 @@ private:
     std::unordered_map<MultiAgentState, std::unordered_map<MultiAgentAction, list < Transition * > *>>
     transition_cache;
 //    std::unordered_map<MultiAgentState, bool> is_terminal_cache;
+    std::unordered_map<MultiAgentState, std::unordered_map<MultiAgentAction, std::unordered_map<MultiAgentState, TransitionOutcome>>> transition_outcome_cache;
 
 public:
     const Grid *grid_ptr;
