@@ -36,7 +36,7 @@ public:
 };
 
 inline size_t std::hash<Location>::operator()(const Location &l) const {
-    return l.row ^ l.col;
+    return l.row + l.col;
 }
 
 
