@@ -33,7 +33,7 @@ inline size_t hash<MultiAgentState>::operator()(const MultiAgentState &s) const 
     int i = 0;
 
     for (i = 0; i < s.locations.size(); i++) {
-        h += hash<Location>()(s.locations[i]);
+        h += i*(hash<Location>()(s.locations[i]));
     }
 
     return h;
@@ -98,7 +98,7 @@ public:
 size_t hash<MultiAgentAction>::operator()(const MultiAgentAction &a) const {
     size_t h = 0;
     for (size_t i = 0; i < a.actions.size(); ++i) {
-        h += a.actions[i];
+        h += i*(a.actions[i]);
     }
 
     return h;
@@ -173,7 +173,7 @@ private:
     /* Caches */
     std::unordered_map<MultiAgentState, std::unordered_map<MultiAgentAction, list < Transition * >*>>
     transition_cache;
-//    std::unordered_map<MultiAgentState, bool> is_terminal_cache;
+    std::unordered_map<MultiAgentState, bool> is_terminal_cache;
 
 public:
     const Grid *grid_ptr;
