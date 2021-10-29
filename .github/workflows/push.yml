@@ -12,10 +12,7 @@ jobs:
           build-type: Debug
       - run: ${{ runner.workspace }}/build/ut
 
-on: push
-name: gym-mapf benchmark
-jobs:
-  UT:
+  benchmark:
     name: benchmark
     runs-on: ubuntu-latest
     steps:
