@@ -17,7 +17,7 @@ void ValueIterationPolicy::train() {
     MultiAgentStateIterator s = this->env->observation_space->begin();
     MultiAgentActionIterator a = this->env->action_space->begin();
     double q_sa = 0;
-    double v_s = -std::numeric_limits<double>::min();
+    double v_s = -std::numeric_limits<double>::max();
     list<Transition *> *transitions = NULL;
     double max_diff = 0;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
@@ -31,14 +31,14 @@ void ValueIterationPolicy::train() {
         prev_v = new ValueTable(*(this->v));
         /* Update the value of current state */
         for (s = this->env->observation_space->begin(); s != this->env->observation_space->end(); ++s) {
-            v_s = -std::numeric_limits<double>::min();
+            v_s = -std::numeric_limits<double>::max();
             /* Calculate Q(s,a) and keep the maximum one */
             for (a = this->env->action_space->begin(); a != this->env->action_space->end(); ++a) {
                 q_sa = 0;
                 transitions = this->env->get_transitions(*s, *a);
                 for (Transition *t: *transitions) {
                     if (t->is_collision) {
-                        q_sa = -std::numeric_limits<double>::min();
+                        q_sa = -std::numeric_limits<double>::max();
                         break;
                     }
 
