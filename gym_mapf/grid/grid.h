@@ -75,7 +75,7 @@ public:
 };
 
 inline size_t std::hash<Location>::operator()(const Location &l) const {
-    return pow(2, l.row) + pow(3, l.col);
+    return hash<double>()(pow(2, l.row) + pow(3, l.col));
 }
 
 class GridIterator {
