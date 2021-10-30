@@ -16,7 +16,7 @@
 #define NO_DISRUPTION (0)
 #define CLOCKWISE (1)
 #define COUNTERCLOCKWISE (2)
-#define DISRUPTION_COUNT (3)
+#define INVALID_DISRUPTION (3)
 
 
 /** Globals ***************************************************************************************************/
@@ -291,7 +291,7 @@ MultiAgentActionIterator MultiAgentActionSpace::end() {
 
 /** MapfEnv *****************************************************************************************************/
 
-MapfEnv::MapfEnv(const Grid *grid,
+MapfEnv::MapfEnv(Grid *grid,
                  size_t n_agents,
                  const MultiAgentState *start_state,
                  const MultiAgentState *goal_state,
@@ -318,9 +318,6 @@ MapfEnv::MapfEnv(const Grid *grid,
 
     /* Reset the env to its starting state */
     this->reset();
-
-    /* TODO: delete me */
-    this->hits = 0;
 
 }
 
@@ -357,7 +354,6 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
     int living_reward = 0;
 
     if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
-        this->hits++;
         return this->living_reward_cache[*prev_state][*action];
     }
 
@@ -442,7 +438,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     unsigned int i = 0;
     size_t curr_agent_idx = 0;
     double curr_prob = 0;
-    unsigned long n_disruptions = (unsigned long) pow((double) DISRUPTION_COUNT, this->n_agents);
+    unsigned long n_disruptions = (unsigned long) pow((double) INVALID_DISRUPTION, this->n_agents);
     double disrupt_ratio = 0.5 * this->fail_prob / (1 - this->fail_prob);
     double normal_ratio = 2 * (1 - this->fail_prob) / this->fail_prob;
     /* TODO: make sure that this the default copy c'tor copies the underlying vector */
@@ -456,7 +452,6 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     /* Try to fetch from cache */
     if (this->transition_cache.find(state) != this->transition_cache.end()) {
         if (this->transition_cache[state].find(action) != this->transition_cache[state].end()) {
-            this->hits++;
             return this->transition_cache[state][action];
         }
     }
@@ -481,7 +476,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
             curr_prob *= disrupt_ratio;
         }
         disruptions[curr_agent_idx]++;
-        while (disruptions[curr_agent_idx] == 3) {
+        while (disruptions[curr_agent_idx] == INVALID_DISRUPTION) {
             disruptions[curr_agent_idx] = 0;
             t_action.actions[curr_agent_idx] = g_action_noise_to_action[action.actions[curr_agent_idx]][disruptions[curr_agent_idx]];
             curr_prob *= normal_ratio;

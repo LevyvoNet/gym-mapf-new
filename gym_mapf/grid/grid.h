@@ -7,6 +7,7 @@
 
 #include <vector>
 #include <string>
+#include <unordered_map>
 
 class Cell {
 public:
@@ -60,6 +61,9 @@ private:
 
     Location _execute_left(const Location &l) const;
 
+    /* Caches */
+
+    std::unordered_map<Location, std::unordered_map<Action, Location*> > movement_cache;
 
 public:
     std::vector<std::vector<Cell>> map;
@@ -69,7 +73,7 @@ public:
     Grid(std::vector<std::string> &map_lines);
 
 
-    Location execute(const Location &l, Action a) const;
+    Location execute(const Location &l, Action a);
 
     GridIterator begin() const;
 

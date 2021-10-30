@@ -10,8 +10,6 @@
 TEST(UtilsTests, EmptyGridCorrect) {
     MultiAgentState start({});
     MultiAgentState goal({});
-    char* cwd = new char[256];
-    getcwd(cwd, 256);
 
     /* Create the file path */
     std::string file_path = __FILE__;

@@ -17,7 +17,7 @@ int main(int argc, char **argv) {
 //    EvaluationInfo* eval_info = policy.evaluate(100, 1000, 0);
 
 
-    std::cout << "iterations: " << (*(train_info->additional_data))["n_iterations"] << " time: " << train_info->time
-              << " hits: " << env->hits << std::endl;
+    std::cout << "iterations: " << (*(train_info->additional_data))["n_iterations"]
+              << " time: " << train_info->time << std::endl;
 
 }

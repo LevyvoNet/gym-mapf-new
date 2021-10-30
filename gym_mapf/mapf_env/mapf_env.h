@@ -177,7 +177,7 @@ private:
     std::unordered_map<MultiAgentState, std::unordered_map<MultiAgentAction, int>> living_reward_cache;
 
 public:
-    const Grid *grid_ptr;
+    Grid *grid_ptr;
     size_t n_agents;
     const MultiAgentState *start_state;
     const MultiAgentState *goal_state;
@@ -188,9 +188,8 @@ public:
     MultiAgentState *s;
     MultiAgentStateSpace *observation_space;
     MultiAgentActionSpace *action_space;
-    uint64_t hits;
 
-    MapfEnv(const Grid *grid,
+    MapfEnv(Grid *grid,
             size_t n_agents,
             const MultiAgentState *start_state,
             const MultiAgentState *goal_state,

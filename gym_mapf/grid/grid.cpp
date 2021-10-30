@@ -46,8 +46,8 @@ GridIterator GridIterator::operator++() {
 
     /* If we have exhausted all of the locations, return the end */
     if (this->ptr->row > this->grid->max_row) {
-       this->ptr = NULL;
-       return *this;
+        this->ptr = NULL;
+        return *this;
     }
 
     /* Keep advance until the next non-obstacle cell (a valid one) or until we reach the end of the grid */
@@ -115,14 +115,19 @@ Grid::Grid(std::vector<std::string> &map_lines) {
 }
 
 
-Location Grid::execute(const Location &l, Action a) const {
-    Location new_loc{0, 0};
+Location Grid::execute(const Location &l, Action a) {
+    if (this->movement_cache[l].find(a) != this->movement_cache[l].end()) {
+        return *this->movement_cache[l][a];
+    }
 
-    new_loc = this->_execute_aux(l, a);
+    Location new_loc = this->_execute_aux(l, a);
     if (this->map[new_loc.row][new_loc.col].is_obstacle) {
+        this->movement_cache[l][a] = new Location( l.row,  l.col);
         return l;
     }
 
+
+    this->movement_cache[l][a] = new Location(new_loc.row, new_loc.col);
     return new_loc;
 }
 
@@ -188,10 +193,12 @@ bool Location::operator==(const Location &other_loc) const {
     return (this->row == other_loc.row) && (this->col == other_loc.col);
 }
 
+
 Location::Location(int row, int col) {
     this->row = row;
     this->col = col;
 }
+
 
 bool Location::operator!=(const Location &other_loc) const {
     return (this->row != other_loc.row) || (this->col != other_loc.col);
