@@ -8,6 +8,7 @@
 #include <vector>
 #include <string>
 #include <unordered_map>
+#include <cmath>
 
 class Cell {
 public:
@@ -30,15 +31,7 @@ public:
 };
 
 
-template<>
-class std::hash<Location> {
-public:
-    inline size_t operator()(const Location &l) const;
-};
 
-inline size_t std::hash<Location>::operator()(const Location &l) const {
-    return l.row * l.col + l.col;
-}
 
 
 enum Action {
@@ -61,9 +54,6 @@ private:
 
     Location _execute_left(const Location &l) const;
 
-    /* Caches */
-
-    std::unordered_map<Location, std::unordered_map<Action, Location*> > movement_cache;
 
 public:
     std::vector<std::vector<Cell>> map;
@@ -80,6 +70,16 @@ public:
     GridIterator end() const;
 };
 
+
+template<>
+class std::hash<Location> {
+public:
+    inline size_t operator()(const Location &l) const;
+};
+
+inline size_t std::hash<Location>::operator()(const Location &l) const {
+    return pow(2, l.row) + pow(3, l.col);
+}
 
 class GridIterator {
 private:
