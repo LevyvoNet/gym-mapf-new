@@ -8,15 +8,10 @@
 #include <list>
 #include <iterator>
 #include <unordered_map>
-#include <cmath>
 
 #include <gym_mapf/grid/grid.h>
 
 using namespace std;
-
-/** Consts ***********************************************************************************************************/
-#define N_PRIMES (25)
-
 
 class MultiAgentState {
 public:
@@ -34,12 +29,11 @@ public:
 };
 
 inline size_t hash<MultiAgentState>::operator()(const MultiAgentState &s) const {
-    uint8_t primes[]{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
     size_t h = 0;
     int i = 0;
 
     for (i = 0; i < s.locations.size(); i++) {
-        h += pow(primes[i % N_PRIMES], hash<Location>()(s.locations[i]));
+        h += i ^ hash<Location>()(s.locations[i]);
     }
 
     return h;
@@ -102,10 +96,9 @@ public:
 };
 
 size_t hash<MultiAgentAction>::operator()(const MultiAgentAction &a) const {
-    uint8_t primes[]{2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97};
     size_t h = 0;
     for (size_t i = 0; i < a.actions.size(); ++i) {
-        h += pow(primes[i % N_PRIMES], (int) a.actions[i]);
+        h += i ^ a.actions[i];
     }
 
     return h;
