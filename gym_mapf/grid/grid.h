@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <cmath>
 
+
 class Cell {
 public:
     bool is_obstacle;
@@ -29,10 +30,6 @@ public:
     bool operator!=(const Location &other_loc) const;
 
 };
-
-
-
-
 
 enum Action {
     STAY, UP, RIGHT, DOWN, LEFT, LAST_INVALID_ACTION
