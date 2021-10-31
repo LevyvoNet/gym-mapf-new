@@ -86,6 +86,7 @@ MapfEnv::MapfEnv(Grid *grid,
             this->n_agents, NULL);
     this->living_reward_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int> *>(this->n_agents,
                                                                                                         NULL);
+    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
 
     /* Reset the env to its starting state */
     this->reset();
@@ -123,11 +124,11 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
 int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
     size_t agent_idx = 0;
     int living_reward = 0;
-    std::unordered_map<MultiAgentAction, int>* cached_state = NULL;
+    std::unordered_map<MultiAgentAction, int> *cached_state = NULL;
 
     cached_state = this->living_reward_cache->get(*prev_state);
-    if (NULL!=cached_state){
-        if (cached_state->find(*action) != cached_state->end()){
+    if (NULL != cached_state) {
+        if (cached_state->find(*action) != cached_state->end()) {
             return (*cached_state)[*action];
         }
     } else {
@@ -182,16 +183,21 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
 bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     size_t i = 0;
     size_t j = 0;
+    bool *cached = NULL;
 
-//    if (this->is_terminal_cache.find(state) != this->is_terminal_cache.end()){
-//        return this->is_terminal_cache[state];
-//    }
+    cached = this->is_terminal_cache->get(state);
+    if (NULL != cached) {
+        return *cached;
+    }
+
+    cached = new bool[1];
 
     /* Collision between two agents */
     for (i = 0; i < this->n_agents; i++) {
         for (j = 0; j < this->n_agents; j++) {
             if ((i != j) && (state.locations[i] == state.locations[j])) {
-//                this->is_terminal_cache[state] = true;
+                *cached = true;
+                this->is_terminal_cache->set(state, cached);
                 return true;
             }
         }
@@ -200,12 +206,14 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
     /* Goal state */
     if (state == *this->goal_state) {
-//        this->is_terminal_cache[state] = true;
+        *cached = true;
+        this->is_terminal_cache->set(state, cached);
         return true;
     }
 
     /* None of the conditions satisfied, this state is not terminal */
-//    this->is_terminal_cache[state] = false;
+    *cached = false;
+    this->is_terminal_cache->set(state, cached);
     return false;
 }
 
@@ -238,7 +246,6 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
         cached_state = new std::unordered_map<MultiAgentAction, list<Transition *> *>();
         this->transition_cache->set(state, cached_state);
     }
-
 
 
     if (this->is_terminal_state(state)) {
