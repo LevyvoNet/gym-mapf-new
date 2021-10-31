@@ -8,7 +8,7 @@
 #include <solvers/value_iteartion/value_iteration.h>
 
 int main(int argc, char **argv) {
-    MapfEnv *env = create_mapf_env("empty-8-8", 1, 2, 0.2, -1000, 0, -1);
+    MapfEnv *env = create_mapf_env("empty-16-16", 1, 2, 0.2, -1000, 0, -1);
 
     ValueIterationPolicy policy = ValueIterationPolicy(env, 1.0, "vi");
 
@@ -16,7 +16,7 @@ int main(int argc, char **argv) {
     TrainInfo *train_info = policy.get_train_info();
     EvaluationInfo *eval_info = policy.evaluate(100, 1000, 0);
 
-
+]
     std::cout << "MDR:" << eval_info->mdr << " rate:" << eval_info->success_rate << " train_time:"
               << train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time << " solver:" << policy.name;
