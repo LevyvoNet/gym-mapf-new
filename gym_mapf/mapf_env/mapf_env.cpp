@@ -82,8 +82,8 @@ MapfEnv::MapfEnv(Grid *grid,
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
     /* Caches */
-    this->transition_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list<Transition *> *> *>(
-            this->n_agents, NULL);
+//    this->transition_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list<Transition *> *> *>(
+//            this->n_agents, NULL);
 //    this->living_reward_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
 //    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
@@ -237,16 +237,15 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     size_t j = 0;
 
     /* Try to fetch from cache */
-    std::unordered_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
-    if (NULL != cached_state) {
-        if (cached_state->find(action) != cached_state->end()) {
-            return (*cached_state)[action];
-        }
-    } else {
-        cached_state = new std::unordered_map<MultiAgentAction, list<Transition *> *>();
-        this->transition_cache->set(state, cached_state);
-    }
-
+//    std::unordered_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
+//    if (NULL != cached_state) {
+//        if (cached_state->find(action) != cached_state->end()) {
+//            return (*cached_state)[action];
+//        }
+//    } else {
+//        cached_state = new std::unordered_map<MultiAgentAction, list<Transition *> *>();
+//        this->transition_cache->set(state, cached_state);
+//    }
 
     if (this->is_terminal_state(state)) {
         transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations), 0, true, false));
@@ -298,7 +297,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
 
     }
 
-    (*cached_state)[action] = transitions;
+//    (*cached_state)[action] = transitions;
     return transitions;
 }
 

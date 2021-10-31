@@ -49,7 +49,7 @@ private:
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
 
     /* Caches */
-    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list < Transition * > *>*> *transition_cache;
+//    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list < Transition * > *>*> *transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
 //    MultiAgentStateStorage<bool*> *is_terminal_cache;
 
