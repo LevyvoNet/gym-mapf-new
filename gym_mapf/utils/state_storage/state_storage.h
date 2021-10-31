@@ -130,7 +130,7 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
 template<typename T>
 MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_value) {
     this->n_agents = n_agents;
-    this->default_value;
+    this->default_value = default_value;
     this->nested_hashmap = new std::unordered_map<Location, void *>();
 }
 
