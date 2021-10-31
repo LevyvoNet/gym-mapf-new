@@ -26,5 +26,21 @@ int main(int argc, char **argv) {
 
     std::cout << endl;
 
+    /* Just check out how much time it takes to iterate over the states */
+    MapfEnv *other_env = create_mapf_env("empty-8-8", 1, 2, 0.2, -1000, 0, -1);
 
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    MultiAgentStateIterator s = other_env->observation_space->begin();
+    MultiAgentActionIterator a = other_env->action_space->begin();
+    for (size_t i = 0; i < 28; ++i) {
+        for (s = other_env->observation_space->begin(); s != other_env->observation_space->end(); ++s) {
+            for (a = other_env->action_space->begin(); a != other_env->action_space->end(); ++a) {}
+        }
+    }
+
+    std::chrono::steady_clock::time_point end = std::chrono::steady_clock::now();
+    auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
+    float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
+    elapsed_time_seconds = round(elapsed_time_seconds * 100) / 100;
+    cout << "iterating took " << elapsed_time_seconds << " seconds"
 }
