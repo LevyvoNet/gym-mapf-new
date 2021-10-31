@@ -64,8 +64,6 @@ private:
 public:
     MultiAgentStateStorage(size_t n_agents, T default_value);
 
-//    MultiAgentStateStorage(const MultiAgentStateStorage<T> &other);
-
     void set(const MultiAgentState &s, T value);
 
     T get(const MultiAgentState &s);

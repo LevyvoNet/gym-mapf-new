@@ -9,7 +9,9 @@
 #define EPSILON (0.01)
 
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {
-    this->v = new ValueTable(0);
+    this->default_value = 0;
+
+    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, &this->default_value);
 }
 
 void ValueIterationPolicy::train() {
@@ -22,13 +24,16 @@ void ValueIterationPolicy::train() {
     double max_diff = 0;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end;
-    ValueTable *prev_v = NULL;
+    MultiAgentStateStorage<double *> *prev_v = NULL;
+    double curr_val;
+    double *new_value = NULL;
 
 
     for (i = 0; i < MAX_ITERATIONS; i++) {
         /* Perform a full iteration */
         max_diff = 0;
-        prev_v = new ValueTable(*(this->v));
+        prev_v = this->v;
+        this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, &this->default_value);
         /* Update the value of current state */
         for (s = this->env->observation_space->begin(); s != this->env->observation_space->end(); ++s) {
             v_s = -std::numeric_limits<double>::max();
@@ -42,7 +47,7 @@ void ValueIterationPolicy::train() {
                         break;
                     }
 
-                    q_sa += t->p * (t->reward + this->gamma * ((*prev_v)[*t->next_state]));
+                    q_sa += t->p * (t->reward + this->gamma * (*prev_v->get(*t->next_state)));
                 }
 
                 if (q_sa > v_s) {
@@ -51,10 +56,13 @@ void ValueIterationPolicy::train() {
             }
 
             /* Update the value table and the diff */
-            if (std::abs((*(this->v))[*s] - v_s) > max_diff) {
-                max_diff = std::abs((*(this->v))[*s] - v_s);
+            curr_val = *(this->v->get(*s));
+            if (std::abs(curr_val - v_s) > max_diff) {
+                max_diff = std::abs(curr_val - v_s);
             }
-            this->v->set(*s, v_s);
+            new_value = new double[1];
+            *new_value = v_s;
+            this->v->set(*s, new_value);
         }
 
         if (max_diff <= EPSILON) {
@@ -85,7 +93,7 @@ MultiAgentAction *ValueIterationPolicy::act(const MultiAgentState &state) {
                 break;
             }
 
-            q_sa += t->p * (t->reward + this->gamma * ((*this->v)[*t->next_state]));
+            q_sa += t->p * (t->reward + this->gamma * (*this->v->get(*t->next_state)));
         }
 
         if (q_sa > max_q) {
