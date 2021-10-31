@@ -27,8 +27,14 @@ add_library(gym_mapf SHARED
         gym_mapf/grid/grid.cpp
         gym_mapf/mapf_env/mapf_env.h
         gym_mapf/mapf_env/mapf_env.cpp
-        gym_mapf/utils/utils.h
-        gym_mapf/utils/utils.cpp
+        gym_mapf/utils/parsing/parsing_utils.h
+        gym_mapf/utils/parsing/parsing_utils.cpp
+        gym_mapf/multiagent_action/multiagent_action.h
+        gym_mapf/multiagent_action/multiagent_action.cpp
+        gym_mapf/multiagent_state/multiagent_state.h
+        gym_mapf/multiagent_state/multiagent_state.cpp
+        gym_mapf/utils/state_storage/state_storage.h
+        gym_mapf/utils/state_storage/state_storage.cpp
         )
 
 add_library(gym_mapf_solvers SHARED
@@ -36,8 +42,6 @@ add_library(gym_mapf_solvers SHARED
         solvers/utils/policy/policy.cpp
         solvers/value_iteartion/value_iteration.h
         solvers/value_iteartion/value_iteration.cpp
-        solvers/utils/value_table/value_table.h
-        solvers/utils/value_table/value_table.cpp
         )
 
 add_executable(

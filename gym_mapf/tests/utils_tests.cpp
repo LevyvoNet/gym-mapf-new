@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 
 #include <gym_mapf/gym_mapf.h>
-#include <gym_mapf/utils/utils.h>
+#include <gym_mapf/utils/parsing/parsing_utils.h>
 
 TEST(UtilsTests, EmptyGridCorrect) {
     MultiAgentState start({});

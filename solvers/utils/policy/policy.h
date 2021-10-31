@@ -34,9 +34,9 @@ public:
 class Policy {
 
 protected:
-    MapfEnv *env;
+
     float gamma;
-    std::string name;
+
     TrainInfo *train_info;
 
     void evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval_info);
@@ -46,6 +46,8 @@ protected:
     virtual void eval_episode_info_process();
 
 public:
+    std::string name;
+    MapfEnv *env;
 
     Policy(MapfEnv *env, float gamma, const std::string &name = "");
 

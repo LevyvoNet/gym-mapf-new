@@ -14,10 +14,18 @@ int main(int argc, char **argv) {
 
     policy.train();
     TrainInfo *train_info = policy.get_train_info();
-//    EvaluationInfo* eval_info = policy.evaluate(100, 1000, 0);
+    EvaluationInfo *eval_info = policy.evaluate(100, 1000, 0);
 
 
-    std::cout << "iterations: " << (*(train_info->additional_data))["n_iterations"]
-              << " time: " << train_info->time << std::endl;
+    std::cout << "MDR:" << eval_info->mdr << " rate:" << eval_info->success_rate << " train_time:"
+              << train_info->time;
+    std::cout << " exec_time:" << eval_info->mean_episode_time << " solver:" << policy.name;
+
+    for (auto item: *train_info->additional_data) {
+        std::cout << " " << item.first << ":" << item.second;
+    }
+
+    std::cout << endl;
+
 
 }

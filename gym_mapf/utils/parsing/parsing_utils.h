@@ -2,8 +2,8 @@
 // Created by levyvonet on 26/10/2021.
 //
 
-#ifndef GYM_MAPF_UTILS_H
-#define GYM_MAPF_UTILS_H
+#ifndef GYM_MAPF_PARSING_UTILS_H
+#define GYM_MAPF_PARSING_UTILS_H
 
 #include <fstream>
 #include <string>
@@ -27,4 +27,4 @@ MapfEnv* create_mapf_env(std::string map_name,
                          int goal_reward,
                          int living_reward);
 
-#endif //GYM_MAPF_UTILS_H
+#endif //GYM_MAPF_PARSING_UTILS_H

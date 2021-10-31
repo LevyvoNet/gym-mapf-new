@@ -9,8 +9,8 @@
 #include <chrono>
 #include <cmath>
 
+#include <gym_mapf/gym_mapf.h>
 #include <solvers/utils/policy/policy.h>
-#include <solvers/utils/value_table/value_table.h>
 
 class ValueIterationPolicy : public Policy {
 private:

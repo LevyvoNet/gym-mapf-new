@@ -2,7 +2,7 @@
 // Created by levyvonet on 26/10/2021.
 //
 
-#include "utils.h"
+#include "parsing_utils.h"
 
 std::vector<std::string> parse_map_file(string file_path) {
     std::string line;
@@ -26,7 +26,7 @@ std::string get_maps_dir() {
     std::string file_path = __FILE__;
     std::string dir_path = file_path.substr(0, file_path.find_last_of("/\\"));
     std::ostringstream maps_dir;
-    maps_dir << dir_path << "/../maps/";
+    maps_dir << dir_path << "/../../maps/";
 
     return maps_dir.str();
 }

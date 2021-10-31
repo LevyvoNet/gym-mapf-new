@@ -118,6 +118,9 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
         /* Calculate mean execution time */
         eval_info->mean_episode_time = time_sum / eval_info->episodes_rewards.size();
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
+
+        /* Calculate success rate */
+        eval_info->success_rate = round((float(eval_info->episodes_rewards.size())/float(n_episodes)) *100);
     }
 
 
