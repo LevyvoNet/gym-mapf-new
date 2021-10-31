@@ -79,11 +79,13 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
     d = this->nested_hashmap;
     size_t i = 0;
 
-    for (i = 0; i < this->n_agents - 2; ++i) {
-        if (d->find(s.locations[i]) == d->end()) {
-            (*d)[s.locations[i]] = new std::unordered_map<Location, void *>();
+    if (this->n_agents > 2) {
+        for (i = 0; i < this->n_agents - 2; ++i) {
+            if (d->find(s.locations[i]) == d->end()) {
+                (*d)[s.locations[i]] = new std::unordered_map<Location, void *>();
+            }
+            d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
         }
-        d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
     }
 
     /* The last one is different */
