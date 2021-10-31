@@ -71,7 +71,7 @@ void ValueIterationPolicy::train() {
     }
 
     /* Update the training time in train_info */
-    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i);
+    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i+1);
     end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
