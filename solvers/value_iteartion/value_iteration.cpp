@@ -56,7 +56,7 @@ void ValueIterationPolicy::train() {
             }
 
             /* Update the value table and the diff */
-            curr_val = *(this->v->get(*s));
+            curr_val = *(prev_v->get(*s));
             if (std::abs(curr_val - v_s) > max_diff) {
                 max_diff = std::abs(curr_val - v_s);
             }
@@ -71,7 +71,7 @@ void ValueIterationPolicy::train() {
     }
 
     /* Update the training time in train_info */
-    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i + 1);
+    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i);
     end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
