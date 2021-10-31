@@ -7,6 +7,8 @@
 #ifndef GYM_MAPF_STATE_STORAGE_H
 #define GYM_MAPF_STATE_STORAGE_H
 
+#include <unordered_map>
+
 #include <gym_mapf/multiagent_action/multiagent_action.h>
 #include <gym_mapf/multiagent_state/multiagent_state.h>
 
@@ -47,6 +49,88 @@ public:
 
     void set(const MultiAgentState &s, double value);
 };
+
+/**
+ * Each agent here has its own hash table which its key is the agents local state (Location)
+ * @tparam T
+ */
+template<typename T>
+class MultiAgentStateStorage {
+private:
+    size_t n_agents;
+    T default_value;
+    std::unordered_map<Location, void *> *nested_hashmap;
+
+public:
+    MultiAgentStateStorage(size_t n_agents, T default_value);
+
+//    MultiAgentStateStorage(const MultiAgentStateStorage<T> &other);
+
+    void set(const MultiAgentState &s, T value);
+
+    T get(const MultiAgentState &s);
+};
+
+
+template<typename T>
+void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
+    std::unordered_map<Location, void *> *d = NULL;
+    std::unordered_map<Location, T> *d_last = NULL;
+    d = this->nested_hashmap;
+    size_t i = 0;
+
+    for (i = 0; i < this->n_agents - 2; ++i) {
+        if (d->find(s.locations[i]) == d->end()) {
+            (*d)[s.locations[i]] = new std::unordered_map<Location, void *>();
+        }
+        d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
+    }
+
+    /* The last one is different */
+    if (d->find(s.locations[i]) == d->end()) {
+        (*d)[s.locations[i]] = new std::unordered_map<Location, T>();
+    }
+    d_last = (std::unordered_map<Location, T> *) ((*d)[s.locations[i]]);
+    ++i;
+
+    (*d_last)[s.locations[i]] = value;
+}
+
+template<typename T>
+T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
+    std::unordered_map<Location, void *> *d = NULL;
+    std::unordered_map<Location, T> *d_last = NULL;
+    d = this->nested_hashmap;
+    size_t i = 0;
+
+    for (i = 0; i < this->n_agents - 2; ++i) {
+        if (d->find(s.locations[i]) == d->end()) {
+            return this->default_value;
+        }
+        d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
+    }
+
+    /* The last one is different */
+    if (d->find(s.locations[i]) == d->end()) {
+        return this->default_value;
+    }
+    d_last = (std::unordered_map<Location, T> *) ((*d)[s.locations[i]]);
+    ++i;
+
+
+    if (d_last->find(s.locations[i]) == d_last->end()) {
+        return this->default_value;
+    }
+
+    return (*d_last)[s.locations[i]];
+}
+
+template<typename T>
+MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_value) {
+    this->n_agents = n_agents;
+    this->default_value;
+    this->nested_hashmap = new std::unordered_map<Location, void *>();
+}
 
 
 #endif //GYM_MAPF_STATE_STORAGE_H

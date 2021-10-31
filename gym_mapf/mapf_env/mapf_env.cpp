@@ -81,6 +81,11 @@ MapfEnv::MapfEnv(Grid *grid,
     this->observation_space = new MultiAgentStateSpace(this->grid_ptr, this->n_agents);
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
+    /* Caches */
+    this->transition_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list<Transition *> *> *>(
+            this->n_agents, NULL);
+    this->living_reward_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int> *>(this->n_agents,
+                                                                                                        NULL);
 
     /* Reset the env to its starting state */
     this->reset();
@@ -118,10 +123,21 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
 int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
     size_t agent_idx = 0;
     int living_reward = 0;
+    std::unordered_map<MultiAgentAction, int>* cached_state = NULL;
 
-    if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
-        return this->living_reward_cache[*prev_state][*action];
+    cached_state = this->living_reward_cache->get(*prev_state);
+    if (NULL!=cached_state){
+        if (cached_state->find(*action) != cached_state->end()){
+            return (*cached_state)[*action];
+        }
+    } else {
+        cached_state = new std::unordered_map<MultiAgentAction, int>();
+        this->living_reward_cache->set(*prev_state, cached_state);
     }
+
+//    if (this->living_reward_cache[*prev_state].find(*action) != this->living_reward_cache[*prev_state].end()) {
+//        return this->living_reward_cache[*prev_state][*action];
+//    }
 
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
         if ((prev_state->locations[agent_idx] == this->goal_state->locations[agent_idx]) &&
@@ -132,7 +148,8 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
         living_reward += this->reward_of_living;
     }
 
-    this->living_reward_cache[*prev_state][*action] = living_reward;
+    (*cached_state)[*action] = living_reward;
+//    this->living_reward_cache[*prev_state][*action] = living_reward;
     return living_reward;
 
 }
@@ -216,11 +233,21 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     size_t j = 0;
 
     /* Try to fetch from cache */
-    if (this->transition_cache.find(state) != this->transition_cache.end()) {
-        if (this->transition_cache[state].find(action) != this->transition_cache[state].end()) {
-            return this->transition_cache[state][action];
+    std::unordered_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
+    if (NULL != cached_state) {
+        if (cached_state->find(action) != cached_state->end()) {
+            return (*cached_state)[action];
         }
+    } else {
+        cached_state = new std::unordered_map<MultiAgentAction, list<Transition *> *>();
+        this->transition_cache->set(state, cached_state);
     }
+
+//    if (this->transition_cache.find(state) != this->transition_cache.end()) {
+//        if (this->transition_cache[state].find(action) != this->transition_cache[state].end()) {
+//            return this->transition_cache[state][action];
+//        }
+//    }
 
     if (this->is_terminal_state(state)) {
         transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations), 0, true, false));
@@ -272,8 +299,8 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
 
     }
 
-
-    this->transition_cache[state][action] = transitions;
+    (*cached_state)[action] = transitions;
+//    this->transition_cache[state][action] = transitions;
     return transitions;
 }
 
