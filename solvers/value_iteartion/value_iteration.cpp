@@ -5,7 +5,7 @@
 #include "value_iteration.h"
 
 /** Constants **************************************************************************************************/
-#define MAX_ITERATIONS (1000)
+#define MAX_ITERATIONS (40)
 #define EPSILON (0.01)
 
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {
