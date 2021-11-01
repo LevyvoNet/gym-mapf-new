@@ -5,12 +5,13 @@
 #include "value_iteration.h"
 
 /** Constants **************************************************************************************************/
-#define MAX_ITERATIONS (40)
+#define MAX_ITERATIONS (1000)
 #define EPSILON (0.01)
 
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {
     this->default_value = 0;
     this->v = new double[this->env->nS];
+    std::fill(this->v, this->v+this->env->nS, 0);
 }
 
 void ValueIterationPolicy::train() {
