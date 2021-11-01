@@ -8,7 +8,7 @@
 #include <solvers/value_iteartion/value_iteration.h>
 
 int main(int argc, char **argv) {
-    MapfEnv *env = create_mapf_env("empty-16-16", 1, 2, 0.2, -1000, 0, -1);
+    MapfEnv *env = create_mapf_env("empty-8-8", 1, 2, 0.2, -1000, 0, -1);
 
     ValueIterationPolicy policy = ValueIterationPolicy(env, 1.0, "vi");
 
