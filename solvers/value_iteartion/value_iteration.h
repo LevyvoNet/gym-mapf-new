@@ -14,8 +14,9 @@
 
 class ValueIterationPolicy : public Policy {
 private:
-    MultiAgentStateStorage<double*> *v;
+//    MultiAgentStateStorage<double*> *v;
     double default_value;
+    double *v;
 //    ValueTable *v;
 
 public:

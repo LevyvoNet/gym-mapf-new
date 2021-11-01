@@ -68,8 +68,8 @@ public:
     /* Constants */
     MultiAgentStateSpace *observation_space;
     MultiAgentActionSpace *action_space;
-    double nS;
-    double nA;
+    uint64_t nS;
+    uint64_t  nA;
 
     /* State */
     MultiAgentState *s;
