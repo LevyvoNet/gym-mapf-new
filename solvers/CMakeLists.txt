@@ -1,4 +1,4 @@
-include_directories(. .. ../gym_mapf)
+include_directories(. .. ../gym_mapf ../third-party/hopscotch-map/include)
 
 add_library(gym_mapf_solvers SHARED
         solvers.h

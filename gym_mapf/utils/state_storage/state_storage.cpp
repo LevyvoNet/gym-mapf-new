@@ -36,7 +36,7 @@ size_t hash<MultiAgentAction>::operator()(const MultiAgentAction &a) const {
 /** ValueTable *****************************************************************************************************/
 ValueTable::ValueTable(double default_value) {
     this->default_value = default_value;
-    this->v = new std::unordered_map<MultiAgentState, double>();
+    this->v = new tsl::hopscotch_map<MultiAgentState, double>();
 }
 
 double ValueTable::operator[](const MultiAgentState &s) {
@@ -53,7 +53,7 @@ void ValueTable::set(const MultiAgentState &s, double value) {
 
 ValueTable::ValueTable(const ValueTable &other) {
     this->default_value = other.default_value;
-    this->v = new std::unordered_map<MultiAgentState, double>();
+    this->v = new tsl::hopscotch_map<MultiAgentState, double>();
 
     for (const auto &entry: *other.v) {
         (*(this->v))[entry.first] = entry.second;

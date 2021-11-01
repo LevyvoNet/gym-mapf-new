@@ -12,6 +12,7 @@ enable_testing()
 
 include_directories(
         .
+        ../third-party/hopscotch-map/include
 )
 
 
@@ -48,6 +49,7 @@ target_link_libraries(
 
         gtest_main
         $<TARGET_OBJECTS:gym_mapf>
+        tsl::hopscotch_map
 )
 
 include(GoogleTest)

@@ -84,9 +84,9 @@ MapfEnv::MapfEnv(Grid *grid,
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
     /* Caches */
-    this->transition_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list<Transition *> *> *>(
+    this->transition_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, list<Transition *> *> *>(
             this->n_agents, NULL);
-//    this->living_reward_cache = new MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int> *>(this->n_agents,
+//    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
 //    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
 
@@ -126,7 +126,7 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
 int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
     size_t agent_idx = 0;
     int living_reward = 0;
-//    std::unordered_map<MultiAgentAction, int> *cached_state = NULL;
+//    tsl::hopscotch_map<MultiAgentAction, int> *cached_state = NULL;
 
 //    cached_state = this->living_reward_cache->get(*prev_state);
 //    if (NULL != cached_state) {
@@ -134,7 +134,7 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
 //            return (*cached_state)[*action];
 //        }
 //    } else {
-//        cached_state = new std::unordered_map<MultiAgentAction, int>();
+//        cached_state = new tsl::hopscotch_map<MultiAgentAction, int>();
 //        this->living_reward_cache->set(*prev_state, cached_state);
 //    }
 
@@ -239,13 +239,13 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     size_t j = 0;
 
     /* Try to fetch from cache */
-    std::unordered_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
+    tsl::hopscotch_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
     if (NULL != cached_state) {
         if (cached_state->find(action) != cached_state->end()) {
             return (*cached_state)[action];
         }
     } else {
-        cached_state = new std::unordered_map<MultiAgentAction, list<Transition *> *>();
+        cached_state = new tsl::hopscotch_map<MultiAgentAction, list<Transition *> *>();
         this->transition_cache->set(state, cached_state);
     }
 

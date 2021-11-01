@@ -7,7 +7,9 @@
 #ifndef GYM_MAPF_STATE_STORAGE_H
 #define GYM_MAPF_STATE_STORAGE_H
 
-#include <unordered_map>
+//#include <unordered_map>
+
+#include <tsl/hopscotch_map.h>
 
 #include <multiagent_action/multiagent_action.h>
 #include <multiagent_state/multiagent_state.h>
@@ -38,7 +40,7 @@ public:
 class ValueTable {
 private:
     double default_value;
-    std::unordered_map<MultiAgentState, double> *v;
+    tsl::hopscotch_map<MultiAgentState, double> *v;
 
 public:
     ValueTable(double default_value);
@@ -59,7 +61,7 @@ class MultiAgentStateStorage {
 private:
     size_t n_agents;
     T default_value;
-    std::unordered_map<Location, void *> *nested_hashmap;
+    tsl::hopscotch_map<Location, void *> *nested_hashmap;
 
 public:
     MultiAgentStateStorage(size_t n_agents, T default_value);
@@ -72,25 +74,25 @@ public:
 
 template<typename T>
 void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
-    std::unordered_map<Location, void *> *d = NULL;
-    std::unordered_map<Location, T> *d_last = NULL;
+    tsl::hopscotch_map<Location, void *> *d = NULL;
+    tsl::hopscotch_map<Location, T> *d_last = NULL;
     d = this->nested_hashmap;
     size_t i = 0;
 
     if (this->n_agents > 2) {
         for (i = 0; i < this->n_agents - 2; ++i) {
             if (d->find(s.locations[i]) == d->end()) {
-                (*d)[s.locations[i]] = new std::unordered_map<Location, void *>();
+                (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, void *>();
             }
-            d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
+            d = (tsl::hopscotch_map<Location, void *> *) ((*d)[s.locations[i]]);
         }
     }
 
     /* The last one is different */
     if (d->find(s.locations[i]) == d->end()) {
-        (*d)[s.locations[i]] = new std::unordered_map<Location, T>();
+        (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, T>();
     }
-    d_last = (std::unordered_map<Location, T> *) ((*d)[s.locations[i]]);
+    d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
     ++i;
 
     (*d_last)[s.locations[i]] = value;
@@ -98,8 +100,8 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
 
 template<typename T>
 T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
-    std::unordered_map<Location, void *> *d = NULL;
-    std::unordered_map<Location, T> *d_last = NULL;
+    tsl::hopscotch_map<Location, void *> *d = NULL;
+    tsl::hopscotch_map<Location, T> *d_last = NULL;
     d = this->nested_hashmap;
     size_t i = 0;
 
@@ -108,7 +110,7 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
             if (d->find(s.locations[i]) == d->end()) {
                 return this->default_value;
             }
-            d = (std::unordered_map<Location, void *> *) ((*d)[s.locations[i]]);
+            d = (tsl::hopscotch_map<Location, void *> *) ((*d)[s.locations[i]]);
         }
     }
 
@@ -116,7 +118,7 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
     if (d->find(s.locations[i]) == d->end()) {
         return this->default_value;
     }
-    d_last = (std::unordered_map<Location, T> *) ((*d)[s.locations[i]]);
+    d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
     ++i;
 
 
@@ -131,7 +133,7 @@ template<typename T>
 MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_value) {
     this->n_agents = n_agents;
     this->default_value = default_value;
-    this->nested_hashmap = new std::unordered_map<Location, void *>();
+    this->nested_hashmap = new tsl::hopscotch_map<Location, void *>();
 }
 
 
