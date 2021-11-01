@@ -7,7 +7,7 @@
 /** Hash functions implementations *******************************************************************************/
 size_t std::hash<Location>::operator()(const Location &l) const {
 //    return pow(2, l.row) + pow(3, l.col);
-    return std::hash<int64_t>()((long) l.id);
+    return std::hash<int64_t>()(l.id);
 }
 
 size_t hash<MultiAgentState>::operator()(const MultiAgentState &s) const {
@@ -19,7 +19,7 @@ size_t hash<MultiAgentState>::operator()(const MultiAgentState &s) const {
 //    }
 //
 //    return h;
-    return std::hash<int64_t>()((long) s.id);
+    return std::hash<int64_t>()(s.id);
 }
 
 size_t hash<MultiAgentAction>::operator()(const MultiAgentAction &a) const {
@@ -29,7 +29,7 @@ size_t hash<MultiAgentAction>::operator()(const MultiAgentAction &a) const {
 //    }
 //
 //    return h;
-    return std::hash<int64_t>()((long) a.id);
+    return std::hash<int64_t>()(a.id);
 }
 
 
