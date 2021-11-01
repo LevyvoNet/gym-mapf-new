@@ -40,7 +40,7 @@ Transition::Transition(double p, MultiAgentState *next_state, int reward, bool d
 
 Transition::Transition(double p, const MultiAgentState &next_state, int reward, bool done, bool is_collision) {
     this->p = p;
-    this->next_state = new MultiAgentState(next_state.locations);
+    this->next_state = new MultiAgentState(next_state.locations, next_state.id);
     this->reward = reward;
     this->done = done;
     this->is_collision = is_collision;
@@ -59,8 +59,8 @@ bool Transition::operator==(const Transition &other) const {
 
 MapfEnv::MapfEnv(Grid *grid,
                  size_t n_agents,
-                 const MultiAgentState *start_state,
-                 const MultiAgentState *goal_state,
+                 const vector<Location> &start_locations,
+                 const vector<Location> &goal_locations,
                  float fail_prob,
                  int collision_reward,
                  int goal_reward,
@@ -68,17 +68,19 @@ MapfEnv::MapfEnv(Grid *grid,
     size_t agent_idx = 0;
 
     /* Copy constant fields */
-    this->grid_ptr = grid;
+    this->grid = grid;
     this->n_agents = n_agents;
-    this->start_state = new MultiAgentState(start_state->locations);
-    this->goal_state = new MultiAgentState(goal_state->locations);
+    this->start_state = this->locations_to_state(start_locations);
+    this->goal_state = this->locations_to_state(goal_locations);
     this->fail_prob = fail_prob;
     this->reward_of_collision = collision_reward;
     this->reward_of_goal = goal_reward;
     this->reward_of_living = living_reward;
 
     /* Set the state and action spaces for the env */
-    this->observation_space = new MultiAgentStateSpace(this->grid_ptr, this->n_agents);
+    this->nS = pow(this->grid->id_to_loc.size(), this->n_agents);
+    this->nA = pow(ACTIONS_COUNT, this->n_agents);
+    this->observation_space = new MultiAgentStateSpace(this->grid, this->n_agents);
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
     /* Caches */
@@ -249,7 +251,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
 
 
     if (this->is_terminal_state(state)) {
-        transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations), 0, true, false));
+        transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
         return transitions;
     }
 
@@ -286,8 +288,9 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
         /* TODO: do it as part of the previous loops instead of nesting another loop */
         /* Execute the whole action */
         for (j = 0; j < this->n_agents; ++j) {
-            t_state->locations[j] = this->grid_ptr->execute(state.locations[j], t_action.actions[j]);
+            t_state->locations[j] = this->grid->execute(state.locations[j], t_action.actions[j]);
         }
+        t_state->id = this->locations_to_state(t_state->locations)->id;
 
         /* We have the probability and the disrupted action, calculate the next state and reward from it */
         this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision);
@@ -322,20 +325,75 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
         noise_idx = d(gen);
         noised_action = g_action_noise_to_action[action.actions[agent_idx]][noise_idx];
-        next_state->locations[agent_idx] = this->grid_ptr->execute(this->s->locations[agent_idx], noised_action);
+        next_state->locations[agent_idx] = this->grid->execute(this->s->locations[agent_idx], noised_action);
     }
+    next_state->id = this->locations_to_state(next_state->locations)->id;
 
     /* Set the reward and done */
     this->calc_transition_reward(this->s, &action, next_state, reward, done, is_collision);
 
     /* Update the current state of the env */
-    for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
-        this->s->locations[agent_idx] = next_state->locations[agent_idx];
-    }
+    this->s = this->locations_to_state(next_state->locations);
 }
 
 MultiAgentState *MapfEnv::reset() {
-    this->s = new MultiAgentState(start_state->locations);
+    this->s = new MultiAgentState(start_state->locations, start_state->id);
 
     return this->s;
+}
+
+MultiAgentState *MapfEnv::locations_to_state(const vector<Location> &locations) {
+    int mul = 1;
+    int sum = 0;
+    int n_options = this->grid->id_to_loc.size();
+
+    sum += locations[0].id * mul;
+
+    for (size_t i = 1; i < locations.size(); ++i) {
+        mul *= n_options;
+        sum += locations[i].id * mul;
+    }
+
+    return new MultiAgentState(locations, sum);
+}
+
+MultiAgentAction *MapfEnv::actions_to_action(const vector<Action> &actions) {
+    int mul = 1;
+    int sum = 0;
+    int n_options = ACTIONS_COUNT;
+
+    sum += actions[0] * mul;
+
+    for (size_t i = 1; i < actions.size(); ++i) {
+        mul *= n_options;
+        sum += actions[i] * mul;
+    }
+
+    return new MultiAgentAction(actions, sum);
+}
+
+MultiAgentState *MapfEnv::id_to_state(int64_t id) {
+    int orig_id = id;
+    vector<Location> locations;
+    int n_options = this->grid->id_to_loc.size();
+
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        locations.push_back(*this->grid->id_to_loc[id % n_options]);
+        id /= n_options;
+    }
+
+    return new MultiAgentState(locations, orig_id);
+}
+
+MultiAgentAction *MapfEnv::id_to_action(int64_t id) {
+    int orig_id = id;
+    vector<Action> actions;
+    int n_options = ACTIONS_COUNT;
+
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        actions.push_back((Action) (id % n_options));
+        id /= n_options;
+    }
+
+    return new MultiAgentAction(actions, orig_id);
 }

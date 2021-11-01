@@ -11,6 +11,7 @@
 #include <cmath>
 
 #define ILLEGAL_LOCATION (-1)
+#define ACTIONS_COUNT (5)
 
 class Cell {
 public:
@@ -34,7 +35,12 @@ public:
 };
 
 enum Action {
-    STAY, UP, RIGHT, DOWN, LEFT, LAST_INVALID_ACTION
+    STAY = 0,
+    UP = 1,
+    RIGHT = 2,
+    DOWN = 3,
+    LEFT = 4,
+    LAST_INVALID_ACTION = 5
 };
 
 /* Forward declaration */

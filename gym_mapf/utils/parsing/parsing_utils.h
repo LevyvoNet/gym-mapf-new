@@ -12,15 +12,10 @@
 #include <mapf_env/mapf_env.h>
 #include <grid/grid.h>
 
-/** Constants ************************************************************************************/
-#define DONT_CARE_ID (99999)
-
 std::vector<std::string> parse_map_file(string file_path);
 
-void parse_scen_file(string file_path,
-                     size_t n_agents,
-                     MultiAgentState *start_state,
-                     MultiAgentState *goal_state);
+void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<Location> *start_locations,
+                     vector<Location> *goal_locations);
 
 MapfEnv* create_mapf_env(std::string map_name,
                          size_t scen_id,

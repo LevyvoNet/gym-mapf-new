@@ -5,25 +5,27 @@
 #include "multiagent_action.h"
 
 /** MultiAgentAction *********************************************************************************************/
-MultiAgentAction::MultiAgentAction(const vector<Action> &actions) {
+MultiAgentAction::MultiAgentAction(const vector<Action> &actions, int64_t id) {
     this->actions = actions;
+    this->id = id;
 }
 
 bool MultiAgentAction::operator==(const MultiAgentAction &other) const {
-    size_t agent_idx = 0;
-
-    if (this->actions.size() != other.actions.size()) {
-        return false;
-    }
-
-    for (agent_idx = 0; agent_idx < this->actions.size(); ++agent_idx) {
-
-        if (this->actions[agent_idx] != other.actions[agent_idx]) {
-            return false;
-        }
-    }
-
-    return true;
+//    size_t agent_idx = 0;
+//
+//    if (this->actions.size() != other.actions.size()) {
+//        return false;
+//    }
+//
+//    for (agent_idx = 0; agent_idx < this->actions.size(); ++agent_idx) {
+//
+//        if (this->actions[agent_idx] != other.actions[agent_idx]) {
+//            return false;
+//        }
+//    }
+//
+//    return true;
+return this->id == other.id;
 }
 
 /** MultiAgentActionIterator *************************************************************************************/
@@ -35,7 +37,7 @@ MultiAgentActionIterator::MultiAgentActionIterator(size_t n_agents) {
         all_stay[i] = STAY;
     }
 
-    this->ptr = new MultiAgentAction(all_stay);
+    this->ptr = new MultiAgentAction(all_stay, 0);
 }
 
 void MultiAgentActionIterator::reach_end() {
@@ -75,6 +77,7 @@ MultiAgentActionIterator MultiAgentActionIterator::operator++() {
         this->reach_end();
     }
 
+    this->ptr->id++;
     return *this;
 }
 

@@ -45,12 +45,12 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
     for (size_t i = 0; i < this->env->n_agents; ++i) {
         all_stay_vector[i] = STAY;
     }
-    MultiAgentAction all_stay(all_stay_vector);
+    MultiAgentAction all_stay(all_stay_vector, 0);
     std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end;
     size_t steps = 0;
     int episode_reward = 0;
-    MultiAgentState next_state(this->env->start_state->locations);
+    MultiAgentState next_state(this->env->start_state->locations, -1);
     int reward = 0;
     bool done = false;
     bool is_collision = false;

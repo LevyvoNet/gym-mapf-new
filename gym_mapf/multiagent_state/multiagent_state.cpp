@@ -7,25 +7,27 @@
 
 /** MultiAgentState *************************************************************************************************/
 
-MultiAgentState::MultiAgentState(const vector<Location> &locations) {
+MultiAgentState::MultiAgentState(const vector<Location> &locations, int64_t id) {
     this->locations = locations;
+    this->id = id;
 }
 
 bool MultiAgentState::operator==(const MultiAgentState &other) const {
-    size_t agent_idx = 0;
-
-    if (this->locations.size() != other.locations.size()) {
-        return false;
-    }
-
-    for (agent_idx = 0; agent_idx < this->locations.size(); ++agent_idx) {
-
-        if (this->locations[agent_idx] != other.locations[agent_idx]) {
-            return false;
-        }
-    }
-
-    return true;
+//    size_t agent_idx = 0;
+//
+//    if (this->locations.size() != other.locations.size()) {
+//        return false;
+//    }
+//
+//    for (agent_idx = 0; agent_idx < this->locations.size(); ++agent_idx) {
+//
+//        if (this->locations[agent_idx] != other.locations[agent_idx]) {
+//            return false;
+//        }
+//    }
+//
+//    return true;
+    return this->id == other.id;
 }
 
 
@@ -41,7 +43,7 @@ MultiAgentStateIterator::MultiAgentStateIterator(const Grid *grid, size_t n_agen
     }
 
 
-    this->ptr = new MultiAgentState(locs);
+    this->ptr = new MultiAgentState(locs, 0);
 }
 
 MultiAgentState *MultiAgentStateIterator::operator->() const {
@@ -78,6 +80,8 @@ MultiAgentStateIterator MultiAgentStateIterator::operator++() {
     if (agent_idx == this->n_agents && carry) {
         this->reach_end();
     }
+
+    this->ptr->id++;
 
     return *this;
 

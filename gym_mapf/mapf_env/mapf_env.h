@@ -49,27 +49,35 @@ private:
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
 
     /* Caches */
-    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list < Transition * > *>*> *transition_cache;
+    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, list < Transition * > *>*> *
+    transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
 //    MultiAgentStateStorage<bool*> *is_terminal_cache;
 
 public:
-    Grid *grid_ptr;
+    /* Parameters */
+    Grid *grid;
     size_t n_agents;
-    const MultiAgentState *start_state;
-    const MultiAgentState *goal_state;
+    MultiAgentState *start_state;
+    MultiAgentState *goal_state;
     float fail_prob;
     int reward_of_collision;
     int reward_of_goal;
     int reward_of_living;
-    MultiAgentState *s;
+
+    /* Constants */
     MultiAgentStateSpace *observation_space;
     MultiAgentActionSpace *action_space;
+    double nS;
+    double nA;
+
+    /* State */
+    MultiAgentState *s;
 
     MapfEnv(Grid *grid,
             size_t n_agents,
-            const MultiAgentState *start_state,
-            const MultiAgentState *goal_state,
+            const vector<Location> &start_locations,
+            const vector<Location> &goal_locations,
             float fail_prob,
             int collision_reward,
             int goal_reward,
@@ -82,6 +90,16 @@ public:
     bool is_terminal_state(const MultiAgentState &state);
 
     MultiAgentState *reset();
+
+    /* Conversions between integers and vectors */
+
+    MultiAgentState * locations_to_state(const vector<Location> &locations);
+
+    MultiAgentAction * actions_to_action(const vector<Action> &actions);
+
+    MultiAgentState *id_to_state(int64_t id);
+
+    MultiAgentAction *id_to_action(int64_t id);
 };
 
 #endif //GYM_MAPF_MAPF_ENV_H

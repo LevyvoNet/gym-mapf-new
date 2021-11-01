@@ -11,9 +11,11 @@ using namespace std;
 
 class MultiAgentAction {
 public:
+    /* TODO: make this a pointer */
     vector<Action> actions;
+    int64_t id;
 
-    MultiAgentAction(const vector<Action> &actions);
+    MultiAgentAction(const vector<Action> &actions, int64_t id);
 
     bool operator==(const MultiAgentAction &other) const;
 

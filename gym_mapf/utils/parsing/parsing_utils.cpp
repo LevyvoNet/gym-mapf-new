@@ -31,12 +31,8 @@ std::string get_maps_dir() {
     return maps_dir.str();
 }
 
-void parse_scen_file(std::string file_path,
-                     size_t n_agents,
-                     MultiAgentState *start_state,
-                     MultiAgentState *goal_state) {
-    std::vector<Location> start_locations;
-    std::vector<Location> goal_locations;
+void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<Location> *start_locations,
+                     vector<Location> *goal_locations) {
     std::ifstream infile(file_path);
     std::string line;
     std::string start_row;
@@ -47,8 +43,6 @@ void parse_scen_file(std::string file_path,
     size_t i = 0;
     size_t j = 0;
     size_t pos = 0;
-    Location start_loc(0, 0,DONT_CARE_ID);
-    Location goal_loc(0, 0, DONT_CARE_ID);
 
     /* Dump the first line */
     std::getline(infile, line);
@@ -83,11 +77,11 @@ void parse_scen_file(std::string file_path,
         goal_col = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
-        start_loc = Location(std::stoi(start_row), std::stoi(start_col), DONT_CARE_ID);
-        goal_loc = Location(std::stoi(goal_row), std::stoi(goal_col), DONT_CARE_ID);
+        Location start_loc = grid->get_location(std::stoi(start_row), std::stoi(start_col));
+        Location goal_loc = grid->get_location(std::stoi(goal_row), std::stoi(goal_col));
 
-        start_state->locations.push_back(start_loc);
-        goal_state->locations.push_back(goal_loc);
+        start_locations->push_back(start_loc);
+        goal_locations->push_back(goal_loc);
     }
 }
 
@@ -102,18 +96,20 @@ MapfEnv *create_mapf_env(std::string map_name,
     std::ostringstream map_file_string_stream;
     map_file_string_stream << get_maps_dir() << "/" << map_name << "/" << map_name << ".map";
     std::vector<std::string> map_lines = parse_map_file(map_file_string_stream.str());
+    Grid *grid = new Grid(map_lines);
 
     /* Create the start and goal states */
-    MultiAgentState start_state({});
-    MultiAgentState goal_state({});
+    vector<Location> start_locations;
+    vector<Location> goal_locations;
     std::ostringstream scen_file_string_stream;
     scen_file_string_stream << get_maps_dir() << "/" << map_name << "/" << map_name << "-even-" << scen_id << ".scen";
-    parse_scen_file(scen_file_string_stream.str(), n_agents, &start_state, &goal_state);
+    parse_scen_file(scen_file_string_stream.str(), n_agents, grid, &start_locations, &goal_locations);
 
-    return new MapfEnv(new Grid(map_lines),
+
+    return new MapfEnv(grid,
                        n_agents,
-                       &start_state,
-                       &goal_state,
+                       start_locations,
+                       goal_locations,
                        fail_prob,
                        collision_reward,
                        goal_reward,

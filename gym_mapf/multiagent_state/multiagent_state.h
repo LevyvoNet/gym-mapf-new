@@ -12,12 +12,16 @@ using namespace std;
 
 class MultiAgentState {
 public:
+    /* TODO: make this a pointer */
     vector<Location> locations;
+    int64_t id;
 
-    MultiAgentState(const vector<Location> &locations);
+    MultiAgentState(const vector<Location> &locations, int64_t id);
 
     bool operator==(const MultiAgentState &other) const;
 };
+
+
 class MultiAgentStateIterator {
 private:
     MultiAgentState *ptr;

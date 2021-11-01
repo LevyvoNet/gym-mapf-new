@@ -81,7 +81,7 @@ void ValueIterationPolicy::train() {
 MultiAgentAction *ValueIterationPolicy::act(const MultiAgentState &state) {
     double q_sa = 0;
     list<Transition *> *transitions = NULL;
-    MultiAgentAction best_action({STAY, STAY});
+    MultiAgentAction* best_action=NULL;
     double max_q = -std::numeric_limits<double>::max();
 
     for (MultiAgentActionIterator a = this->env->action_space->begin(); a != this->env->action_space->end(); ++a) {
@@ -97,12 +97,13 @@ MultiAgentAction *ValueIterationPolicy::act(const MultiAgentState &state) {
         }
 
         if (q_sa > max_q) {
-            best_action = *a;
+            /* TODO: this copies the actions, make everything a pointer */
+            best_action = new MultiAgentAction(a->actions, a->id);
             max_q = q_sa;
         }
     }
 
-    return new MultiAgentAction(best_action.actions);
+    return best_action;
 }
 
 TrainInfo *ValueIterationPolicy::get_train_info() {
