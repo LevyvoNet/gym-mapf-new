@@ -37,7 +37,11 @@ int main(int argc, char **argv) {
     sstream >> n_iters;
     for (size_t i = 0; i < n_iters; ++i) {
         for (s = other_env->observation_space->begin(); s != other_env->observation_space->end(); ++s) {
-            for (a = other_env->action_space->begin(); a != other_env->action_space->end(); ++a) {}
+            for (a = other_env->action_space->begin(); a != other_env->action_space->end(); ++a) {
+                for (Transition *t: *other_env->get_transitions(*s, *a)) {
+                    
+                }
+            }
         }
     }
 
