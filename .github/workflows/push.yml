@@ -10,7 +10,7 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
-      - run: ${{ runner.workspace }}/build/gym_mapf_ut
+      - run: ${{ runner.workspace }}/build/gym_mapf/gym_mapf_ut
 
   benchmark:
     name: benchmark
