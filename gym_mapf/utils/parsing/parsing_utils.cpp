@@ -47,8 +47,8 @@ void parse_scen_file(std::string file_path,
     size_t i = 0;
     size_t j = 0;
     size_t pos = 0;
-    Location start_loc(0, 0);
-    Location goal_loc(0, 0);
+    Location start_loc(0, 0,DONT_CARE_ID);
+    Location goal_loc(0, 0, DONT_CARE_ID);
 
     /* Dump the first line */
     std::getline(infile, line);
@@ -83,8 +83,8 @@ void parse_scen_file(std::string file_path,
         goal_col = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
-        start_loc = Location(std::stoi(start_row), std::stoi(start_col));
-        goal_loc = Location(std::stoi(goal_row), std::stoi(goal_col));
+        start_loc = Location(std::stoi(start_row), std::stoi(start_col), DONT_CARE_ID);
+        goal_loc = Location(std::stoi(goal_row), std::stoi(goal_col), DONT_CARE_ID);
 
         start_state->locations.push_back(start_loc);
         goal_state->locations.push_back(goal_loc);

@@ -5,7 +5,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-#include <gym_mapf/gym_mapf.h>
+#include <gym_mapf.h>
 
 #define REWARD_OF_COLLISION (-1000)
 #define REWARD_OF_GOAL (100)
@@ -54,8 +54,8 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
                                        {'.', '.', '.', '.', '.', '.', '.', '.'},
                                        {'.', '.', '.', '.', '.', '.', '.', '.'}};
     Grid g(empty_8_8);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(7, 7)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 2), Location(5, 7)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(7, 7)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 2), g.get_location(5, 7)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
     MultiAgentAction action({RIGHT, UP});
@@ -65,31 +65,31 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
     list<Transition *> expected_transitions(
             {
                     new Transition(0.64,
-                                   MultiAgentState({Location(0, 1), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(6, 7)}),
                                    -1, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(1, 0), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(1, 0), g.get_location(6, 7)}),
                                    -1, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 0), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(0, 0), g.get_location(6, 7)}),
                                    -1, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 1), Location(7, 7)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(7, 7)}),
                                    -1, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 1), Location(7, 6)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(7, 6)}),
                                    -1, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(1, 0), Location(7, 7)}),
+                                   MultiAgentState({g.get_location(1, 0), g.get_location(7, 7)}),
                                    -1, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(1, 0), Location(7, 6)}),
+                                   MultiAgentState({g.get_location(1, 0), g.get_location(7, 6)}),
                                    -1, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(0, 0), Location(7, 7)}),
+                                   MultiAgentState({g.get_location(0, 0), g.get_location(7, 7)}),
                                    -1, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(0, 0), Location(7, 6)}),
+                                   MultiAgentState({g.get_location(0, 0), g.get_location(7, 6)}),
                                    -1, false, false),});
     list<Transition *> *transitions = env.get_transitions(*env.s, action);
 
@@ -101,36 +101,36 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
 
     /* Test transitions from a state near the goal */
 
-    MultiAgentState wish_state = MultiAgentState({Location(0, 1), Location(6, 7)});
+    MultiAgentState wish_state = MultiAgentState({g.get_location(0, 1), g.get_location(6, 7)});
     /* Set the expected transitions */
     list<Transition *> expected_transitions_from_wish_state(
             {
                     new Transition(0.64,
-                                   MultiAgentState({Location(0, 2), Location(5, 7)}),
+                                   MultiAgentState({g.get_location(0, 2), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING + REWARD_OF_GOAL, true, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(1, 1), Location(5, 7)}),
+                                   MultiAgentState({g.get_location(1, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 1), Location(5, 7)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 2), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(0, 2), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   MultiAgentState({Location(0, 2), Location(6, 6)}),
+                                   MultiAgentState({g.get_location(0, 2), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(1, 1), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(1, 1), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(1, 1), Location(6, 6)}),
+                                   MultiAgentState({g.get_location(1, 1), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(0, 1), Location(6, 7)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   MultiAgentState({Location(0, 1), Location(6, 6)}),
+                                   MultiAgentState({g.get_location(0, 1), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),});
     transitions = env.get_transitions(wish_state, action);
 
@@ -154,8 +154,8 @@ TEST(MapfEnvTests, CollisionStateTerminalNegativeReward) {
                                        {'.', '.', '.', '.', '.', '.', '.', '.'}};
 
     Grid g(empty_8_8);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(0, 2)});
-    MultiAgentState goal_state = MultiAgentState({Location(7, 7), Location(5, 5)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(0, 2)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(7, 7), g.get_location(5, 5)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
@@ -166,7 +166,7 @@ TEST(MapfEnvTests, CollisionStateTerminalNegativeReward) {
     for (Transition *t: *transitions) {
         t->p = round(t->p * 100) / 100;
     }
-    Transition *target_transition = new Transition(0.64, MultiAgentState({Location(0, 1), Location(0, 1)}),
+    Transition *target_transition = new Transition(0.64, MultiAgentState({g.get_location(0, 1), g.get_location(0, 1)}),
                                                    2 * REWARD_OF_LIVING + REWARD_OF_COLLISION, true, true);
 
     ASSERT_TRUE(contains(*transitions, target_transition));
@@ -177,12 +177,12 @@ TEST(MapfEnvTests, ActionFromTerminalStateHasNoEffect) {
     std::vector<std::string> empty_2_2{{'.', '.'},
                                        {'.', '.'}};
     Grid g(empty_2_2);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0)});
-    MultiAgentState goal_state = MultiAgentState({Location(1, 1)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(1, 1)});
     MapfEnv env(&g, 1, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     /* Step results */
-    MultiAgentState next_state({Location(0, 0)});
+    MultiAgentState next_state({g.get_location(0, 0)});
     int reward = 0;
     bool done = false;
     bool collision = false;
@@ -192,45 +192,45 @@ TEST(MapfEnvTests, ActionFromTerminalStateHasNoEffect) {
     env.step(MultiAgentAction({RIGHT}), &next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING);
     ASSERT_EQ(done, false);
-    ASSERT_EQ(next_state, MultiAgentState({Location(0, 1)}));
+    ASSERT_EQ(next_state, MultiAgentState({g.get_location(0, 1)}));
 
     /* Execute the second step - this one reaches the goal */
     env.step(MultiAgentAction({DOWN}), &next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING + REWARD_OF_GOAL);
     ASSERT_EQ(done, true);
-    ASSERT_EQ(next_state, MultiAgentState({Location(1, 1)}));
+    ASSERT_EQ(next_state, MultiAgentState({g.get_location(1, 1)}));
 
     /* Now, after the game is finished - do another step and make sure it has not effect. */
     env.step(MultiAgentAction({UP}), &next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 0);
     ASSERT_EQ(done, true);
-    ASSERT_EQ(next_state, MultiAgentState({Location(1, 1)}));
+    ASSERT_EQ(next_state, MultiAgentState({g.get_location(1, 1)}));
 
     /* Another time like I'm trying to reach the goal */
     env.step(MultiAgentAction({DOWN}), &next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 0);
     ASSERT_EQ(done, true);
-    ASSERT_EQ(next_state, MultiAgentState({Location(1, 1)}));
+    ASSERT_EQ(next_state, MultiAgentState({g.get_location(1, 1)}));
 
 }
 
 TEST(MapfEnvTests, SwitchStopIsCollision) {
     std::vector<std::string> empty_2{{'.', '.'}};
     Grid g(empty_2);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(0, 1)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 1), Location(0, 0)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(0, 1)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 1), g.get_location(0, 0)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     /* Step results */
-    MultiAgentState next_state({Location(0, 0), Location(0, 0)});
+    MultiAgentState next_state({g.get_location(0, 0), g.get_location(0, 0)});
     int reward = 0;
     bool done = false;
     bool collision = false;
 
     /* Execute an action which switches the locations of the agents - this should be a collision */
     env.step(MultiAgentAction({RIGHT, LEFT}), &next_state, &reward, &done, &collision);
-    ASSERT_EQ(next_state, MultiAgentState({Location(0, 1), Location(0, 0)}));
+    ASSERT_EQ(next_state, MultiAgentState({g.get_location(0, 1), g.get_location(0, 0)}));
     ASSERT_EQ(reward, 2 * REWARD_OF_LIVING + REWARD_OF_COLLISION);
     ASSERT_EQ(done, true);
 
@@ -242,8 +242,8 @@ TEST(MapfEnvTests, SameTestTransitionsProbabilitySummed) {
     std::vector<std::string> empty_2_2{{'.', '.'},
                                        {'.', '.'}};
     Grid g(empty_2_2);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0)});
-    MultiAgentState goal_state = MultiAgentState({Location(1, 1)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(1, 1)});
     MapfEnv env(&g, 1, &start_state, &goal_state, 0.1, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     list<Transition *> *transitions = env.get_transitions(*env.s, MultiAgentAction({STAY, STAY}));
@@ -251,7 +251,7 @@ TEST(MapfEnvTests, SameTestTransitionsProbabilitySummed) {
     list<Transition *> expected_transitions(
             {
                     new Transition(1,
-                                   MultiAgentState({Location(0, 0)}),
+                                   MultiAgentState({g.get_location(0, 0)}),
                                    REWARD_OF_LIVING, false, false)
             });
 
@@ -265,15 +265,15 @@ TEST(MapfEnvTests, RewardMultiagentSoc) {
                                        {'.', '.', '.', '.',},
                                        {'.', '.', '.', '.',}};
     Grid g(empty_4_4);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(3, 3), Location(1, 1)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 1), Location(1, 3), Location(1, 2)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(3, 3), g.get_location(1, 1)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 1), g.get_location(1, 3), g.get_location(1, 2)});
 
     MapfEnv env(&g, 3, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     int total_reward = 0;
 
     /* Step results */
-    MultiAgentState next_state({Location(0, 0), Location(0, 0), Location(0, 0)});
+    MultiAgentState next_state({g.get_location(0, 0), g.get_location(0, 0), g.get_location(0, 0)});
     int reward = 0;
     bool done = false;
     bool collision = false;
@@ -303,15 +303,15 @@ TEST(MapfEnvTests, RewardMultiagentSocStayBeforeGoal) {
                                        {'.', '.', '.', '.',},
                                        {'.', '.', '.', '.',}};
     Grid g(empty_4_4);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(3, 3), Location(1, 1)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 1), Location(1, 3), Location(1, 2)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(3, 3), g.get_location(1, 1)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 1), g.get_location(1, 3), g.get_location(1, 2)});
 
     MapfEnv env(&g, 3, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     int total_reward = 0;
 
     /* Step results */
-    MultiAgentState next_state({Location(0, 0), Location(0, 0), Location(0, 0)});
+    MultiAgentState next_state({g.get_location(0, 0), g.get_location(0, 0), g.get_location(0, 0)});
     int reward = 0;
     bool done = false;
     bool collision = false;
@@ -330,15 +330,15 @@ TEST(MapfEnvTests, RewardMultiagentSocSingleAgent) {
                                        {'.', '.', '.', '.',},
                                        {'.', '.', '.', '.',}};
     Grid g(empty_4_5);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0)});
-    MultiAgentState goal_state = MultiAgentState({Location(4, 0)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(4, 0)});
 
     MapfEnv env(&g, 1, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     int total_reward = 0;
 
     /* Step results */
-    MultiAgentState next_state({Location(0, 0)});
+    MultiAgentState next_state({g.get_location(0, 0)});
     int reward = 0;
     bool done = false;
     bool collision = false;
@@ -364,8 +364,8 @@ TEST(MafpEnvTests, StateSpaceIteration) {
                                                        {'.', '@', '.'},
                                                        {'.', '.', '.'}};
     Grid g(small_grid_with_obstacles);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(0, 2)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 2), Location(0, 0)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(0, 2)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 2), g.get_location(0, 0)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
@@ -377,61 +377,61 @@ TEST(MafpEnvTests, StateSpaceIteration) {
 
 
     list<MultiAgentState *> expected_states{
-            new MultiAgentState({Location(0, 0), Location(0, 0)}),
-            new MultiAgentState({Location(0, 2), Location(0, 0)}),
-            new MultiAgentState({Location(1, 0), Location(0, 0)}),
-            new MultiAgentState({Location(1, 2), Location(0, 0)}),
-            new MultiAgentState({Location(2, 0), Location(0, 0)}),
-            new MultiAgentState({Location(2, 1), Location(0, 0)}),
-            new MultiAgentState({Location(2, 2), Location(0, 0)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(0, 0)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(0, 0)}),
 
-            new MultiAgentState({Location(0, 0), Location(0, 2)}),
-            new MultiAgentState({Location(0, 2), Location(0, 2)}),
-            new MultiAgentState({Location(1, 0), Location(0, 2)}),
-            new MultiAgentState({Location(1, 2), Location(0, 2)}),
-            new MultiAgentState({Location(2, 0), Location(0, 2)}),
-            new MultiAgentState({Location(2, 1), Location(0, 2)}),
-            new MultiAgentState({Location(2, 2), Location(0, 2)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(0, 2)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(0, 2)}),
 
-            new MultiAgentState({Location(0, 0), Location(1, 0)}),
-            new MultiAgentState({Location(0, 2), Location(1, 0)}),
-            new MultiAgentState({Location(1, 0), Location(1, 0)}),
-            new MultiAgentState({Location(1, 2), Location(1, 0)}),
-            new MultiAgentState({Location(2, 0), Location(1, 0)}),
-            new MultiAgentState({Location(2, 1), Location(1, 0)}),
-            new MultiAgentState({Location(2, 2), Location(1, 0)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(1, 0)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(1, 0)}),
 
-            new MultiAgentState({Location(0, 0), Location(1, 2)}),
-            new MultiAgentState({Location(0, 2), Location(1, 2)}),
-            new MultiAgentState({Location(1, 0), Location(1, 2)}),
-            new MultiAgentState({Location(1, 2), Location(1, 2)}),
-            new MultiAgentState({Location(2, 0), Location(1, 2)}),
-            new MultiAgentState({Location(2, 1), Location(1, 2)}),
-            new MultiAgentState({Location(2, 2), Location(1, 2)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(1, 2)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(1, 2)}),
 
-            new MultiAgentState({Location(0, 0), Location(2, 0)}),
-            new MultiAgentState({Location(0, 2), Location(2, 0)}),
-            new MultiAgentState({Location(1, 0), Location(2, 0)}),
-            new MultiAgentState({Location(1, 2), Location(2, 0)}),
-            new MultiAgentState({Location(2, 0), Location(2, 0)}),
-            new MultiAgentState({Location(2, 1), Location(2, 0)}),
-            new MultiAgentState({Location(2, 2), Location(2, 0)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(2, 0)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(2, 0)}),
 
-            new MultiAgentState({Location(0, 0), Location(2, 1)}),
-            new MultiAgentState({Location(0, 2), Location(2, 1)}),
-            new MultiAgentState({Location(1, 0), Location(2, 1)}),
-            new MultiAgentState({Location(1, 2), Location(2, 1)}),
-            new MultiAgentState({Location(2, 0), Location(2, 1)}),
-            new MultiAgentState({Location(2, 1), Location(2, 1)}),
-            new MultiAgentState({Location(2, 2), Location(2, 1)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(2, 1)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(2, 1)}),
 
-            new MultiAgentState({Location(0, 0), Location(2, 2)}),
-            new MultiAgentState({Location(0, 2), Location(2, 2)}),
-            new MultiAgentState({Location(1, 0), Location(2, 2)}),
-            new MultiAgentState({Location(1, 2), Location(2, 2)}),
-            new MultiAgentState({Location(2, 0), Location(2, 2)}),
-            new MultiAgentState({Location(2, 1), Location(2, 2)}),
-            new MultiAgentState({Location(2, 2), Location(2, 2)}),
+            new MultiAgentState({g.get_location(0, 0), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(0, 2), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(1, 0), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(1, 2), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(2, 0), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(2, 1), g.get_location(2, 2)}),
+            new MultiAgentState({g.get_location(2, 2), g.get_location(2, 2)}),
     };
 
     ASSERT_TRUE(list_equal_no_order(states, expected_states));
@@ -443,8 +443,8 @@ TEST(MafpEnvTests, ActionSpaceIteration) {
                                                        {'.', '@', '.'},
                                                        {'.', '.', '.'}};
     Grid g(small_grid_with_obstacles);
-    MultiAgentState start_state = MultiAgentState({Location(0, 0), Location(0, 2)});
-    MultiAgentState goal_state = MultiAgentState({Location(0, 2), Location(0, 0)});
+    MultiAgentState start_state = MultiAgentState({g.get_location(0, 0), g.get_location(0, 2)});
+    MultiAgentState goal_state = MultiAgentState({g.get_location(0, 2), g.get_location(0, 0)});
 
     MapfEnv env(&g, 2, &start_state, &goal_state, 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 

@@ -5,7 +5,7 @@
 #ifndef GYM_MAPF_MULTIAGENT_STATE_H
 #define GYM_MAPF_MULTIAGENT_STATE_H
 
-#include "gym_mapf/grid/grid.h"
+#include "grid/grid.h"
 
 using namespace std;
 

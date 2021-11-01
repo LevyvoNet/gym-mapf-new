@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         for (s = other_env->observation_space->begin(); s != other_env->observation_space->end(); ++s) {
             for (a = other_env->action_space->begin(); a != other_env->action_space->end(); ++a) {
                 for (Transition *t: *other_env->get_transitions(*s, *a)) {
-                    
+
                 }
             }
         }

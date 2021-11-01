@@ -9,8 +9,8 @@
 
 #include <unordered_map>
 
-#include <gym_mapf/multiagent_action/multiagent_action.h>
-#include <gym_mapf/multiagent_state/multiagent_state.h>
+#include <multiagent_action/multiagent_action.h>
+#include <multiagent_state/multiagent_state.h>
 
 using namespace std;
 

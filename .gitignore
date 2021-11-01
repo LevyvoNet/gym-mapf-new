@@ -12,3 +12,9 @@ _deps
 .idea/*
 cmake-build-debug/*
 cmake-build-release/*
+lib/*
+*.cbp
+gym_mapf/libgym_mapf.so
+solvers/libgym_mapf_solvers.so
+main
+gym_mapf/gym_mapf_ut

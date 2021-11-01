@@ -17,13 +17,7 @@ GridIterator::GridIterator(const Grid *grid) {
     this->grid = grid;
 
     /* 'Guess' the first valid location of the map, if it is not valid, increment to next valid one */
-    this->ptr = new Location(0, 0);
-
-    if ((this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) ||
-        (this->ptr->col >= this->grid->max_col) ||
-        (this->ptr->row >= this->grid->max_row)) {
-        ++(*this);
-    }
+    this->ptr = this->grid->id_to_loc[0];
 }
 
 Location *GridIterator::operator->() {
@@ -35,40 +29,48 @@ Location GridIterator::operator*() const {
 }
 
 GridIterator GridIterator::operator++() {
-
-    /* Advance at least one time */
-    if (this->ptr->col < this->grid->max_col) {
-        this->ptr->col++;
-    } else {
-        this->ptr->col = 0;
-        this->ptr->row++;
-    }
-
-    /* If we have exhausted all of the locations, return the end */
-    if (this->ptr->row > this->grid->max_row) {
+    if (this->grid->id_to_loc.size() <= this->ptr->id + 1) {
         this->ptr = NULL;
-        return *this;
-    }
+    } else {
 
-    /* Keep advance until the next non-obstacle cell (a valid one) or until we reach the end of the grid */
-    while (this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) {
-
-        /* Advance again */
-        if (this->ptr->col < this->grid->max_col) {
-            this->ptr->col++;
-        } else {
-            this->ptr->col = 0;
-            this->ptr->row++;
-        }
-
-        /* Check again if we have reached the end of the grid */
-        if (this->ptr->row > this->grid->max_row) {
-            this->ptr = NULL;
-        }
-
+        this->ptr = this->grid->id_to_loc[this->ptr->id + 1];
     }
 
     return *this;
+
+//    /* Advance at least one time */
+//    if (this->ptr->col < this->grid->max_col) {
+//        this->ptr->col++;
+//    } else {
+//        this->ptr->col = 0;
+//        this->ptr->row++;
+//    }
+//
+//    /* If we have exhausted all of the locations, return the end */
+//    if (this->ptr->row > this->grid->max_row) {
+//        this->ptr = NULL;
+//        return *this;
+//    }
+//
+//    /* Keep advance until the next non-obstacle cell (a valid one) or until we reach the end of the grid */
+//    while (this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) {
+//
+//        /* Advance again */
+//        if (this->ptr->col < this->grid->max_col) {
+//            this->ptr->col++;
+//        } else {
+//            this->ptr->col = 0;
+//            this->ptr->row++;
+//        }
+//
+//        /* Check again if we have reached the end of the grid */
+//        if (this->ptr->row > this->grid->max_row) {
+//            this->ptr = NULL;
+//        }
+//
+//    }
+//
+//    return *this;
 
 }
 
@@ -101,12 +103,23 @@ Grid::Grid(std::vector<std::string> &map_lines) {
     std::size_t j = 0;
     std::size_t n_rows = map_lines.size();
     std::size_t n_cols = map_lines[0].size();
+    bool is_obstacle = false;
+    int64_t loc_id = 0;
 
     /* Initialize the array of cells */
     for (i = 0; i < n_rows; ++i) {
+        this->loc_to_id.push_back(std::vector<int64_t>());
         this->map.emplace_back(std::vector<Cell>{});
         for (j = 0; j < n_cols; ++j) {
-            this->map[i].push_back(Cell(map_lines[i][j] == OBSTACLE_CELL_CHAR));
+            is_obstacle = map_lines[i][j] == OBSTACLE_CELL_CHAR;
+            this->map[i].push_back(Cell(is_obstacle));
+            if (!is_obstacle) {
+                id_to_loc.push_back(new Location(i, j, loc_id));
+                this->loc_to_id[i].push_back(loc_id);
+                loc_id++;
+            }else {
+                this->loc_to_id[i].push_back(ILLEGAL_LOCATION);
+            }
         }
     }
 
@@ -156,19 +169,27 @@ Location Grid::_execute_aux(const Location &l, Action a) const {
 }
 
 Location Grid::_execute_up(const Location &l) const {
-    return Location{max(0, l.row - 1), l.col};
+    int new_row = max(0, l.row - 1);
+    int new_col = l.col;
+    return Location{new_row, new_col, this->loc_to_id[new_row][new_col]};
 }
 
 Location Grid::_execute_right(const Location &l) const {
-    return Location{l.row, min(this->max_col, l.col + 1)};
+    int new_row = l.row;
+    int new_col = min(this->max_col, l.col + 1);
+    return Location{new_row, new_col, this->loc_to_id[new_row][new_col]};
 }
 
 Location Grid::_execute_down(const Location &l) const {
-    return Location{min(this->max_row, l.row + 1), l.col};
+    int new_row = min(this->max_row, l.row + 1);
+    int new_col = l.col;
+    return Location{new_row, new_col, this->loc_to_id[new_row][new_col]};
 }
 
 Location Grid::_execute_left(const Location &l) const {
-    return Location{l.row, max(0, l.col - 1)};
+    int new_row = l.row;
+    int new_col = max(0, l.col - 1);
+    return Location{new_row, new_col, this->loc_to_id[new_row][new_col]};
 }
 
 
@@ -181,20 +202,28 @@ GridIterator Grid::end() const {
     return GridIterator(this, NULL);
 }
 
+Location Grid::get_location(int row, int col) {
+    return *this->id_to_loc[this->loc_to_id[row][col]];
+}
+
 
 bool Location::operator==(const Location &other_loc) const {
     return (this->row == other_loc.row) && (this->col == other_loc.col);
 }
 
 
-Location::Location(int row, int col) {
+Location::Location(int row, int col, int64_t id) {
     this->row = row;
     this->col = col;
+    this->id = id;
 }
+
 
 
 bool Location::operator!=(const Location &other_loc) const {
     return (this->row != other_loc.row) || (this->col != other_loc.col);
 }
+
+
 
 

@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <cmath>
 
+#define ILLEGAL_LOCATION (-1)
 
 class Cell {
 public:
@@ -22,8 +23,9 @@ class Location {
 public:
     int row;
     int col;
+    int64_t id;
 
-    Location(int row, int col);
+    Location(int row, int col, int64_t id);
 
     bool operator==(const Location &other_loc) const;
 
@@ -56,9 +58,12 @@ public:
     std::vector<std::vector<Cell>> map;
     std::size_t max_row;
     std::size_t max_col;
+    std::vector<Location *> id_to_loc;
+    std::vector<std::vector<int64_t>> loc_to_id;
 
     Grid(std::vector<std::string> &map_lines);
 
+    Location get_location(int row, int col);
 
     Location execute(const Location &l, Action a);
 
@@ -66,8 +71,6 @@ public:
 
     GridIterator end() const;
 };
-
-
 
 
 class GridIterator {

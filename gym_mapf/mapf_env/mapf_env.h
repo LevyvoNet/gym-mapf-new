@@ -10,10 +10,10 @@
 #include <unordered_map>
 #include <cmath>
 
-#include <gym_mapf/grid/grid.h>
-#include <gym_mapf/multiagent_action/multiagent_action.h>
-#include <gym_mapf/multiagent_state/multiagent_state.h>
-#include <gym_mapf/utils/state_storage/state_storage.h>
+#include <grid/grid.h>
+#include <multiagent_action/multiagent_action.h>
+#include <multiagent_state/multiagent_state.h>
+#include <utils/state_storage/state_storage.h>
 
 using namespace std;
 

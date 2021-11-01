@@ -9,8 +9,11 @@
 #include <string>
 #include <sstream>
 
-#include <gym_mapf/mapf_env/mapf_env.h>
-#include <gym_mapf/grid/grid.h>
+#include <mapf_env/mapf_env.h>
+#include <grid/grid.h>
+
+/** Constants ************************************************************************************/
+#define DONT_CARE_ID (99999)
 
 std::vector<std::string> parse_map_file(string file_path);
 

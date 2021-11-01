@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include <gym_mapf/gym_mapf.h>
+#include <gym_mapf.h>
 
 TEST(GridTests, ObstacleCellTest) {
     std::vector<std::string> map_lines{{'.', '.', '.'},
@@ -25,13 +25,13 @@ TEST(GridTests, SingleAgentAction) {
     Grid *g = new Grid(map_lines);
 
     /* Test regular actions */
-    ASSERT_EQ(g->execute(Location(1, 1), UP), Location(0, 1));
-    ASSERT_EQ(g->execute(Location(0, 0), RIGHT), Location(0, 1));
-    ASSERT_EQ(g->execute(Location(0, 1), LEFT), Location(0, 0));
-    ASSERT_EQ(g->execute(Location(0, 1), DOWN), Location(1, 1));
+    ASSERT_EQ(g->execute(g->get_location(1, 1), UP), g->get_location(0, 1));
+    ASSERT_EQ(g->execute(g->get_location(0, 0), RIGHT), g->get_location(0, 1));
+    ASSERT_EQ(g->execute(g->get_location(0, 1), LEFT), g->get_location(0, 0));
+    ASSERT_EQ(g->execute(g->get_location(0, 1), DOWN), g->get_location(1, 1));
 
     /* Test obstacles */
-    ASSERT_EQ(g->execute(Location(0, 0), DOWN), Location(0, 0));
-    ASSERT_EQ(g->execute(Location(1, 1), LEFT), Location(1, 1));
-    ASSERT_EQ(g->execute(Location(1, 1), RIGHT), Location(1, 1));
+    ASSERT_EQ(g->execute(g->get_location(0, 0), DOWN), g->get_location(0, 0));
+    ASSERT_EQ(g->execute(g->get_location(1, 1), LEFT), g->get_location(1, 1));
+    ASSERT_EQ(g->execute(g->get_location(1, 1), RIGHT), g->get_location(1, 1));
 }

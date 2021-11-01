@@ -8,7 +8,7 @@
 #include <map>
 #include <random>
 
-#include <gym_mapf/mapf_env/mapf_env.h>
+#include <mapf_env/mapf_env.h>
 #include <set>
 
 
