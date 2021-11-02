@@ -30,6 +30,9 @@ void ValueIterationPolicy::train() {
     for (i = 0; i < MAX_ITERATIONS; i++) {
         /* Perform a full iteration */
         max_diff = 0;
+        if (NULL != prev_v){
+            delete prev_v;
+        }
         prev_v = this->v;
         this->v = new double[this->env->nS];
         /* Update the value of current state */
