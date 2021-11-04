@@ -11,7 +11,7 @@
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {
     this->default_value = 0;
     this->v = new double[this->env->nS];
-    std::fill(this->v, this->v+this->env->nS, 0);
+    std::fill(this->v, this->v + this->env->nS, 0);
 }
 
 void ValueIterationPolicy::train() {
@@ -30,7 +30,7 @@ void ValueIterationPolicy::train() {
     for (i = 0; i < MAX_ITERATIONS; i++) {
         /* Perform a full iteration */
         max_diff = 0;
-        if (NULL != prev_v){
+        if (NULL != prev_v) {
             delete prev_v;
         }
         prev_v = this->v;

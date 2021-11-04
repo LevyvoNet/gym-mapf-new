@@ -13,13 +13,10 @@
 #include <solvers/utils/policy/policy.h>
 
 class ValueIterationPolicy : public Policy {
-private:
-//    MultiAgentStateStorage<double*> *v;
+public:
     double default_value;
     double *v;
-//    ValueTable *v;
 
-public:
 
     ValueIterationPolicy(MapfEnv *env, float gamma, const string &name);
 

@@ -12,6 +12,17 @@ jobs:
           build-type: Debug
       - run: ${{ runner.workspace }}/build/gym_mapf/gym_mapf_ut
 
+  solvers_ut:
+    name: solvers unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: ashutoshvarma/action-cmake-build@master
+        with:
+          build-dir: ${{ runner.workspace }}/build
+          build-type: Debug
+      - run: ${{ runner.workspace }}/build/solvers/solvers_ut
+
   benchmark:
     name: benchmark
     runs-on: ubuntu-latest

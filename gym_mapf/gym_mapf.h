@@ -7,6 +7,5 @@
 #include "utils/state_storage/state_storage.h"
 #include "multiagent_action/multiagent_action.h"
 #include "multiagent_state/multiagent_state.h"
-#include "utils/state_storage/state_storage.h"
 
 #endif //GYM_MAPF_GYM_MAPF_H

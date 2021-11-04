@@ -153,7 +153,7 @@ int main(int argc, char **argv) {
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
             for (EnvCreator *env_creator: env_creators[env_lvl]) {
-                cout << env_creator->name << " :" << endl;
+                cout << env_creator->name << endl;
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
                     env = (*env_creator)();
                     policy = (*solver_creator)(env, 1.0);
