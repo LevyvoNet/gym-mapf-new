@@ -113,38 +113,41 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
     DijkstraHeuristic h = DijkstraHeuristic();
     h.init(&env);
 
-    /* Calculate the expected values by value iteration */
+    /* Calculate the expected_reward values by value iteration */
     ValueIterationPolicy vi_policy0 = ValueIterationPolicy(&env0, 1.0, "");
     vi_policy0.train();
 
-    /* Calculate the expected values by value iteration */
+    /* Calculate the expected_reward values by value iteration */
     ValueIterationPolicy vi_policy1 = ValueIterationPolicy(&env1, 1.0, "");
     vi_policy1.train();
 
-    int exptected_reward = 0;
+    int expected_reward = 0;
     bool all_in_goal = true;
     for (MultiAgentStateIterator s_iter = env.observation_space->begin();
          s_iter != env.observation_space->end(); ++s_iter) {
 
-        exptected_reward = 0;
+        expected_reward = 0;
         all_in_goal = true;
 
         if (s_iter->locations[0] != env.goal_state->locations[0]) {
             all_in_goal = false;
-            exptected_reward += vi_policy0.v[s_iter->id] - env.reward_of_goal;
+            expected_reward += vi_policy0.v[s_iter->locations[0].id] - env.reward_of_goal;
         }
 
         if (s_iter->locations[1] != env.goal_state->locations[1]) {
             all_in_goal = false;
-            exptected_reward += vi_policy1.v[s_iter->id] - env.reward_of_goal;
+            expected_reward += vi_policy1.v[s_iter->locations[1].id] - env.reward_of_goal;
         }
 
         if (!all_in_goal) {
-            exptected_reward += env.reward_of_goal;
+            expected_reward += env.reward_of_goal;
         }
 
         MultiAgentState s = *s_iter;
-        ASSERT_EQ(h(&s), exptected_reward);
+        if (h(&s)!=expected_reward){
+            cout<<"wow"<<endl;
+        }
+        ASSERT_EQ(h(&s), expected_reward);
     }
 
 }
