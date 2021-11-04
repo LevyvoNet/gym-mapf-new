@@ -121,19 +121,22 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
     ValueIterationPolicy vi_policy1 = ValueIterationPolicy(&env1, 1.0, "");
     vi_policy1.train();
 
+    int exptected_reward = 0;
+    bool all_in_goal = true;
     for (MultiAgentStateIterator s_iter = env.observation_space->begin();
          s_iter != env.observation_space->end(); ++s_iter) {
-        int exptected_reward = 0;
-        bool all_in_goal = true;
+
+        exptected_reward = 0;
+        all_in_goal = true;
 
         if (s_iter->locations[0] != env.goal_state->locations[0]) {
             all_in_goal = false;
-            exptected_reward += vi_policy0.v[s_iter->id];
+            exptected_reward += vi_policy0.v[s_iter->id] - env.reward_of_goal;
         }
 
         if (s_iter->locations[1] != env.goal_state->locations[1]) {
             all_in_goal = false;
-            exptected_reward += vi_policy1.v[s_iter->id];
+            exptected_reward += vi_policy1.v[s_iter->id] - env.reward_of_goal;
         }
 
         if (!all_in_goal) {
