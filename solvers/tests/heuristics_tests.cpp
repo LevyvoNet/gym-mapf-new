@@ -85,44 +85,59 @@ TEST(HeuristicsTest, DijkstraRoomEnv) {
 }
 
 
-TEST(HeuristicsTest, DijkstraRoomEnvTwoAgents) {
-    MapfEnv *env = create_mapf_env("room-32-32-4", 1, 2, 0, -1000, 100, -1);
-    MapfEnv *env0 = create_mapf_env("room-32-32-4", 1, 1, 0, -1000, 100, -1);
-    MapfEnv *env1 = create_mapf_env("room-32-32-4", 1, 1, 0, -1000, 100, -1);
+TEST(HeuristicsTest, DijkstraTwoAgents) {
+    std::vector<std::string> lines{{'.', '.', '@', '.', '.',},
+                                   {'.', '.', '@', '.', '.',},
+                                   {'.', '.', '.', '.', '.',}};
 
-    /* Make env1 the local view of agent #1 in the joint env */
-    env1->start_state->locations[0] = env->start_state->locations[1];
-    env1->goal_state->locations[0] = env->goal_state->locations[1];
+    Grid g(lines);
+
+    MapfEnv env(&g, 2,
+                {g.get_location(0, 0), g.get_location(0, 4)},
+                {g.get_location(2, 1), g.get_location(2, 3)},
+                0, -1000, 100, -1);
+
+    MapfEnv env0(&g, 1,
+                 {g.get_location(0, 0),},
+                 {g.get_location(2, 1),},
+                 0, -1000, 100, -1);
+
+
+    MapfEnv env1(&g, 1,
+                 {g.get_location(0, 4)},
+                 {g.get_location(2, 3)},
+                 0, -1000, 100, -1);
+
 
     /* Initialize the heuristic */
     DijkstraHeuristic h = DijkstraHeuristic();
-    h.init(env);
+    h.init(&env);
 
     /* Calculate the expected values by value iteration */
-    ValueIterationPolicy vi_policy0 = ValueIterationPolicy(env0, 1.0, "");
+    ValueIterationPolicy vi_policy0 = ValueIterationPolicy(&env0, 1.0, "");
     vi_policy0.train();
 
     /* Calculate the expected values by value iteration */
-    ValueIterationPolicy vi_policy1 = ValueIterationPolicy(env1, 1.0, "");
+    ValueIterationPolicy vi_policy1 = ValueIterationPolicy(&env1, 1.0, "");
     vi_policy1.train();
 
-    for (MultiAgentStateIterator s_iter = env->observation_space->begin();
-         s_iter != env->observation_space->end(); ++s_iter) {
+    for (MultiAgentStateIterator s_iter = env.observation_space->begin();
+         s_iter != env.observation_space->end(); ++s_iter) {
         int exptected_reward = 0;
         bool all_in_goal = true;
 
-        if (s_iter->locations[0] != env->goal_state->locations[0]) {
+        if (s_iter->locations[0] != env.goal_state->locations[0]) {
             all_in_goal = false;
             exptected_reward += vi_policy0.v[s_iter->id];
         }
 
-        if (s_iter->locations[1] != env->goal_state->locations[1]) {
+        if (s_iter->locations[1] != env.goal_state->locations[1]) {
             all_in_goal = false;
             exptected_reward += vi_policy1.v[s_iter->id];
         }
 
         if (!all_in_goal) {
-            exptected_reward += env->reward_of_goal;
+            exptected_reward += env.reward_of_goal;
         }
 
         MultiAgentState s = *s_iter;
