@@ -24,6 +24,8 @@ bool RtdpPolicy::single_iteration() {
     MultiAgentAction *a = nullptr;
     int diff = 0;
     bool converged = true;
+    double new_value = 0;
+    double *new_value_ptr = nullptr;
 
     MultiAgentState *s = this->env->reset();
 
@@ -35,10 +37,15 @@ bool RtdpPolicy::single_iteration() {
 
         /* Select action */
         /* TODO: this is a problem because it is choosing the best action from v instead of prev_v */
-        a = this->select_max_value_action(*s);
+        a = this->select_max_value_action(*s, &new_value);
+        diff = std::abs(this->get_value(s) - new_value);
 
         /* Bellman update the current state */
-        diff = this->update(s, prev_v);
+        new_value_ptr = new double;
+        *new_value_ptr = new_value;
+        this->v->set(*s, new_value_ptr);
+
+        /* Check non-convergence */
         if (std::abs(diff) > EPSILON) {
             converged = false;
         }
@@ -52,7 +59,11 @@ bool RtdpPolicy::single_iteration() {
     }
 
     for (size_t i = path.size() - 1; i >= 0; ++i) {
-        update(&path[i], prev_v);
+        s = &path[i];
+        this->select_max_value_action(*s, &new_value);
+        new_value_ptr = new double;
+        *new_value_ptr = new_value;
+        this->v->set(*s, new_value_ptr);
     }
 
     this->env->reset();
@@ -106,37 +117,5 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
     return *value;
 }
 
-int RtdpPolicy::update(MultiAgentState *s, MultiAgentStateStorage<double *> *prev_v) {
-    MultiAgentActionIterator a = this->env->action_space->begin();
-    double q_sa = 0;
-    list<Transition *> *transitions = NULL;
-    double new_value = -std::numeric_limits<double>::max();
-
-    double prev_value = this->get_value(s);
-
-    /* Calculate Q(s,a) and keep the maximum one */
-    for (a = this->env->action_space->begin(); a != this->env->action_space->end(); ++a) {
-        q_sa = 0;
-        transitions = this->env->get_transitions(*s, *a);
-        for (Transition *t: *transitions) {
-            if (t->is_collision) {
-                q_sa = -std::numeric_limits<double>::max();
-                break;
-            }
-
-            q_sa += t->p * (t->reward + this->gamma * (*prev_v->get(*t->next_state)));
-        }
-
-        if (q_sa > new_value) {
-            new_value = q_sa;
-        }
-    }
-
-    /* Update the value table and the diff */
-    double *new_value_ptr = new double;
-    *new_value_ptr = new_value;
-    this->v->set(*s, new_value_ptr);
-    return std::abs(prev_value - new_value);
-}
 
 

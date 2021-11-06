@@ -4,7 +4,7 @@
 
 #include "value_function_policy.h"
 
-MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentState& s) {
+MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, double *value) {
     double q_sa = 0;
     list<Transition *> *transitions = NULL;
     MultiAgentAction *best_action = NULL;
@@ -29,11 +29,13 @@ MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentS
         }
     }
 
+    *value = max_q;
     return best_action;
 }
 
 MultiAgentAction *ValueFunctionPolicy::act(const MultiAgentState &state) {
-    return this->select_max_value_action(state);
+    double d=0;
+    return this->select_max_value_action(state, &d);
 }
 
 ValueFunctionPolicy::ValueFunctionPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {}

@@ -8,5 +8,8 @@
 #include "gym_mapf/gym_mapf.h"
 #include "solvers/utils/policy/policy.h"
 #include "solvers/value_iteartion/value_iteration.h"
+#include "solvers/heuristics/heuristic.h"
+#include "solvers/heuristics/dijkstra_heuristic.h"
+#include "solvers/rtdp/rtdp.h"
 
 #endif //GYM_MAPF_SOLVERS_H

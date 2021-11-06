@@ -16,7 +16,6 @@ private:
 
     virtual double get_value(MultiAgentState *s) override;
     bool single_iteration();
-    int update(MultiAgentState* s, MultiAgentStateStorage<double *> *prev_v);
 
 public:
 

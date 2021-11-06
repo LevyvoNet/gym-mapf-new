@@ -5,7 +5,8 @@
 #include <string>
 
 #include <gym_mapf/gym_mapf.h>
-#include <solvers/value_iteartion/value_iteration.h>
+#include <solvers/solvers.h>
+
 
 /** Abstracts ********************************************************************************************************/
 class EnvCreator {
@@ -113,20 +114,30 @@ public:
     }
 };
 
+class rtdp_dijkstra : public SolverCreator {
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
+        return new RtdpPolicy(env, gamma, "RTDP", new DijkstraHeuristic());
+    }
+};
 
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
-                {new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                 new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                 new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                 new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100)}
+                {
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100)
+                }
         }
 );
 
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
-                {new vi()}
+                {
+                        new vi(),
+                        new rtdp_dijkstra()
+                }
         }
 );
 
