@@ -84,7 +84,7 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
             eval_info->episodes_rewards.push_back(episode_reward);
             end = std::chrono::steady_clock::now();
             auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
-            float elapsed_time_seconds = float(elapsed_time_milliseconds)/1000;
+            float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
             eval_info->episodes_times.push_back(round(elapsed_time_seconds * 100) / 100);
         }
 
@@ -120,7 +120,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
 
         /* Calculate success rate */
-        eval_info->success_rate = round((float(eval_info->episodes_rewards.size())/float(n_episodes)) *100);
+        eval_info->success_rate = round((float(eval_info->episodes_rewards.size()) / float(n_episodes)) * 100);
     }
 
 
@@ -130,6 +130,10 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
     this->reset();
 
     return eval_info;
+}
+
+TrainInfo *Policy::get_train_info() {
+    return this->train_info;
 }
 
 

@@ -6,21 +6,24 @@
 #define GYM_MAPF_RTDP_H
 
 #include <gym_mapf/gym_mapf.h>
-#include <solvers/utils/policy/policy.h>
+#include <solvers/utils/policy/value_function_policy.h>
+#include "solvers/heuristics/heuristic.h"
 
-class RtdpPolicy : public Policy {
+class RtdpPolicy : public ValueFunctionPolicy{
 private:
-    MultiAgentStateStorage<double*> *v;
+    MultiAgentStateStorage<double *> *v;
+    Heuristic *h;
+
+    virtual double get_value(MultiAgentState *s) override;
+    bool single_iteration();
+    int update(MultiAgentState* s, MultiAgentStateStorage<double *> *prev_v);
 
 public:
 
-    RtdpPolicy(MapfEnv *env, float gamma, const string &name);
-
-    virtual MultiAgentAction *act(const MultiAgentState &state) override;
+    RtdpPolicy(MapfEnv *env, float gamma, const string &name, Heuristic *h);
 
     virtual void train() override;
 
-    virtual TrainInfo *get_train_info() override;
 };
 
 

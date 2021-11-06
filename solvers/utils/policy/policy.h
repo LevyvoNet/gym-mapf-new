@@ -53,13 +53,13 @@ public:
 
     void reset();
 
+    TrainInfo *get_train_info();
+
     EvaluationInfo *evaluate(std::size_t n_episodes, std::size_t max_steps, double min_success_rate = 0);
 
     virtual MultiAgentAction *act(const MultiAgentState &state) = 0;
 
     virtual void train() = 0;
-
-    virtual TrainInfo *get_train_info() = 0;
 };
 
 #endif //GYM_MAPF_POLICY_H

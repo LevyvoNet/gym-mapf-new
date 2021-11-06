@@ -17,6 +17,8 @@ add_library(gym_mapf_solvers SHARED
         solvers.h
         utils/policy/policy.h
         utils/policy/policy.cpp
+        utils/policy/value_function_policy.h
+        utils/policy/value_function_policy.cpp
         value_iteartion/value_iteration.h
         value_iteartion/value_iteration.cpp
         heuristics/heuristic.h

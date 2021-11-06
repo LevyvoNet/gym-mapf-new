@@ -8,7 +8,9 @@
 #define MAX_ITERATIONS (1000)
 #define EPSILON (0.01)
 
-ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {
+ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : ValueFunctionPolicy(env,
+                                                                                                                gamma,
+                                                                                                                name) {
     this->default_value = 0;
     this->v = new double[this->env->nS];
     std::fill(this->v, this->v + this->env->nS, 0);
@@ -76,35 +78,10 @@ void ValueIterationPolicy::train() {
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
 }
 
-MultiAgentAction *ValueIterationPolicy::act(const MultiAgentState &state) {
-    double q_sa = 0;
-    list<Transition *> *transitions = NULL;
-    MultiAgentAction *best_action = NULL;
-    double max_q = -std::numeric_limits<double>::max();
 
-    for (MultiAgentActionIterator a = this->env->action_space->begin(); a != this->env->action_space->end(); ++a) {
-        q_sa = 0;
-        transitions = this->env->get_transitions(state, *a);
-        for (Transition *t: *transitions) {
-            if (t->is_collision) {
-                q_sa = -std::numeric_limits<double>::max();
-                break;
-            }
-
-            q_sa += t->p * (t->reward + this->gamma * this->v[t->next_state->id]);
-        }
-
-        if (q_sa > max_q) {
-            /* TODO: this copies the actions, make everything a pointer */
-            best_action = new MultiAgentAction(a->actions, a->id);
-            max_q = q_sa;
-        }
-    }
-
-    return best_action;
+double ValueIterationPolicy::get_value(MultiAgentState *s) {
+    return this->v[s->id];
 }
 
-TrainInfo *ValueIterationPolicy::get_train_info() {
-    return this->train_info;
-}
+
 
