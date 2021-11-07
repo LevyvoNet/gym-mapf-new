@@ -106,6 +106,24 @@ public:
 
 };
 
+class RoomEnv : public EnvCreator {
+public:
+    size_t room_size;
+    size_t scen_id;
+    size_t n_agents;
+
+    RoomEnv(string name, size_t room_size, size_t scen_id, size_t n_agents) : EnvCreator(name),
+                                                                              room_size(room_size),
+                                                                              scen_id(scen_id),
+                                                                              n_agents(n_agents) {}
+
+    virtual MapfEnv *operator()() {
+        std::ostringstream map_name;
+        map_name << "room-" << this->room_size << "-" << this->room_size;
+        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.2, -1000, 0, -1);
+    }
+};
+
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
@@ -127,8 +145,16 @@ vector<vector<EnvCreator *>> env_creators(
                         new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
                         new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100)
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                },
+                /* lvl 1 */
+                {
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 12, 2),
+                        new RoomEnv("room-32-32-4_scen-1_2-agents", 32, 1, 2),
                 }
+
         }
 );
 
@@ -136,7 +162,12 @@ vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
                         new vi(),
-                        new rtdp_dijkstra()
+
+                },
+
+                /* lvl 1 */
+                {
+                        new rtdp_dijkstra(),
                 }
         }
 );

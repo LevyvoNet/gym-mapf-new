@@ -120,7 +120,7 @@ void RtdpPolicy::train() {
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
     total_eval_time = float(total_eval_time) / 1000;
-    (*(this->train_info->additional_data))["eval_time"] = std::to_string(total_eval_time);
+    (*(this->train_info->additional_data))["eval_time"] = round(total_eval_time * 100) / 100;
 
 
 }
