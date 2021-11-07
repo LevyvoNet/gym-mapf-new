@@ -22,12 +22,15 @@ void ValueIterationPolicy::train() {
     MultiAgentActionIterator a = this->env->action_space->begin();
     double q_sa = 0;
     double v_s = -std::numeric_limits<double>::max();
-    list<Transition *> *transitions = NULL;
+    list < Transition * > *transitions = NULL;
     double max_diff = 0;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end;
     double *prev_v = NULL;
+    MultiAgentActionIterator action_begin = this->env->action_space->begin();
     MultiAgentActionIterator action_end = this->env->action_space->end();
+    MultiAgentStateIterator state_begin = this->env->observation_space->begin();
+    MultiAgentStateIterator state_end = this->env->observation_space->end();
 
 
     for (i = 0; i < MAX_ITERATIONS; i++) {
@@ -39,10 +42,10 @@ void ValueIterationPolicy::train() {
         prev_v = this->v;
         this->v = new double[this->env->nS];
         /* Update the value of current state */
-        for (s = this->env->observation_space->begin(); s != this->env->observation_space->end(); ++s) {
+        for (s = state_begin; s != state_end; ++s) {
             v_s = -std::numeric_limits<double>::max();
             /* Calculate Q(s,a) and keep the maximum one */
-            for (a = this->env->action_space->begin(); a != action_end; ++a) {
+            for (a = action_begin; a != action_end; ++a) {
                 q_sa = 0;
                 transitions = this->env->get_transitions(*s, *a);
                 for (Transition *t: *transitions) {
