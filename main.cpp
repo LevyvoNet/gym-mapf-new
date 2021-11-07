@@ -94,8 +94,8 @@ public:
 
         return new MapfEnv(g,
                            2,
-                           {g->get_location(2, 0), g->get_location(2, 5)},
-                           {g->get_location(2, 5), g->get_location(2, 0)},
+                           {g->get_location(2, 0), g->get_location(2, 4)},
+                           {g->get_location(2, 4), g->get_location(2, 0)},
                            0.2,
                            -1000,
                            goal_reward,
