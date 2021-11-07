@@ -18,3 +18,4 @@ gym_mapf/libgym_mapf.so
 solvers/libgym_mapf_solvers.so
 main
 gym_mapf/gym_mapf_ut
+solvers/solvers_ut
