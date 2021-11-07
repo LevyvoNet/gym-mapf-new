@@ -111,15 +111,17 @@ public:
     size_t room_size;
     size_t scen_id;
     size_t n_agents;
+    size_t n_rooms;
 
-    RoomEnv(string name, size_t room_size, size_t scen_id, size_t n_agents) : EnvCreator(name),
-                                                                              room_size(room_size),
-                                                                              scen_id(scen_id),
-                                                                              n_agents(n_agents) {}
+    RoomEnv(string name, size_t room_size, size_t n_rooms, size_t scen_id, size_t n_agents) : EnvCreator(name),
+                                                                                              room_size(room_size),
+                                                                                              scen_id(scen_id),
+                                                                                              n_agents(n_agents),
+                                                                                              n_rooms(n_rooms) {}
 
     virtual MapfEnv *operator()() {
         std::ostringstream map_name;
-        map_name << "room-" << this->room_size << "-" << this->room_size;
+        map_name << "room-" << this->room_size << "-" << this->room_size << "-" << this->n_rooms;
         return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.2, -1000, 0, -1);
     }
 };
@@ -151,8 +153,8 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 12, 2),
-                        new RoomEnv("room-32-32-4_scen-1_2-agents", 32, 1, 2),
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new RoomEnv("room-32-32-4_scen-1_2-agents", 32, 4, 1, 2),
                 }
 
         }
@@ -193,9 +195,9 @@ int main(int argc, char **argv) {
     MapfEnv *env = nullptr;
 
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
-        for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
-            for (EnvCreator *env_creator: env_creators[env_lvl]) {
-                cout << env_creator->name << endl;
+        for (EnvCreator *env_creator: env_creators[env_lvl]) {
+            cout << endl << env_creator->name << endl;
+            for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
                     env = (*env_creator)();
                     policy = (*solver_creator)(env, 1.0);
