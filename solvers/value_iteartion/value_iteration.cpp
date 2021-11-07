@@ -6,7 +6,7 @@
 
 /** Constants **************************************************************************************************/
 #define MAX_ITERATIONS (1000)
-#define EPSILON (0.01)
+#define MDR_EPSILON (0.01)
 
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : ValueFunctionPolicy(env,
                                                                                                                 gamma,
@@ -65,7 +65,7 @@ void ValueIterationPolicy::train() {
             this->v[s->id] = v_s;
         }
 
-        if (max_diff <= EPSILON) {
+        if (max_diff <= MDR_EPSILON) {
             break;
         }
     }

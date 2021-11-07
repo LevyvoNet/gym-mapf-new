@@ -13,9 +13,10 @@ class RtdpPolicy : public ValueFunctionPolicy{
 private:
     MultiAgentStateStorage<double *> *v;
     Heuristic *h;
+    vector<int> train_rewards;
 
     virtual double get_value(MultiAgentState *s) override;
-    bool single_iteration();
+    void single_iteration();
 
 public:
 
