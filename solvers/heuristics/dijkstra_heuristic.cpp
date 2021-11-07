@@ -98,3 +98,7 @@ double DijkstraHeuristic::operator()(MultiAgentState *s) {
 
     return sum * this->env->reward_of_living + this->env->reward_of_goal;
 }
+
+DijkstraHeuristic::~DijkstraHeuristic() {
+    delete[] this->distance;
+}

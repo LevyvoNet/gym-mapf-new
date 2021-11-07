@@ -136,6 +136,10 @@ TrainInfo *Policy::get_train_info() {
     return this->train_info;
 }
 
+Policy::~Policy() {
+
+}
+
 
 
 

@@ -20,6 +20,8 @@ public:
 
     ValueIterationPolicy(MapfEnv *env, float gamma, const string &name);
 
+    virtual ~ValueIterationPolicy() override;
+
     virtual double get_value(MultiAgentState *s) override;
 
     virtual void train() override;

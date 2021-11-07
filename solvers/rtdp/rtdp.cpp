@@ -7,7 +7,7 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (10000)
+#define MAX_ITERATIONS (100)
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
@@ -132,6 +132,11 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
     }
 
     return *value;
+}
+
+RtdpPolicy::~RtdpPolicy() {
+    delete this->v;
+    delete this->h;
 }
 
 

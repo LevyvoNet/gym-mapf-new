@@ -85,6 +85,8 @@ public:
             int goal_reward,
             int living_reward);
 
+    ~MapfEnv();
+
     list<Transition *> *get_transitions(const MultiAgentState &state, const MultiAgentAction &action);
 
     void step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done, bool *is_collision);

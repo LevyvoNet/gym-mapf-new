@@ -19,6 +19,8 @@ private:
 
 public:
 
+    virtual ~DijkstraHeuristic() override;
+
     virtual void init(MapfEnv *env);
 
     virtual double operator()(MultiAgentState *s);

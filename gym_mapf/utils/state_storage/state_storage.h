@@ -66,6 +66,8 @@ private:
 public:
     MultiAgentStateStorage(size_t n_agents, T default_value);
 
+    ~MultiAgentStateStorage();
+
     void set(const MultiAgentState &s, T value);
 
     T get(const MultiAgentState &s);
@@ -134,6 +136,11 @@ MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_val
     this->n_agents = n_agents;
     this->default_value = default_value;
     this->nested_hashmap = new tsl::hopscotch_map<Location, void *>();
+}
+
+template<typename T>
+MultiAgentStateStorage<T>::~MultiAgentStateStorage() {
+    /* Iterate over the tree post-order and release the "nodes" */
 }
 
 

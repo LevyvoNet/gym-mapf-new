@@ -221,8 +221,7 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
 /* TODO: calculate next state and living reward as part of the main loop instead of helper functions (inline it) */
 /* TODO: sum all of the transitions to the same next_state to a single one with the sum of probabilities */
-list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) {
-    list<Transition *> *transitions = new list<Transition *>();
+list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) { list<Transition *> *transitions = NULL;
     vector<int> disruptions(this->n_agents);
     unsigned int i = 0;
     size_t curr_agent_idx = 0;
@@ -237,6 +236,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     bool t_done = false;
     bool t_collision = false;
     size_t j = 0;
+    vector<Location> * t_state_locations = NULL;
 
     /* Try to fetch from cache */
     tsl::hopscotch_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
@@ -249,7 +249,7 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
         this->transition_cache->set(state, cached_state);
     }
 
-
+    transitions = new list<Transition *>();
     if (this->is_terminal_state(state)) {
         transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
         return transitions;
@@ -284,21 +284,21 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
         /* In case there was not "carry", set the proper action */
         t_action.actions[curr_agent_idx] = g_action_noise_to_action[action.actions[curr_agent_idx]][disruptions[curr_agent_idx]];
 
-        t_state = new MultiAgentState(state);
+        t_state_locations = new vector<Location>();
+//        t_state = new MultiAgentState(state);
         /* TODO: do it as part of the previous loops instead of nesting another loop */
         /* Execute the whole action */
         for (j = 0; j < this->n_agents; ++j) {
-            t_state->locations[j] = this->grid->execute(state.locations[j], t_action.actions[j]);
+            t_state_locations->push_back(this->grid->execute(state.locations[j], t_action.actions[j]));
+//            t_state->locations[j] = this->grid->execute(state.locations[j], t_action.actions[j]);
         }
-        t_state->id = this->locations_to_state(t_state->locations)->id;
+        t_state = this->locations_to_state(*t_state_locations);
 
         /* We have the probability and the disrupted action, calculate the next state and reward from it */
         this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision);
 
         /* Add the transition to the result */
         transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
-
-
     }
 
     (*cached_state)[action] = transitions;
@@ -396,4 +396,11 @@ MultiAgentAction *MapfEnv::id_to_action(int64_t id) {
     }
 
     return new MultiAgentAction(actions, orig_id);
+}
+
+MapfEnv::~MapfEnv() {
+    delete this->transition_cache;
+    delete this->action_space;
+    delete this->observation_space;
+//    delete this->grid;
 }

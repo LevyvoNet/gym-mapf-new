@@ -11,6 +11,8 @@ class Heuristic {
 public:
     virtual void init(MapfEnv *env)=0;
 
+    virtual ~Heuristic();
+
     virtual double operator()(MultiAgentState *s)=0;
 };
 

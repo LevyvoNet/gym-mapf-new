@@ -51,6 +51,8 @@ public:
 
     Policy(MapfEnv *env, float gamma, const std::string &name = "");
 
+    virtual ~Policy();
+
     void reset();
 
     TrainInfo *get_train_info();

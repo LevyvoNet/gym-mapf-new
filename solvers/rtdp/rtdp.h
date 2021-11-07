@@ -22,6 +22,8 @@ public:
 
     RtdpPolicy(MapfEnv *env, float gamma, const string &name, Heuristic *h);
 
+    virtual ~RtdpPolicy();
+
     virtual void train() override;
 
 };
