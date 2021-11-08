@@ -30,6 +30,7 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
     std::priority_queue<LocationNode, vector<LocationNode>, std::greater<LocationNode>> q;
     MultiAgentActionSpace single_action_space = MultiAgentActionSpace(1);
     std::vector<Location> neighbours;
+    MultiAgentActionIterator a =single_action_space.begin();
     MultiAgentActionIterator action_space_end = single_action_space.end();
 
     /* Initialize visited to false */
@@ -46,7 +47,7 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
 
         /* Find the neighbours of the current node */
         neighbours = vector<Location>();
-        for (MultiAgentActionIterator a =single_action_space.begin(); a != action_space_end; ++a) {
+        for (a =single_action_space.begin(); a != action_space_end; ++a) {
             neighbours.push_back(this->env->grid->execute(curr_node.loc, a->actions[0]));
         }
 

@@ -139,6 +139,11 @@ MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_val
 }
 
 template<typename T>
+void nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap){
+
+}
+
+template<typename T>
 MultiAgentStateStorage<T>::~MultiAgentStateStorage() {
     /* Iterate over the tree post-order and release the "nodes" */
 }
