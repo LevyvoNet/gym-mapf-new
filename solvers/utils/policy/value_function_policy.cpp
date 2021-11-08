@@ -9,8 +9,9 @@ MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentS
     list<Transition *> *transitions = NULL;
     MultiAgentAction *best_action = NULL;
     double max_q = -std::numeric_limits<double>::max();
+    MultiAgentActionIterator action_space_end = this->env->action_space->end();
 
-    for (MultiAgentActionIterator a = this->env->action_space->begin(); a != this->env->action_space->end(); ++a) {
+    for (MultiAgentActionIterator a = this->env->action_space->begin(); a != action_space_end; ++a) {
         q_sa = 0;
         transitions = this->env->get_transitions(s, *a);
         for (Transition *t: *transitions) {

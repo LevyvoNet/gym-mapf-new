@@ -293,6 +293,8 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
 //            t_state->locations[j] = this->grid->execute(state.locations[j], t_action.actions[j]);
         }
         t_state = this->locations_to_state(*t_state_locations);
+        delete t_state_locations;
+        t_state_locations= nullptr;
 
         /* We have the probability and the disrupted action, calculate the next state and reward from it */
         this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision);
