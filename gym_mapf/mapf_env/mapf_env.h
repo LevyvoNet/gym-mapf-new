@@ -51,6 +51,15 @@ public:
     ~TransitionsList();
 };
 
+class ActionToTransitionStorage{
+public:
+    tsl::hopscotch_map<MultiAgentAction, TransitionsList *> * m;
+
+    ActionToTransitionStorage();
+
+    ~ActionToTransitionStorage();
+
+};
 
 class MapfEnv {
 private:
@@ -60,7 +69,7 @@ private:
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
 
     /* Caches */
-    MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *> *transition_cache;
+    MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
 //    MultiAgentStateStorage<bool*> *is_terminal_cache;
 

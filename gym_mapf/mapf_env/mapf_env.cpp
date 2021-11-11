@@ -84,8 +84,7 @@ MapfEnv::MapfEnv(Grid *grid,
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
     /* Caches */
-    this->transition_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *> (this->n_agents,
-    NULL);
+    this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, NULL);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
 //    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
@@ -240,13 +239,13 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
     vector<Location> *t_state_locations = NULL;
 
     /* Try to fetch from cache */
-    tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *state_cache = this->transition_cache->get(state);
+    ActionToTransitionStorage *state_cache = this->transition_cache->get(state);
     if (NULL != state_cache) {
-        if (state_cache->find(action) != state_cache->end()) {
-            return (*state_cache)[action];
+        if (state_cache->m->find(action) != state_cache->m->end()) {
+            return (*state_cache->m)[action];
         }
     } else {
-        state_cache = new tsl::hopscotch_map<MultiAgentAction, TransitionsList *>();
+        state_cache = new ActionToTransitionStorage();
         this->transition_cache->set(state, state_cache);
     }
 
@@ -305,9 +304,7 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
         transitions->transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
     }
 
-    size_t before = state_cache->size();
-    (*state_cache)[action] = transitions;
-    size_t after = state_cache->size();
+    (*state_cache->m)[action] = transitions;
     return transitions;
 }
 
@@ -422,5 +419,15 @@ TransitionsList::~TransitionsList() {
     }
 
     delete this->transitions;
+}
 
+ActionToTransitionStorage::ActionToTransitionStorage() {
+    this->m = new tsl::hopscotch_map<MultiAgentAction, TransitionsList *>();
+}
+
+ActionToTransitionStorage::~ActionToTransitionStorage() {
+    for (auto item: *this->m) {
+        delete item.second;
+    }
+    delete this->m;
 }

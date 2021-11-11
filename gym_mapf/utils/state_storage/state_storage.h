@@ -162,14 +162,14 @@ nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap, vec
     T temp_item;
     if (depth == 1) {
         for (auto item: *nested_hashmap) {
-            ancestor_locations.push_back(item.first);
-            /* Debug print */
+//            ancestor_locations.push_back(item.first);
+//            /* Debug print */
 //            cout << "(";
 //            for (Location loc: ancestor_locations) {
 //                cout << "(" << loc.row << "," << loc.col << ")";
 //            }
 //            cout << ")" << endl;
-            ancestor_locations.pop_back();
+//            ancestor_locations.pop_back();
             delete (T) (item.second);
         }
         return;
