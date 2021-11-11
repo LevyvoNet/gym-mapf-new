@@ -9,6 +9,8 @@
 
 //#include <unordered_map>
 
+#include <iostream>
+
 #include <tsl/hopscotch_map.h>
 
 #include <multiagent_action/multiagent_action.h>
@@ -81,8 +83,14 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
     d = this->nested_hashmap;
     size_t i = 0;
 
-    if (this->n_agents > 2) {
-        for (i = 0; i < this->n_agents - 2; ++i) {
+    if (this->n_agents == 1) {
+        d_last = (tsl::hopscotch_map<Location, T> *) (d);
+        (*d_last)[s.locations[i]] = value;
+        return;
+    }
+
+    if (this->n_agents >= 2) {
+        for (i = 0; i < this->n_agents - 1; ++i) {
             if (d->find(s.locations[i]) == d->end()) {
                 (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, void *>();
             }
@@ -95,8 +103,6 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
         (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, T>();
     }
     d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
-    ++i;
-
     (*d_last)[s.locations[i]] = value;
 }
 
@@ -107,8 +113,16 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
     d = this->nested_hashmap;
     size_t i = 0;
 
-    if (this->n_agents > 2) {
-        for (i = 0; i < this->n_agents - 2; ++i) {
+    if (this->n_agents == 1) {
+        if (d->find(s.locations[i]) == d->end()) {
+            return this->default_value;
+        }
+
+        return (*(tsl::hopscotch_map<Location, T> *) (d))[s.locations[i]];
+    }
+
+    if (this->n_agents >= 2) {
+        for (i = 0; i < this->n_agents - 1; ++i) {
             if (d->find(s.locations[i]) == d->end()) {
                 return this->default_value;
             }
@@ -121,8 +135,6 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
         return this->default_value;
     }
     d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
-    ++i;
-
 
     if (d_last->find(s.locations[i]) == d_last->end()) {
         return this->default_value;
@@ -135,17 +147,50 @@ template<typename T>
 MultiAgentStateStorage<T>::MultiAgentStateStorage(size_t n_agents, T default_value) {
     this->n_agents = n_agents;
     this->default_value = default_value;
-    this->nested_hashmap = new tsl::hopscotch_map<Location, void *>();
+
+    if (this->n_agents > 1) {
+        this->nested_hashmap = new tsl::hopscotch_map<Location, void *>();
+    } else {
+        this->nested_hashmap = (tsl::hopscotch_map<Location, void *> *) new tsl::hopscotch_map<Location, T>();
+    }
 }
 
 template<typename T>
-void nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap){
+void
+nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap, vector<Location> ancestor_locations,
+                       size_t depth) {
+    T temp_item;
+    if (depth == 1) {
+        for (auto item: *nested_hashmap) {
+            ancestor_locations.push_back(item.first);
+            /* Debug print */
+//            cout << "(";
+//            for (Location loc: ancestor_locations) {
+//                cout << "(" << loc.row << "," << loc.col << ")";
+//            }
+//            cout << ")" << endl;
+            ancestor_locations.pop_back();
+            delete (T) (item.second);
+        }
+        return;
+    }
 
+    for (auto item: *nested_hashmap) {
+        /* Delete all of the current node's children */
+        for (auto nested_item: *(tsl::hopscotch_map<Location, void *> *) item.second) {
+            ancestor_locations.push_back(item.first);
+            nested_hashmap_destroy<T>((tsl::hopscotch_map<Location, void *> *) nested_item.second, ancestor_locations,
+                                      depth - 1);
+        }
+        delete (tsl::hopscotch_map<Location, void *> *) (item.second);
+    }
 }
 
 template<typename T>
 MultiAgentStateStorage<T>::~MultiAgentStateStorage() {
-    /* Iterate over the tree post-order and release the "nodes" */
+    nested_hashmap_destroy<T>(this->nested_hashmap,
+                              {},
+                              this->n_agents);
 }
 
 

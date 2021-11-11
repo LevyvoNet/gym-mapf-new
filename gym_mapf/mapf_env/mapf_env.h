@@ -42,6 +42,15 @@ public:
     bool operator==(const Transition &other) const;
 };
 
+class TransitionsList {
+public:
+    list<Transition *> *transitions;
+
+    TransitionsList();
+
+    ~TransitionsList();
+};
+
 
 class MapfEnv {
 private:
@@ -51,8 +60,7 @@ private:
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
 
     /* Caches */
-    MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, list < Transition * > *>*> *
-    transition_cache;
+    MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *> *transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
 //    MultiAgentStateStorage<bool*> *is_terminal_cache;
 
@@ -71,7 +79,7 @@ public:
     MultiAgentStateSpace *observation_space;
     MultiAgentActionSpace *action_space;
     uint64_t nS;
-    uint64_t  nA;
+    uint64_t nA;
 
     /* State */
     MultiAgentState *s;
@@ -87,7 +95,7 @@ public:
 
     ~MapfEnv();
 
-    list<Transition *> *get_transitions(const MultiAgentState &state, const MultiAgentAction &action);
+    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action);
 
     void step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done, bool *is_collision);
 
@@ -97,9 +105,9 @@ public:
 
     /* Conversions between integers and vectors */
 
-    MultiAgentState * locations_to_state(const vector<Location> &locations);
+    MultiAgentState *locations_to_state(const vector<Location> &locations);
 
-    MultiAgentAction * actions_to_action(const vector<Action> &actions);
+    MultiAgentAction *actions_to_action(const vector<Action> &actions);
 
     MultiAgentState *id_to_state(int64_t id);
 

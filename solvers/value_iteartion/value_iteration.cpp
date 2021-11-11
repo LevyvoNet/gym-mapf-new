@@ -45,7 +45,7 @@ void ValueIterationPolicy::train() {
             /* Calculate Q(s,a) and keep the maximum one */
             for (a = this->env->action_space->begin(); a != action_end; ++a) {
                 q_sa = 0;
-                transitions = this->env->get_transitions(*s, *a);
+                transitions = this->env->get_transitions(*s, *a)->transitions;
                 for (Transition *t: *transitions) {
                     if (t->is_collision) {
                         q_sa = -std::numeric_limits<double>::max();

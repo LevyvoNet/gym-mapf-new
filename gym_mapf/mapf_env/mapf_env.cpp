@@ -84,8 +84,8 @@ MapfEnv::MapfEnv(Grid *grid,
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
     /* Caches */
-    this->transition_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, list<Transition *> *> *>(
-            this->n_agents, NULL);
+    this->transition_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *> (this->n_agents,
+    NULL);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
 //    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
@@ -221,7 +221,8 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
 /* TODO: calculate next state and living reward as part of the main loop instead of helper functions (inline it) */
 /* TODO: sum all of the transitions to the same next_state to a single one with the sum of probabilities */
-list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) { list<Transition *> *transitions = NULL;
+TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) {
+    TransitionsList *transitions = NULL;
     vector<int> disruptions(this->n_agents);
     unsigned int i = 0;
     size_t curr_agent_idx = 0;
@@ -236,22 +237,23 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
     bool t_done = false;
     bool t_collision = false;
     size_t j = 0;
-    vector<Location> * t_state_locations = NULL;
+    vector<Location> *t_state_locations = NULL;
 
     /* Try to fetch from cache */
-    tsl::hopscotch_map<MultiAgentAction, list<Transition *> *> *cached_state = this->transition_cache->get(state);
-    if (NULL != cached_state) {
-        if (cached_state->find(action) != cached_state->end()) {
-            return (*cached_state)[action];
+    tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *state_cache = this->transition_cache->get(state);
+    if (NULL != state_cache) {
+        if (state_cache->find(action) != state_cache->end()) {
+            return (*state_cache)[action];
         }
     } else {
-        cached_state = new tsl::hopscotch_map<MultiAgentAction, list<Transition *> *>();
-        this->transition_cache->set(state, cached_state);
+        state_cache = new tsl::hopscotch_map<MultiAgentAction, TransitionsList *>();
+        this->transition_cache->set(state, state_cache);
     }
 
-    transitions = new list<Transition *>();
+    transitions = new TransitionsList();
     if (this->is_terminal_state(state)) {
-        transitions->push_back(new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
+        transitions->transitions->push_back(
+                new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
         return transitions;
     }
 
@@ -294,16 +296,18 @@ list<Transition *> *MapfEnv::get_transitions(const MultiAgentState &state, const
         }
         t_state = this->locations_to_state(*t_state_locations);
         delete t_state_locations;
-        t_state_locations= nullptr;
+        t_state_locations = nullptr;
 
         /* We have the probability and the disrupted action, calculate the next state and reward from it */
         this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision);
 
         /* Add the transition to the result */
-        transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
+        transitions->transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
     }
 
-    (*cached_state)[action] = transitions;
+    size_t before = state_cache->size();
+    (*state_cache)[action] = transitions;
+    size_t after = state_cache->size();
     return transitions;
 }
 
@@ -405,4 +409,18 @@ MapfEnv::~MapfEnv() {
     delete this->action_space;
     delete this->observation_space;
 //    delete this->grid;
+}
+
+TransitionsList::TransitionsList() {
+    this->transitions = new list<Transition *>();
+
+}
+
+TransitionsList::~TransitionsList() {
+    for (Transition *t: *this->transitions) {
+        delete t;
+    }
+
+    delete this->transitions;
+
 }

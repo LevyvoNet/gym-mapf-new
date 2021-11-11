@@ -44,6 +44,28 @@ bool list_equal_no_order(list<T *> l1, list<T *> l2) {
     return true;
 }
 
+//TEST(MapfEnvTests, TransitionCache){
+//    std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+//                                       {'.', '.', '.', '.', '.', '.', '.', '.'}};
+//    Grid g(empty_8_8);
+//    vector<Location> start_locations{g.get_location(0, 0), g.get_location(7, 7)};
+//    vector<Location> goal_locations = {g.get_location(0, 2), g.get_location(5, 7)};
+//
+//    MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
+//    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
+//    TransitionsList * transitions = env->get_transitions(*env->s, *action);
+//
+//    cout << endl << endl;
+//    delete env;
+//    cout << endl << endl;
+//}
+
 TEST(MapfEnvTests, EmptyGridTransitionFunction) {
     std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
                                        {'.', '.', '.', '.', '.', '.', '.', '.'},
@@ -57,83 +79,91 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
     vector<Location> start_locations{g.get_location(0, 0), g.get_location(7, 7)};
     vector<Location> goal_locations = {g.get_location(0, 2), g.get_location(5, 7)};
 
-    MapfEnv env(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
-    MultiAgentAction *action = env.actions_to_action({RIGHT, UP});
-
-
+    MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
+    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
 
     /* Set the expected transitions */
     list<Transition *> expected_transitions(
             {
                     new Transition(0.64,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(6, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(6, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(1, 0), g.get_location(6, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(1, 0), g.get_location(6, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 0), g.get_location(6, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(0, 0), g.get_location(6, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(7, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(7, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(7, 6)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(7, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(1, 0), g.get_location(7, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(1, 0), g.get_location(7, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(1, 0), g.get_location(7, 6)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(1, 0), g.get_location(7, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(0, 0), g.get_location(7, 7)}),
-                                   -1, false, false),
+                                   env->locations_to_state({g.get_location(0, 0), g.get_location(7, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(0, 0), g.get_location(7, 6)}),
-                                   -1, false, false),});
-    list<Transition *> *transitions = env.get_transitions(*env.s, *action);
+                                   env->locations_to_state({g.get_location(0, 0), g.get_location(7, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),});
 
+    /* Get the transitions */
+    list<Transition *> *transitions = env->get_transitions(*env->s, *action)->transitions;
     /* Round the probabilities to 2 decimal points */
     for (Transition *t: *transitions) {
         t->p = round(t->p * 100) / 100;
     }
 
+    ASSERT_TRUE(list_equal_no_order(*transitions, expected_transitions));
+
+    /* Do this again, this time from cache */
+    transitions = env->get_transitions(*env->s, *action)->transitions;
+    /* Round the probabilities to 2 decimal points */
+    for (Transition *t: *transitions) {
+        t->p = round(t->p * 100) / 100;
+    }
+
+    ASSERT_TRUE(list_equal_no_order(*transitions, expected_transitions));
 
     /* Test transitions from a state near the goal */
-
-    MultiAgentState *wish_state = env.locations_to_state({g.get_location(0, 1), g.get_location(6, 7)});
+    MultiAgentState *wish_state = env->locations_to_state({g.get_location(0, 1), g.get_location(6, 7)});
     /* Set the expected transitions */
     list<Transition *> expected_transitions_from_wish_state(
             {
                     new Transition(0.64,
-                                   env.locations_to_state({g.get_location(0, 2), g.get_location(5, 7)}),
+                                   env->locations_to_state({g.get_location(0, 2), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING + REWARD_OF_GOAL, true, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(1, 1), g.get_location(5, 7)}),
+                                   env->locations_to_state({g.get_location(1, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(5, 7)}),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 2), g.get_location(6, 7)}),
+                                   env->locations_to_state({g.get_location(0, 2), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.08,
-                                   env.locations_to_state({g.get_location(0, 2), g.get_location(6, 6)}),
+                                   env->locations_to_state({g.get_location(0, 2), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(1, 1), g.get_location(6, 7)}),
+                                   env->locations_to_state({g.get_location(1, 1), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(1, 1), g.get_location(6, 6)}),
+                                   env->locations_to_state({g.get_location(1, 1), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(6, 7)}),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
-                                   env.locations_to_state({g.get_location(0, 1), g.get_location(6, 6)}),
+                                   env->locations_to_state({g.get_location(0, 1), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),});
-    transitions = env.get_transitions(*wish_state, *action);
+    transitions = env->get_transitions(*wish_state, *action)->transitions;
 
     /* Round the probabilities to 2 decimal points */
     for (Transition *t: *transitions) {
@@ -166,7 +196,7 @@ TEST(MapfEnvTests, CollisionStateTerminalNegativeReward) {
                 REWARD_OF_LIVING);
 
     MultiAgentAction *action = env.actions_to_action({RIGHT, LEFT});
-    list<Transition *> *transitions = env.get_transitions(*env.s, *action);
+    list<Transition *> *transitions = env.get_transitions(*env.s, *action)->transitions;
 
     /* Round the probabilities to 2 decimal points */
     for (Transition *t: *transitions) {
@@ -251,7 +281,7 @@ TEST(MapfEnvTests, SameTestTransitionsProbabilitySummed) {
     MapfEnv env(&g, 1, {g.get_location(0, 0)}, {g.get_location(1, 1)}, 0.1, REWARD_OF_COLLISION, REWARD_OF_GOAL,
                 REWARD_OF_LIVING);
 
-    list<Transition *> *transitions = env.get_transitions(*env.s, *env.actions_to_action({STAY, STAY}));
+    list<Transition *> *transitions = env.get_transitions(*env.s, *env.actions_to_action({STAY, STAY}))->transitions;
 
     list<Transition *> expected_transitions(
             {
