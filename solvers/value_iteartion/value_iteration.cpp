@@ -43,7 +43,7 @@ void ValueIterationPolicy::train() {
         for (s = this->env->observation_space->begin(); s != state_end; ++s) {
             v_s = -std::numeric_limits<double>::max();
             /* Calculate Q(s,a) and keep the maximum one */
-            for (a = this->env->action_space->begin(); a != action_end; ++a) {
+            for (a.reach_begin(); a != action_end; ++a) {
                 q_sa = 0;
                 transitions = this->env->get_transitions(*s, *a)->transitions;
                 for (Transition *t: *transitions) {
