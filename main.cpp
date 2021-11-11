@@ -171,7 +171,7 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra(),
+                        new rtdp_dijkstra(),
                 }
         }
 );
