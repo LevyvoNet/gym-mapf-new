@@ -33,6 +33,8 @@ public:
 
     void reach_end();
 
+    void reach_begin();
+
     MultiAgentAction *operator->() const;
 
     MultiAgentAction operator*() const;

@@ -144,8 +144,8 @@ class rtdp_dijkstra : public SolverCreator {
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
                         new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
                         new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
@@ -165,7 +165,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi(),
+//                        new vi(),
 
                 },
 

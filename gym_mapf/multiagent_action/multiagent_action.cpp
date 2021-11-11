@@ -46,6 +46,17 @@ void MultiAgentActionIterator::reach_end() {
     }
 }
 
+void MultiAgentActionIterator::reach_begin(){
+    vector<Action> all_stay(n_agents);
+
+    for (size_t i = 0; i < n_agents; ++i) {
+        all_stay[i] = STAY;
+    }
+
+    this->ptr->actions = all_stay;
+    this->ptr->id = 0;
+}
+
 MultiAgentAction *MultiAgentActionIterator::operator->() const {
     return this->ptr;
 }
