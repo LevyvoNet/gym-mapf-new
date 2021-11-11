@@ -171,7 +171,7 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra(),
+//                        new rtdp_dijkstra(),
                 }
         }
 );
@@ -210,4 +210,8 @@ int main(int argc, char **argv) {
             }
         }
     }
+
+    /* Delete all env creators */
+
+    /* Delete all solver creators */
 }

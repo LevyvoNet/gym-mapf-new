@@ -39,6 +39,8 @@ public:
                bool done,
                bool is_collision);
 
+    ~Transition();
+
     bool operator==(const Transition &other) const;
 };
 

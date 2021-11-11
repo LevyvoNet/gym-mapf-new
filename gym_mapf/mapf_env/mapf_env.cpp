@@ -54,6 +54,10 @@ bool Transition::operator==(const Transition &other) const {
             (this->is_collision == other.is_collision));
 }
 
+Transition::~Transition() {
+    delete this->next_state;
+}
+
 
 /** MapfEnv *****************************************************************************************************/
 
@@ -253,6 +257,7 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
     if (this->is_terminal_state(state)) {
         transitions->transitions->push_back(
                 new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
+        (*state_cache->m)[action] = transitions;
         return transitions;
     }
 
@@ -407,6 +412,7 @@ MapfEnv::~MapfEnv() {
     delete this->observation_space;
 //    delete this->grid;
 }
+
 
 TransitionsList::TransitionsList() {
     this->transitions = new list<Transition *>();
