@@ -27,10 +27,11 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
     Location goal_location = this->env->goal_state->locations[agent_idx];
     bool *visited = new bool[this->env->grid->id_to_loc.size()];
     int *d = this->distance[agent_idx];
-    std::priority_queue<LocationNode, vector<LocationNode>, std::greater<LocationNode>> q;
+    std::priority_queue<LocationNode, vector < LocationNode>, std::greater<LocationNode>>
+    q;
     MultiAgentActionSpace single_action_space = MultiAgentActionSpace(1);
     std::vector<Location> neighbours;
-    MultiAgentActionIterator a =single_action_space.begin();
+    MultiAgentActionIterator a = single_action_space.begin();
     MultiAgentActionIterator action_space_end = single_action_space.end();
 
     /* Initialize visited to false */
@@ -41,6 +42,10 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
     q.push(LocationNode(goal_location, 0));
 
     while (q.size() > 0) {
+        if (q.size() % 100 == 0) {
+            std::cout << "size is " << q.size() << endl << std::flush;
+        }
+
         /* Select the node with the minimum distance */
         LocationNode curr_node = q.top();
         q.pop();
