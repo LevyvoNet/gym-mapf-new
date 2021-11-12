@@ -46,7 +46,7 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
         q.pop();
 
         /* Find the neighbours of the current node */
-        neighbours = vector<Location>();
+        neighbours.clear();
         for (a.reach_begin(); a != action_space_end; ++a) {
             neighbours.push_back(this->env->grid->execute(curr_node.loc, a->actions[0]));
         }

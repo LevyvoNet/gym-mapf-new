@@ -79,7 +79,7 @@ void RtdpPolicy::train() {
     /* Initialize the heuristic and measure the time for it */
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     this->h->init(this->env);
-    std::cout << "done heuristic" << std::flush;
+    std::cout << "done heuristic" << endl << std::flush;
     std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
