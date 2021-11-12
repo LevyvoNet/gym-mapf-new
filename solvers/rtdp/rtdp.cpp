@@ -21,24 +21,20 @@ void RtdpPolicy::single_iteration() {
     vector<MultiAgentState> path;
     int steps = 0;
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
-    MultiAgentAction *a = nullptr;
+    MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
     int diff = 0;
     double new_value = 0;
     double *new_value_ptr = nullptr;
 
     MultiAgentState *s = this->env->reset();
 
-    vector<Action> all_stay_vector(this->env->n_agents);
-    for (size_t i = 0; i < this->env->n_agents; ++i) {
-        all_stay_vector[i] = STAY;
-    }
-    MultiAgentAction all_stay(all_stay_vector, 0);
+
 
     while (!done && steps < MAX_STEPS) {
         ++steps;
 
         /* Select action */
-        a = this->select_max_value_action(*s, &new_value);
+        this->select_max_value_action(*s, &new_value, a);
         diff = std::abs(this->get_value(s) - new_value);
 
         /* Bellman update the current state */
@@ -56,7 +52,7 @@ void RtdpPolicy::single_iteration() {
 
     for (int i = path.size() - 1; i >= 0; --i) {
         s = &path[i];
-        this->select_max_value_action(*s, &new_value);
+        this->select_max_value_action(*s, &new_value, nullptr);
         new_value_ptr = new double;
         *new_value_ptr = new_value;
         this->v->set(*s, new_value_ptr);
@@ -65,6 +61,9 @@ void RtdpPolicy::single_iteration() {
     this->env->reset();
 
     this->train_rewards.push_back(total_reward);
+
+l_cleanup:
+    delete a;
 }
 
 

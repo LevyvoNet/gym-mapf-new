@@ -17,6 +17,8 @@ public:
 
     MultiAgentAction(const vector<Action> &actions, int64_t id);
 
+    MultiAgentAction(size_t n_agents);
+
     bool operator==(const MultiAgentAction &other) const;
 
 };
@@ -44,6 +46,8 @@ public:
     bool operator==(const MultiAgentActionIterator &other) const;
 
     bool operator!=(const MultiAgentActionIterator &other) const;
+
+
 };
 
 class MultiAgentActionSpace {

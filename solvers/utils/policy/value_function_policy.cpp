@@ -4,14 +4,16 @@
 
 #include "value_function_policy.h"
 
-MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, double *value) {
+void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, double *value,
+                                                  MultiAgentAction *ret) {
     double q_sa = 0;
     list<Transition *> *transitions = NULL;
-    MultiAgentAction *best_action = NULL;
+    MultiAgentAction best_action = MultiAgentAction(this->env->n_agents);
     double max_q = -std::numeric_limits<double>::max();
     MultiAgentActionIterator action_space_end = this->env->action_space->end();
+    MultiAgentActionIterator a = this->env->action_space->begin();
 
-    for (MultiAgentActionIterator a = this->env->action_space->begin(); a != action_space_end; ++a) {
+    for (a.reach_begin(); a != action_space_end; ++a) {
         q_sa = 0;
         transitions = this->env->get_transitions(s, *a)->transitions;
         for (Transition *t: *transitions) {
@@ -24,19 +26,26 @@ MultiAgentAction *ValueFunctionPolicy::select_max_value_action(const MultiAgentS
         }
 
         if (q_sa > max_q) {
-            /* TODO: this copies the actions, make everything a pointer */
-            best_action = new MultiAgentAction(a->actions, a->id);
+            best_action = *a;
             max_q = q_sa;
         }
     }
 
-    *value = max_q;
-    return best_action;
+    if (nullptr != value) {
+
+        *value = max_q;
+    }
+    if (nullptr != ret) {
+
+        *ret = best_action;
+    }
 }
 
 MultiAgentAction *ValueFunctionPolicy::act(const MultiAgentState &state) {
-    double d=0;
-    return this->select_max_value_action(state, &d);
+    double d = 0;
+    MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
+    this->select_max_value_action(state, &d, a);
+    return a;
 }
 
 ValueFunctionPolicy::ValueFunctionPolicy(MapfEnv *env, float gamma, const string &name) : Policy(env, gamma, name) {}

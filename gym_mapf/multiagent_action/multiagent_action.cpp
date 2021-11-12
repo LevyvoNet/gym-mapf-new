@@ -25,7 +25,15 @@ bool MultiAgentAction::operator==(const MultiAgentAction &other) const {
 //    }
 //
 //    return true;
-return this->id == other.id;
+    return this->id == other.id;
+}
+
+MultiAgentAction::MultiAgentAction(size_t n_agents) {
+    this->actions = vector<Action>(n_agents);
+    for (size_t i = 0; i < n_agents; ++i) {
+        this->actions[i] = STAY;
+    }
+    this->id = 0;
 }
 
 /** MultiAgentActionIterator *************************************************************************************/
@@ -46,7 +54,7 @@ void MultiAgentActionIterator::reach_end() {
     }
 }
 
-void MultiAgentActionIterator::reach_begin(){
+void MultiAgentActionIterator::reach_begin() {
     vector<Action> all_stay(n_agents);
 
     for (size_t i = 0; i < n_agents; ++i) {
@@ -111,6 +119,7 @@ bool MultiAgentActionIterator::operator!=(const MultiAgentActionIterator &other)
 
     return true;
 }
+
 
 /** MultiAgentActionSpace ****************************************************************************************/
 MultiAgentActionSpace::MultiAgentActionSpace(size_t n_agents) {

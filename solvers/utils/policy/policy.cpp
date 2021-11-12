@@ -15,12 +15,19 @@ Policy::Policy(MapfEnv *env, float gamma, const std::string &name) {
     this->gamma = gamma;
     this->name = name;
 
+
+    this->train_info = new TrainInfo();
     this->reset();
+}
+
+Policy::~Policy() {
+    if (nullptr!=this->train_info){
+        delete this->train_info;
+    }
 }
 
 void Policy::reset() {
     this->env->reset();
-    this->train_info = new TrainInfo();
 }
 
 /** Evaluation ************************************************************************************************/
@@ -63,6 +70,9 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
         steps++;
 
         /* Select the best action */
+        if (NULL!= selected_action){
+            delete selected_action;
+        }
         selected_action = this->act(*(this->env->s));
         /* Check if we are stuck */
         if (*selected_action == all_stay) {
@@ -90,6 +100,7 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
 
     } while (steps < max_steps);
 
+    delete selected_action;
 }
 
 EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, double min_success_rate) {
@@ -136,9 +147,7 @@ TrainInfo *Policy::get_train_info() {
     return this->train_info;
 }
 
-Policy::~Policy() {
 
-}
 
 
 

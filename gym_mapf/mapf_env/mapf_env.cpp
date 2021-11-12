@@ -321,6 +321,7 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     int noise_idx = 0;
     Action noised_action = STAY;
     size_t agent_idx = 0;
+    MultiAgentState *next_state_local = nullptr;
 
     if (this->is_terminal_state(*this->s)) {
         *next_state = *this->s;
@@ -329,22 +330,28 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
         return;
     }
 
-    /* Set the next state - for each agent sample an action and set its next location properly */
+    /* Set the next state locations - for each agent sample an action and set its next location properly */
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
         noise_idx = d(gen);
         noised_action = g_action_noise_to_action[action.actions[agent_idx]][noise_idx];
         next_state->locations[agent_idx] = this->grid->execute(this->s->locations[agent_idx], noised_action);
     }
-    next_state->id = this->locations_to_state(next_state->locations)->id;
+    next_state_local = this->locations_to_state(next_state->locations);
+    next_state->id = next_state_local->id;
 
     /* Set the reward and done */
     this->calc_transition_reward(this->s, &action, next_state, reward, done, is_collision);
 
     /* Update the current state of the env */
-    this->s = this->locations_to_state(next_state->locations);
+    this->s->id = next_state_local->id;
+    this->s->locations = next_state_local->locations;
+    delete next_state_local;
 }
 
 MultiAgentState *MapfEnv::reset() {
+//    if (nullptr != this->s){
+//        delete this->s;
+//    }
     this->s = new MultiAgentState(start_state->locations, start_state->id);
 
     return this->s;
