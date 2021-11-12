@@ -122,12 +122,11 @@ void MultiAgentStateIterator::reach_end() {
 void MultiAgentStateIterator::reach_begin(){
     vector<Location> locs;
     for (size_t i = 0; i < this->n_agents; ++i) {
-        this->iters.push_back(this->grid->begin());
+        this->iters[i] = this->grid->begin();
         locs.push_back(*(this->iters[i]));
     }
 
-
-    this->ptr = new MultiAgentState(locs, 0);
+    *(this->ptr) = MultiAgentState(locs, 0);
 }
 
 /** MultiAgentStateSpace ***************************************************************************************/

@@ -28,7 +28,7 @@ Location GridIterator::operator*() const {
     return *(this->ptr);
 }
 
-GridIterator GridIterator::operator++() {
+GridIterator& GridIterator::operator++() {
     if (this->grid->id_to_loc.size() <= this->ptr->id + 1) {
         this->ptr = NULL;
     } else {
@@ -37,41 +37,6 @@ GridIterator GridIterator::operator++() {
     }
 
     return *this;
-
-//    /* Advance at least one time */
-//    if (this->ptr->col < this->grid->max_col) {
-//        this->ptr->col++;
-//    } else {
-//        this->ptr->col = 0;
-//        this->ptr->row++;
-//    }
-//
-//    /* If we have exhausted all of the locations, return the end */
-//    if (this->ptr->row > this->grid->max_row) {
-//        this->ptr = NULL;
-//        return *this;
-//    }
-//
-//    /* Keep advance until the next non-obstacle cell (a valid one) or until we reach the end of the grid */
-//    while (this->grid->map[this->ptr->row][this->ptr->col].is_obstacle) {
-//
-//        /* Advance again */
-//        if (this->ptr->col < this->grid->max_col) {
-//            this->ptr->col++;
-//        } else {
-//            this->ptr->col = 0;
-//            this->ptr->row++;
-//        }
-//
-//        /* Check again if we have reached the end of the grid */
-//        if (this->ptr->row > this->grid->max_row) {
-//            this->ptr = NULL;
-//        }
-//
-//    }
-//
-//    return *this;
-
 }
 
 bool GridIterator::operator==(const GridIterator &other) const {

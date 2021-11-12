@@ -94,7 +94,7 @@ public:
 
     Location operator*() const;
 
-    GridIterator operator++();
+    GridIterator& operator++();
 
     bool operator==(const GridIterator &other) const;
 
