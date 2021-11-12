@@ -29,7 +29,6 @@ void RtdpPolicy::single_iteration() {
     MultiAgentState *s = this->env->reset();
 
 
-
     while (!done && steps < MAX_STEPS) {
         ++steps;
 
@@ -98,18 +97,23 @@ void RtdpPolicy::train() {
             this->single_iteration();
             iters_count++;
         }
-        prev_eval_info = eval_info;
-        eval_info = this->evaluate(100, 1000, 0);
 
+        /* Evaluate */
+        prev_eval_info = eval_info;
         std::chrono::steady_clock::time_point eval_begin = std::chrono::steady_clock::now();
+        eval_info = this->evaluate(100, 1000, 0);
+        std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
+        total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(
+                eval_end - eval_begin).count();
+
+        /* Check if there is no improvement since the last batch */
         if (nullptr != prev_eval_info && nullptr != eval_info) {
             if (std::abs(eval_info->mdr - prev_eval_info->mdr) < MDR_EPSILON) {
                 break;
             }
+            delete prev_eval_info;
         }
-        std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
-        total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(
-                eval_end - eval_begin).count();
+
     }
     std::chrono::steady_clock::time_point train_end = std::chrono::steady_clock::now();
 
@@ -121,7 +125,10 @@ void RtdpPolicy::train() {
     total_eval_time = float(total_eval_time) / 1000;
     (*(this->train_info->additional_data))["eval_time"] = round(total_eval_time * 100) / 100;
 
-
+l_cleanup:
+    if (nullptr != eval_info) {
+        delete eval_info;
+    }
 }
 
 double RtdpPolicy::get_value(MultiAgentState *s) {

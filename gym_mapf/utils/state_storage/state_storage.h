@@ -103,6 +103,7 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
         (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, T>();
     }
     d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
+    delete (*d_last)[s.locations[i]];
     (*d_last)[s.locations[i]] = value;
 }
 
@@ -191,6 +192,7 @@ MultiAgentStateStorage<T>::~MultiAgentStateStorage() {
     nested_hashmap_destroy<T>(this->nested_hashmap,
                               {},
                               this->n_agents);
+    delete this->nested_hashmap;
 }
 
 

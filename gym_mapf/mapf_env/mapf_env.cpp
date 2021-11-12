@@ -87,6 +87,9 @@ MapfEnv::MapfEnv(Grid *grid,
     this->observation_space = new MultiAgentStateSpace(this->grid, this->n_agents);
     this->action_space = new MultiAgentActionSpace(this->n_agents);
 
+    /* State */
+    this->s = new MultiAgentState(start_state->locations, start_state->id);
+
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, NULL);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
@@ -349,11 +352,7 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
 }
 
 MultiAgentState *MapfEnv::reset() {
-//    if (nullptr != this->s){
-//        delete this->s;
-//    }
-    this->s = new MultiAgentState(start_state->locations, start_state->id);
-
+    *(this->s) = MultiAgentState(this->start_state->locations, this->start_state->id);
     return this->s;
 }
 
@@ -418,6 +417,7 @@ MapfEnv::~MapfEnv() {
     delete this->action_space;
     delete this->observation_space;
 //    delete this->grid;
+    delete this->s;
 }
 
 
