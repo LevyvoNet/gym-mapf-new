@@ -49,6 +49,7 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
         /* Select the node with the minimum distance */
         LocationNode curr_node = q.top();
         q.pop();
+        visited[curr_node.loc.id] = true;
 
         /* Find the neighbours of the current node */
         neighbours.clear();
@@ -63,8 +64,6 @@ void DijkstraHeuristic::dijkstra_single_agent(size_t agent_idx) {
                 q.push(LocationNode(neighbour, d[neighbour.id]));
             }
         }
-
-        visited[curr_node.loc.id] = true;
     }
 }
 
