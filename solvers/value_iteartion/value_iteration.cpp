@@ -40,7 +40,7 @@ void ValueIterationPolicy::train() {
         prev_v = this->v;
         this->v = new double[this->env->nS];
         /* Update the value of current state */
-        for (s = this->env->observation_space->begin(); s != state_end; ++s) {
+        for (s.reach_begin(); s != state_end; ++s) {
             v_s = -std::numeric_limits<double>::max();
             /* Calculate Q(s,a) and keep the maximum one */
             for (a.reach_begin(); a != action_end; ++a) {

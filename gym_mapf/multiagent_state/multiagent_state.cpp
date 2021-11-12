@@ -46,6 +46,10 @@ MultiAgentStateIterator::MultiAgentStateIterator(const Grid *grid, size_t n_agen
     this->ptr = new MultiAgentState(locs, 0);
 }
 
+MultiAgentStateIterator::~MultiAgentStateIterator() {
+    delete this->ptr;
+}
+
 MultiAgentState *MultiAgentStateIterator::operator->() const {
     return this->ptr;
 }
@@ -54,7 +58,7 @@ MultiAgentState MultiAgentStateIterator::operator*() const {
     return *(this->ptr);
 }
 
-MultiAgentStateIterator MultiAgentStateIterator::operator++() {
+MultiAgentStateIterator& MultiAgentStateIterator::operator++() {
     size_t agent_idx = 0;
     bool carry = false;
 
@@ -113,6 +117,17 @@ void MultiAgentStateIterator::reach_end() {
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
         this->iters[agent_idx] = this->grid->end();
     }
+}
+
+void MultiAgentStateIterator::reach_begin(){
+    vector<Location> locs;
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        this->iters.push_back(this->grid->begin());
+        locs.push_back(*(this->iters[i]));
+    }
+
+
+    this->ptr = new MultiAgentState(locs, 0);
 }
 
 /** MultiAgentStateSpace ***************************************************************************************/

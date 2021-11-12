@@ -410,8 +410,9 @@ TEST(MafpEnvTests, StateSpaceIteration) {
                 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     list<MultiAgentState *> states;
-
-    for (MultiAgentStateIterator iter = env.observation_space->begin(); iter != env.observation_space->end(); ++iter) {
+    MultiAgentStateIterator iter = env.observation_space->begin();
+    MultiAgentStateIterator end = env.observation_space->end();
+    for (iter.reach_begin(); iter != end; ++iter) {
         states.push_back(new MultiAgentState(iter->locations, iter->id));
     }
 
@@ -490,8 +491,10 @@ TEST(MafpEnvTests, ActionSpaceIteration) {
                 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     list<MultiAgentAction *> actions;
+    MultiAgentActionIterator iter = env.action_space->begin();
+    MultiAgentActionIterator end = env.action_space->end();
 
-    for (MultiAgentActionIterator iter = env.action_space->begin(); iter != env.action_space->end(); ++iter) {
+    for (iter.reach_begin(); iter != end; ++iter) {
         actions.push_back(new MultiAgentAction(iter->actions, iter->id));
     }
 

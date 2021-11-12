@@ -28,8 +28,10 @@ TEST(HeuristicsTest, DijkstraSimpleEnv) {
     ValueIterationPolicy vi_policy = ValueIterationPolicy(&env, 1.0, "vi");
     vi_policy.train();
 
-    for (MultiAgentStateIterator s_iter = env.observation_space->begin();
-         s_iter != env.observation_space->end(); ++s_iter) {
+    MultiAgentStateIterator s_iter = env.observation_space->begin();
+    MultiAgentStateIterator s_end = env.observation_space->end();
+
+    for (s_iter.reach_begin(); s_iter != s_end; ++s_iter) {
         MultiAgentState s = *s_iter;
         ASSERT_EQ(h(&s), vi_policy.v[s_iter->id]);
     }
@@ -55,8 +57,10 @@ TEST(HeuristicsTest, DijkstraLargeGoalReward) {
     ValueIterationPolicy vi_policy = ValueIterationPolicy(&env, 1.0, "vi");
     vi_policy.train();
 
-    for (MultiAgentStateIterator s_iter = env.observation_space->begin();
-         s_iter != env.observation_space->end(); ++s_iter) {
+    MultiAgentStateIterator s_iter = env.observation_space->begin();
+    MultiAgentStateIterator s_end = env.observation_space->end();
+
+    for (s_iter.reach_begin(); s_iter != s_end; ++s_iter) {
         MultiAgentState s = *s_iter;
         ASSERT_EQ(h(&s), vi_policy.v[s_iter->id]);
     }
@@ -144,8 +148,8 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
         }
 
         MultiAgentState s = *s_iter;
-        if (h(&s)!=expected_reward){
-            cout<<"wow"<<endl;
+        if (h(&s) != expected_reward) {
+            cout << "wow" << endl;
         }
         ASSERT_EQ(h(&s), expected_reward);
     }

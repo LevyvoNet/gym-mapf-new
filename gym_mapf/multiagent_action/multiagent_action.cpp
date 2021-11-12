@@ -48,6 +48,10 @@ MultiAgentActionIterator::MultiAgentActionIterator(size_t n_agents) {
     this->ptr = new MultiAgentAction(all_stay, 0);
 }
 
+MultiAgentActionIterator::~MultiAgentActionIterator() {
+    delete this->ptr;
+}
+
 void MultiAgentActionIterator::reach_end() {
     for (size_t i = 0; i < this->n_agents; ++i) {
         this->ptr->actions[i] = LAST_INVALID_ACTION;
@@ -73,7 +77,7 @@ MultiAgentAction MultiAgentActionIterator::operator*() const {
     return *(this->ptr);
 }
 
-MultiAgentActionIterator MultiAgentActionIterator::operator++() {
+MultiAgentActionIterator& MultiAgentActionIterator::operator++() {
     size_t agent_idx = 0;
     bool carry = false;
 

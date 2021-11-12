@@ -33,6 +33,8 @@ public:
 
     MultiAgentActionIterator(size_t n_agents);
 
+    ~MultiAgentActionIterator();
+
     void reach_end();
 
     void reach_begin();
@@ -41,7 +43,7 @@ public:
 
     MultiAgentAction operator*() const;
 
-    MultiAgentActionIterator operator++();
+    MultiAgentActionIterator& operator++();
 
     bool operator==(const MultiAgentActionIterator &other) const;
 

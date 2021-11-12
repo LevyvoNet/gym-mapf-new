@@ -33,13 +33,17 @@ public:
 
     MultiAgentStateIterator(const Grid *grid, size_t n_agents);
 
+    ~MultiAgentStateIterator();
+
     void reach_end();
+
+    void reach_begin();
 
     MultiAgentState *operator->() const;
 
     MultiAgentState operator*() const;
 
-    MultiAgentStateIterator operator++();
+    MultiAgentStateIterator &operator++();
 
     bool operator==(const MultiAgentStateIterator &other) const;
 
