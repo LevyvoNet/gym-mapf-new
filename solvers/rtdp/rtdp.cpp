@@ -79,12 +79,11 @@ void RtdpPolicy::train() {
     /* Initialize the heuristic and measure the time for it */
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     this->h->init(this->env);
-    std::cout << "done heuristic" << endl << std::flush;
     std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["init_time"] = round(elapsed_time_seconds * 100) / 100;
+    (*(this->train_info->additional_data))["init_time"] = std::to_string(round(elapsed_time_seconds * 100) / 100);
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
@@ -124,7 +123,7 @@ void RtdpPolicy::train() {
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
     total_eval_time = float(total_eval_time) / 1000;
-    (*(this->train_info->additional_data))["eval_time"] = round(total_eval_time * 100) / 100;
+    (*(this->train_info->additional_data))["eval_time"] = std::to_string(round(total_eval_time * 100) / 100);
 
 l_cleanup:
     if (nullptr != eval_info) {
