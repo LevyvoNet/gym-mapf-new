@@ -99,7 +99,7 @@ void RtdpPolicy::train() {
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["init_time"] = std::to_string(round(elapsed_time_seconds * 100) / 100);
+    (*(this->train_info->additional_data))["init_time"] = std::to_string(round(int(elapsed_time_seconds) * 100) / 100);
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
@@ -132,12 +132,12 @@ void RtdpPolicy::train() {
     std::chrono::steady_clock::time_point train_end = std::chrono::steady_clock::now();
 
     /* Set the train info */
-    elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(train_end - train_begin).count();
+    elapsed_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(train_end - train_begin).count();
     elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    this->train_info->time = round(elapsed_time_seconds * 100) / 100;
-    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
     total_eval_time = float(total_eval_time) / 1000;
-    (*(this->train_info->additional_data))["eval_time"] = std::to_string(round(total_eval_time * 100) / 100);
+    this->train_info->time = round(int(elapsed_time_seconds) * 100) / 100;
+    (*(this->train_info->additional_data))["eval_time"] = std::to_string(round(int(total_eval_time) * 100) / 100);
+    (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
 
 l_cleanup:
     if (nullptr != eval_info) {
