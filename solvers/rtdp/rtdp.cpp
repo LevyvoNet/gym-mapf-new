@@ -53,7 +53,7 @@ void RtdpPolicy::single_iteration() {
         this->select_max_value_action(path[i], &new_value, nullptr);
         new_value_ptr = new double;
         *new_value_ptr = new_value;
-        this->v->set(*s, new_value_ptr);
+        this->v->set(path[i], new_value_ptr);
     }
 
     this->env->reset();
@@ -73,7 +73,7 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
         return false;
     }
 
-    if (std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / (std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
+    if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
         return false;
     }
 
