@@ -19,7 +19,7 @@ void RtdpPolicy::single_iteration() {
     bool is_collision = false;
     int reward = 0;
     int total_reward = 0;
-    vector <MultiAgentState> path;
+    vector<MultiAgentState> path;
     int steps = 0;
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
@@ -35,7 +35,6 @@ void RtdpPolicy::single_iteration() {
 
         /* Select action */
         this->select_max_value_action(*s, &new_value, a);
-        diff = std::abs(this->get_value(s) - new_value);
 
         /* Bellman update the current state */
         new_value_ptr = new double;
@@ -51,8 +50,7 @@ void RtdpPolicy::single_iteration() {
     }
 
     for (int i = path.size() - 1; i >= 0; --i) {
-        s = &path[i];
-        this->select_max_value_action(*s, &new_value, nullptr);
+        this->select_max_value_action(path[i], &new_value, nullptr);
         new_value_ptr = new double;
         *new_value_ptr = new_value;
         this->v->set(*s, new_value_ptr);
@@ -66,15 +64,6 @@ l_cleanup:
     delete a;
 }
 
-
-/** Public ****************************************************************************************************/
-RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
-                       const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
-    this->h = h;
-    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, NULL);
-
-}
-
 bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info) {
     if (nullptr == prev_eval_info || nullptr == curr_eval_info) {
         return false;
@@ -84,12 +73,21 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
         return false;
     }
 
-    if (std::abs(curr_eval_info->mdr - prev_eval_info->mdr) >= MDR_EPSILON) {
+    if (std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / (std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
         return false;
     }
 
     return true;
 }
+
+/** Public ****************************************************************************************************/
+RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
+                       const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
+    this->h = h;
+    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, NULL);
+
+}
+
 
 void RtdpPolicy::train() {
     /* Initialize the heuristic and measure the time for it */
