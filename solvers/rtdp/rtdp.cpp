@@ -99,7 +99,7 @@ void RtdpPolicy::train() {
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["init_time"] = std::to_string(round(elapsed_time_seconds) * 100) / 100);
+    (*(this->train_info->additional_data))["init_time"] = std::to_string(round(elapsed_time_seconds * 100) / 100);
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
