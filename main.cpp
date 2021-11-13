@@ -181,8 +181,7 @@ void benchmark_solver_on_env(Policy *policy) {
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
 
-    std::cout << "MDR:" << eval_info->mdr << " rate:" << eval_info->success_rate << " train_time:"
-              << train_info->time;
+    std::cout << "MDR:" << eval_info->mdr << " rate:" << eval_info->success_rate << " train_time:" << train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time << " solver:" << policy->name;
 
     for (auto item: *train_info->additional_data) {

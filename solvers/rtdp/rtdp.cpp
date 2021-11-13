@@ -11,6 +11,7 @@
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
+#define MIN_SUCCESS_RATE (50)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration() {
@@ -18,7 +19,7 @@ void RtdpPolicy::single_iteration() {
     bool is_collision = false;
     int reward = 0;
     int total_reward = 0;
-    vector<MultiAgentState> path;
+    vector <MultiAgentState> path;
     int steps = 0;
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
@@ -74,6 +75,21 @@ RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
 
 }
 
+bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info) {
+    if (nullptr == prev_eval_info || nullptr == curr_eval_info) {
+        return false;
+    }
+
+    if (curr_eval_info->success_rate < MIN_SUCCESS_RATE) {
+        return false;
+    }
+
+    if (std::abs(curr_eval_info->mdr - prev_eval_info->mdr) >= MDR_EPSILON) {
+        return false;
+    }
+
+    return true;
+}
 
 void RtdpPolicy::train() {
     /* Initialize the heuristic and measure the time for it */
@@ -99,21 +115,19 @@ void RtdpPolicy::train() {
         }
 
         /* Evaluate */
+        if (nullptr != prev_eval_info) {
+            delete prev_eval_info;
+        }
         prev_eval_info = eval_info;
         std::chrono::steady_clock::time_point eval_begin = std::chrono::steady_clock::now();
         eval_info = this->evaluate(100, 1000, 0);
         std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
-        total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(
-                eval_end - eval_begin).count();
+        total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(eval_end - eval_begin).count();
 
         /* Check if there is no improvement since the last batch */
-        if (nullptr != prev_eval_info && nullptr != eval_info) {
-            if (std::abs(eval_info->mdr - prev_eval_info->mdr) < MDR_EPSILON) {
-                break;
-            }
-            delete prev_eval_info;
+        if (should_stop(prev_eval_info, eval_info)) {
+            break;
         }
-
     }
     std::chrono::steady_clock::time_point train_end = std::chrono::steady_clock::now();
 
@@ -128,6 +142,9 @@ void RtdpPolicy::train() {
 l_cleanup:
     if (nullptr != eval_info) {
         delete eval_info;
+    }
+    if (nullptr != prev_eval_info) {
+        delete prev_eval_info;
     }
 }
 
