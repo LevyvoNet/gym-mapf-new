@@ -11,7 +11,8 @@
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
-#define MIN_SUCCESS_RATE (80)
+#define SUCCESS_RATE_EPSILON (0.05)
+#define MIN_SUCCESS_RATE (50)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration() {
@@ -74,6 +75,11 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
     }
 
     if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
+        return false;
+    }
+
+    if ((std::abs(curr_eval_info->success_rate - prev_eval_info->success_rate) /
+         std::abs(prev_eval_info->success_rate)) >= SUCCESS_RATE_EPSILON) {
         return false;
     }
 
