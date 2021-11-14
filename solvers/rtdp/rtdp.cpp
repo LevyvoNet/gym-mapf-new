@@ -81,11 +81,18 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
     return true;
 }
 
+void RtdpPolicy::clear_cache() {
+    delete this->cache;
+    this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
+}
+
+
 /** Public ****************************************************************************************************/
 RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
                        const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
     this->h = h;
     this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, NULL);
+    this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
 
 }
 
@@ -119,6 +126,7 @@ void RtdpPolicy::train() {
         }
         prev_eval_info = eval_info;
         std::chrono::steady_clock::time_point eval_begin = std::chrono::steady_clock::now();
+        this->clear_cache();
         eval_info = this->evaluate(100, 1000, 0);
         std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
         total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(eval_end - eval_begin).count();
@@ -160,6 +168,21 @@ RtdpPolicy::~RtdpPolicy() {
     delete this->v;
     delete this->h;
 }
+
+MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
+    MultiAgentAction *a = nullptr;
+
+    a = this->cache->get(state);
+    if (nullptr != a) {
+        return new MultiAgentAction(a->actions, a->id);
+    }
+
+    a = ValueFunctionPolicy::act(state);
+    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
+
+    return a;
+}
+
 
 
 

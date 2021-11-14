@@ -9,14 +9,17 @@
 #include <solvers/utils/policy/value_function_policy.h>
 #include "solvers/heuristics/heuristic.h"
 
-class RtdpPolicy : public ValueFunctionPolicy{
+class RtdpPolicy : public ValueFunctionPolicy {
 private:
     MultiAgentStateStorage<double *> *v;
     Heuristic *h;
     vector<int> train_rewards;
+    MultiAgentStateStorage<MultiAgentAction *> *cache;
 
     virtual double get_value(MultiAgentState *s) override;
+
     void single_iteration();
+    void clear_cache();
 
 public:
 
@@ -25,6 +28,8 @@ public:
     virtual ~RtdpPolicy();
 
     virtual void train() override;
+
+    virtual MultiAgentAction *act(const MultiAgentState &state) override;
 
 };
 

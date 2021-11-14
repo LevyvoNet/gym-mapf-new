@@ -71,6 +71,7 @@ private:
     int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
 
     /* Caches */
+    /* TODO: add another hierarchical structure for multi agent actions as well */
     MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
 //    MultiAgentStateStorage<bool*> *is_terminal_cache;
