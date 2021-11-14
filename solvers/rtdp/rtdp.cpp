@@ -11,7 +11,7 @@
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
-#define MIN_SUCCESS_RATE (50)
+#define MIN_SUCCESS_RATE (80)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration() {
