@@ -12,7 +12,7 @@
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define SUCCESS_RATE_EPSILON (0.05)
-#define MIN_SUCCESS_RATE (90)
+#define MIN_SUCCESS_RATE (50)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration() {
@@ -169,19 +169,19 @@ RtdpPolicy::~RtdpPolicy() {
     delete this->h;
 }
 
-MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
-    MultiAgentAction *a = nullptr;
-
-//    a = this->cache->get(state);
-//    if (nullptr != a) {
-//        return new MultiAgentAction(a->actions, a->id);
-//    }
-
-    a = ValueFunctionPolicy::act(state);
-    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
-
-    return a;
-}
+//MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
+//    MultiAgentAction *a = nullptr;
+//
+////    a = this->cache->get(state);
+////    if (nullptr != a) {
+////        return new MultiAgentAction(a->actions, a->id);
+////    }
+//
+//    a = ValueFunctionPolicy::act(state);
+////    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
+//
+//    return a;
+//}
 
 
 
