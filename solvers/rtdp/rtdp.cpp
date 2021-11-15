@@ -172,10 +172,10 @@ RtdpPolicy::~RtdpPolicy() {
 MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
     MultiAgentAction *a = nullptr;
 
-    a = this->cache->get(state);
-    if (nullptr != a) {
-        return new MultiAgentAction(a->actions, a->id);
-    }
+//    a = this->cache->get(state);
+//    if (nullptr != a) {
+//        return new MultiAgentAction(a->actions, a->id);
+//    }
 
     a = ValueFunctionPolicy::act(state);
     this->cache->set(state, new MultiAgentAction(a->actions, a->id));
