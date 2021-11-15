@@ -29,7 +29,7 @@ public:
 
     virtual void train() override;
 
-//    virtual MultiAgentAction *act(const MultiAgentState &state) override;
+    virtual MultiAgentAction *act(const MultiAgentState &state) override;
 
 };
 
