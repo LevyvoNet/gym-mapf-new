@@ -91,7 +91,7 @@ void RtdpPolicy::clear_cache() {
 RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
                        const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
     this->h = h;
-    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, NULL);
+    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, nullptr);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
 
 }
@@ -171,13 +171,17 @@ RtdpPolicy::~RtdpPolicy() {
 
 MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
     MultiAgentAction *a = nullptr;
+    MultiAgentAction *all_stay = nullptr;
 
     a = this->cache->get(state);
     if (nullptr != a) {
-//        if (a->id != (ValueFunctionPolicy::act(state)->id)) {
-//            int x = 500;
-//        }
         return new MultiAgentAction(a->actions, a->id);
+    }
+
+    /* If this is an unfamiliar state, return all stay action */
+    if (nullptr == this->v->get(state)) {
+        MultiAgentActionIterator a_iter = this->env->action_space->begin();
+        return new MultiAgentAction(a_iter->actions, a_iter->id);
     }
 
     a = ValueFunctionPolicy::act(state);
