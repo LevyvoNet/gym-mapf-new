@@ -91,10 +91,10 @@ MapfEnv::MapfEnv(Grid *grid,
     this->s = new MultiAgentState(start_state->locations, start_state->id);
 
     /* Caches */
-    this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, NULL);
+    this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
-    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
+    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
 
     /* Reset the env to its starting state */
     this->reset();
@@ -196,17 +196,18 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     cached = this->is_terminal_cache->get(state);
     if (NULL != cached) {
         return *cached;
+    } else {
+        cached = new bool;
+        this->is_terminal_cache->set(state, cached);
     }
 
-    cached = new bool[1];
 
     /* Collision between two agents */
     for (i = 0; i < this->n_agents; i++) {
         for (j = 0; j < this->n_agents; j++) {
             if ((i != j) && (state.locations[i] == state.locations[j])) {
                 *cached = true;
-//                this->is_terminal_cache->set(state, cached);
-                return true;
+                goto l_cleanup;
             }
         }
 
@@ -215,14 +216,14 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     /* Goal state */
     if (state == *this->goal_state) {
         *cached = true;
-//        this->is_terminal_cache->set(state, cached);
-        return true;
+        goto l_cleanup;
     }
 
     /* None of the conditions satisfied, this state is not terminal */
     *cached = false;
-    this->is_terminal_cache->set(state, cached);
-    return false;
+
+l_cleanup:
+    return *cached;
 }
 
 /* TODO: calculate next state and living reward as part of the main loop instead of helper functions (inline it) */
@@ -414,6 +415,7 @@ MultiAgentAction *MapfEnv::id_to_action(int64_t id) {
 
 MapfEnv::~MapfEnv() {
     delete this->transition_cache;
+    delete this->is_terminal_cache;
     delete this->action_space;
     delete this->observation_space;
 //    delete this->grid;
@@ -439,8 +441,9 @@ ActionToTransitionStorage::ActionToTransitionStorage() {
 }
 
 ActionToTransitionStorage::~ActionToTransitionStorage() {
-    for (auto item: *this->m) {
-        delete item.second;
-    }
-    delete this->m;
+//    for (auto item: *this->m) {
+//        cout << "wow" << endl;
+//        delete item.second;
+//    }
+//    delete this->m;
 }

@@ -44,27 +44,28 @@ bool list_equal_no_order(list<T *> l1, list<T *> l2) {
     return true;
 }
 
-//TEST(MapfEnvTests, TransitionCache){
-//    std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
-//                                       {'.', '.', '.', '.', '.', '.', '.', '.'}};
-//    Grid g(empty_8_8);
-//    vector<Location> start_locations{g.get_location(0, 0), g.get_location(7, 7)};
-//    vector<Location> goal_locations = {g.get_location(0, 2), g.get_location(5, 7)};
-//
-//    MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
-//    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
-//    TransitionsList * transitions = env->get_transitions(*env->s, *action);
-//
-//    cout << endl << endl;
-//    delete env;
-//    cout << endl << endl;
-//}
+TEST(MapfEnvTests, TransitionCache){
+    std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'}};
+    Grid g(empty_8_8);
+    vector<Location> start_locations{g.get_location(0, 0), g.get_location(7, 7)};
+    vector<Location> goal_locations = {g.get_location(0, 2), g.get_location(5, 7)};
+
+    MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
+    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
+    TransitionsList * transitions = env->get_transitions(*env->s, *action);
+    transitions = env->get_transitions(*env->s, *action);
+
+    cout << endl << endl;
+    delete env;
+    cout << endl << endl;
+}
 
 TEST(MapfEnvTests, EmptyGridTransitionFunction) {
     std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
