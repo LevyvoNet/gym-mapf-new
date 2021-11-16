@@ -74,7 +74,7 @@ private:
     /* TODO: add another hierarchical structure for multi agent actions as well */
     MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
 //    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
-//    MultiAgentStateStorage<bool*> *is_terminal_cache;
+    MultiAgentStateStorage<bool*> *is_terminal_cache;
 
 public:
     /* Parameters */

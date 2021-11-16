@@ -94,7 +94,7 @@ MapfEnv::MapfEnv(Grid *grid,
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, NULL);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
-//    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
+    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, NULL);
 
     /* Reset the env to its starting state */
     this->reset();
@@ -193,10 +193,10 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     size_t j = 0;
     bool *cached = NULL;
 
-//    cached = this->is_terminal_cache->get(state);
-//    if (NULL != cached) {
-//        return *cached;
-//    }
+    cached = this->is_terminal_cache->get(state);
+    if (NULL != cached) {
+        return *cached;
+    }
 
     cached = new bool[1];
 
@@ -221,7 +221,7 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
     /* None of the conditions satisfied, this state is not terminal */
     *cached = false;
-//    this->is_terminal_cache->set(state, cached);
+    this->is_terminal_cache->set(state, cached);
     return false;
 }
 
