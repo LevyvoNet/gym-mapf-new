@@ -420,6 +420,7 @@ MultiAgentAction *MapfEnv::id_to_action(int64_t id) {
 MapfEnv::~MapfEnv() {
     delete this->transition_cache;
     delete this->is_terminal_cache;
+    delete this->living_reward_cache;
     delete this->action_space;
     delete this->observation_space;
 //    delete this->grid;
