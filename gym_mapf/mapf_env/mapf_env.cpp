@@ -441,9 +441,8 @@ ActionToTransitionStorage::ActionToTransitionStorage() {
 }
 
 ActionToTransitionStorage::~ActionToTransitionStorage() {
-//    for (auto item: *this->m) {
-//        cout << "wow" << endl;
-//        delete item.second;
-//    }
-//    delete this->m;
+    for (auto item: *this->m) {
+        delete item.second;
+    }
+    delete this->m;
 }

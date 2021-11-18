@@ -43,7 +43,23 @@ add_executable(
         tests/grid_test.cpp
         tests/mapf_env_tests.cpp
         tests/utils_tests.cpp
+        tests/state_storage_tests.cpp
 )
+
+add_executable(
+        storage_ut
+
+        tests/state_storage_tests.cpp
+)
+
+target_link_libraries(
+        storage_ut
+
+        gtest_main
+        $<TARGET_OBJECTS:gym_mapf>
+        tsl::hopscotch_map
+)
+
 target_link_libraries(
         gym_mapf_ut
 

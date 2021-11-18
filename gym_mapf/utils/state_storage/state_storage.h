@@ -85,6 +85,9 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
 
     if (this->n_agents == 1) {
         d_last = (tsl::hopscotch_map<Location, T> *) (d);
+        if (d_last->find(s.locations[i]) != d_last->end()) {
+            delete (*d_last)[s.locations[i]];
+        }
         (*d_last)[s.locations[i]] = value;
         return;
     }
@@ -99,11 +102,10 @@ void MultiAgentStateStorage<T>::set(const MultiAgentState &s, T value) {
     }
 
     /* The last one is different */
-    if (d->find(s.locations[i]) == d->end()) {
-        (*d)[s.locations[i]] = new tsl::hopscotch_map<Location, T>();
+    d_last = (tsl::hopscotch_map<Location, T> *) (d);
+    if (d_last->find(s.locations[i]) != d_last->end()) {
+        delete (*d_last)[s.locations[i]];
     }
-    d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
-    delete (*d_last)[s.locations[i]];
     (*d_last)[s.locations[i]] = value;
 }
 
@@ -132,16 +134,19 @@ T MultiAgentStateStorage<T>::get(const MultiAgentState &s) {
     }
 
     /* The last one is different */
-    if (d->find(s.locations[i]) == d->end()) {
-        return this->default_value;
-    }
-    d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
-
+    d_last = (tsl::hopscotch_map<Location, T> *) (d);
     if (d_last->find(s.locations[i]) == d_last->end()) {
         return this->default_value;
     }
-
     return (*d_last)[s.locations[i]];
+//
+//    d_last = (tsl::hopscotch_map<Location, T> *) ((*d)[s.locations[i]]);
+//
+//    if (d_last->find(s.locations[i]) == d_last->end()) {
+//        return this->default_value;
+//    }
+//
+//    return (*d_last)[s.locations[i]];
 }
 
 template<typename T>
@@ -160,7 +165,6 @@ template<typename T>
 void
 nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap, vector<Location> ancestor_locations,
                        size_t depth) {
-    T temp_item;
     if (depth == 1) {
         for (auto item: *nested_hashmap) {
             ancestor_locations.push_back(item.first);
@@ -176,15 +180,16 @@ nested_hashmap_destroy(tsl::hopscotch_map<Location, void *> *nested_hashmap, vec
             delete (T) (item.second);
         }
 
-        return;
-    }
+    } else {
 
-    for (auto item: *nested_hashmap) {
-        /* Delete all of the current node's children */
-        ancestor_locations.push_back(item.first);
-        nested_hashmap_destroy<T>((tsl::hopscotch_map<Location, void *> *) item.second, ancestor_locations, depth-1);
-        ancestor_locations.pop_back();
-        delete (tsl::hopscotch_map<Location, void *> *) (item.second);
+        for (auto item: *nested_hashmap) {
+            /* Delete all current node's children */
+            ancestor_locations.push_back(item.first);
+            nested_hashmap_destroy<T>((tsl::hopscotch_map<Location, void *> *) item.second, ancestor_locations,
+                                      depth - 1);
+            ancestor_locations.pop_back();
+            delete (tsl::hopscotch_map<Location, void *> *) (item.second);
+        }
     }
 }
 
