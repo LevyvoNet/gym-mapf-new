@@ -53,6 +53,16 @@ public:
     ~TransitionsList();
 };
 
+class ActionToIntStorage{
+public:
+    tsl::hopscotch_map<MultiAgentAction, int *> * m;
+
+    ActionToIntStorage();
+
+    ~ActionToIntStorage();
+
+};
+
 class ActionToTransitionStorage{
 public:
     tsl::hopscotch_map<MultiAgentAction, TransitionsList *> * m;
@@ -73,7 +83,7 @@ private:
     /* Caches */
     /* TODO: add another hierarchical structure for multi agent actions as well */
     MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
-//    MultiAgentStateStorage<std::unordered_map<MultiAgentAction, int>*> *living_reward_cache;
+    MultiAgentStateStorage<ActionToIntStorage*> *living_reward_cache;
     MultiAgentStateStorage<bool*> *is_terminal_cache;
 
 public:

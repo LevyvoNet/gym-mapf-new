@@ -92,6 +92,7 @@ MapfEnv::MapfEnv(Grid *grid,
 
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
+    this->living_reward_cache = new MultiAgentStateStorage<ActionToIntStorage *>(this->n_agents, nullptr);
 //    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
 //                                                                                                        NULL);
     this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
@@ -132,17 +133,18 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
 int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
     size_t agent_idx = 0;
     int living_reward = 0;
-//    tsl::hopscotch_map<MultiAgentAction, int> *cached_state = NULL;
+    int *new_value = nullptr;
 
-//    cached_state = this->living_reward_cache->get(*prev_state);
-//    if (NULL != cached_state) {
-//        if (cached_state->find(*action) != cached_state->end()) {
-//            return (*cached_state)[*action];
-//        }
-//    } else {
-//        cached_state = new tsl::hopscotch_map<MultiAgentAction, int>();
-//        this->living_reward_cache->set(*prev_state, cached_state);
-//    }
+    /* Try to fetch from cache */
+    ActionToIntStorage *state_cache = this->living_reward_cache->get(*prev_state);
+    if (nullptr != state_cache) {
+        if (state_cache->m->find(*action) != state_cache->m->end()) {
+            return *(*state_cache->m)[*action];
+        }
+    } else {
+        state_cache = new ActionToIntStorage();
+        this->living_reward_cache->set(*prev_state, state_cache);
+    }
 
 
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
@@ -154,7 +156,9 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
         living_reward += this->reward_of_living;
     }
 
-//    (*cached_state)[*action] = living_reward;
+    new_value = new int;
+    *new_value = living_reward;
+    (*state_cache->m)[*action] = new_value;
     return living_reward;
 
 }
@@ -441,6 +445,17 @@ ActionToTransitionStorage::ActionToTransitionStorage() {
 }
 
 ActionToTransitionStorage::~ActionToTransitionStorage() {
+    for (auto item: *this->m) {
+        delete item.second;
+    }
+    delete this->m;
+}
+
+ActionToIntStorage::ActionToIntStorage() {
+    this->m = new tsl::hopscotch_map<MultiAgentAction, int *>();
+}
+
+ActionToIntStorage::~ActionToIntStorage() {
     for (auto item: *this->m) {
         delete item.second;
     }
