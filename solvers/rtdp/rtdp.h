@@ -8,6 +8,7 @@
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/utils/policy/value_function_policy.h>
 #include "solvers/heuristics/heuristic.h"
+#include "solvers/id/id.h"
 
 class RtdpPolicy : public ValueFunctionPolicy {
 private:
@@ -33,5 +34,16 @@ public:
 
 };
 
+
+class RtdpMerger: public PolicyMerger {
+public:
+    virtual Policy *operator()(MapfEnv *env,
+                               float gamma,
+                               vector<vector<size_t>> groups,
+                               size_t group1,
+                               size_t group2,
+                               Policy* policy1,
+                               Policy* policy2);
+};
 
 #endif //GYM_MAPF_RTDP_H

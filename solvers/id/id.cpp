@@ -4,6 +4,28 @@
 
 #include "id.h"
 
+/** Default Policy Merger***************************************************************************************/
+Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
+                                        float gamma,
+                                        vector<vector<size_t>> groups,
+                                        size_t group1,
+                                        size_t group2,
+                                        Policy *policy1,
+                                        Policy *policy2) {
+    CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
+    MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
+
+    Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
+    policy->train();
+
+    return policy;
+}
+
+DefaultPolicyMerger::DefaultPolicyMerger(SolverCreator *low_level_planner_creator) :
+        low_level_planner_creator(low_level_planner_creator) {}
+
+/** ID *******************************************************************************************************/
+
 IdPolicy::IdPolicy(MapfEnv *env, float gamma, const string &name,
                    SolverCreator *low_level_planner_creator, PolicyMerger *low_level_merger) :
         Policy(env, gamma, name),
@@ -15,17 +37,6 @@ IdPolicy::IdPolicy(MapfEnv *env, float gamma, const string &name,
 
 }
 
-int find_group_of_agent(size_t agent, const vector<vector<size_t>> &groups) {
-    for (size_t i = 0; i < groups.size(); ++i) {
-        for (size_t j = 0; j < groups[i].size(); ++j) {
-            if (groups[i][j] == agent) {
-                return i;
-            }
-        }
-    }
-
-    return -1;
-}
 
 CrossedPolicy *merge_agents(MapfEnv *env,
                             float gamma,
@@ -116,21 +127,4 @@ MultiAgentAction *IdPolicy::act(const MultiAgentState &state) {
 }
 
 
-Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
-                                        float gamma,
-                                        vector<vector<size_t>> groups,
-                                        size_t group1,
-                                        size_t group2,
-                                        Policy *policy1,
-                                        Policy *policy2) {
-    CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
-    MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
 
-    Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
-    policy->train();
-
-    return policy;
-}
-
-DefaultPolicyMerger::DefaultPolicyMerger(SolverCreator *low_level_planner_creator) :
-        low_level_planner_creator(low_level_planner_creator) {}
