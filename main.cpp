@@ -8,22 +8,6 @@
 #include <solvers/solvers.h>
 
 
-/** Abstracts ********************************************************************************************************/
-class EnvCreator {
-public:
-    string name;
-
-    EnvCreator(string name) : name(name) {}
-
-    virtual MapfEnv *operator()() = 0;
-};
-
-class SolverCreator {
-public:
-    virtual Policy *operator()(MapfEnv *env, float gamma) = 0;
-};
-
-
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
 public:
@@ -140,18 +124,24 @@ class rtdp_dijkstra : public SolverCreator {
     }
 };
 
+class id_rtdp: public SolverCreator{
+    virtual Policy *operator()(MapfEnv *env, float gamma){
+        return new IdPolicy(env, gamma, "id_rtdp", new rtdp_dijkstra(), nullptr);
+    }
+};
+
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
                 },
                 /* lvl 1 */
                 {
@@ -168,13 +158,14 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi(),
+//                        new vi(),
 
                 },
 
                 /* lvl 1 */
                 {
                         new rtdp_dijkstra(),
+                        new id_rtdp()
                 }
         }
 );

@@ -136,4 +136,8 @@ public:
     MultiAgentAction *id_to_action(int64_t id);
 };
 
+MapfEnv* get_local_view(MapfEnv*, vector<size_t> agents);
+
+bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
+
 #endif //GYM_MAPF_MAPF_ENV_H

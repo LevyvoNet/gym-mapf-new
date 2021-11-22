@@ -462,3 +462,22 @@ ActionToIntStorage::~ActionToIntStorage() {
     }
     delete this->m;
 }
+
+
+MapfEnv *get_local_view(MapfEnv *env, vector<size_t> agents) {
+    vector<Location> start_locations;
+    vector<Location> goal_locations;
+
+    for (size_t a: agents) {
+        start_locations.push_back(env->start_state->locations[a]);
+        goal_locations.push_back(env->goal_state->locations[a]);
+    }
+
+    return new MapfEnv(env->grid,
+                       agents.size(), start_locations,
+                       goal_locations,
+                       env->fail_prob,
+                       env->reward_of_collision,
+                       env->reward_of_goal,
+                       env->reward_of_living);
+}

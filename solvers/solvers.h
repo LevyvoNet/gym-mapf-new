@@ -11,5 +11,7 @@
 #include "solvers/heuristics/heuristic.h"
 #include "solvers/heuristics/dijkstra_heuristic.h"
 #include "solvers/rtdp/rtdp.h"
+#include "solvers/id/id.h"
+#include "utils/utils.h"
 
 #endif //GYM_MAPF_SOLVERS_H
