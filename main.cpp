@@ -152,7 +152,7 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 1 */
                 {
                         new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 2 */
                 {
@@ -165,7 +165,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi(),
+                        new vi(),
 
                 },
 
