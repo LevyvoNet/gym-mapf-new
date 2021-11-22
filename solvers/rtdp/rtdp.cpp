@@ -167,6 +167,7 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
 RtdpPolicy::~RtdpPolicy() {
     delete this->v;
     delete this->h;
+    delete this->cache;
 }
 
 MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
@@ -205,6 +206,13 @@ public:
                          vector<size_t> g2) :
             p1(p1), p2(p2), g1(g1), g2(g2) {}
 
+    ~SolutionSumHeuristic(){
+//        delete this->p1->env;
+//        delete this->p2->env;
+//        delete this->p1;
+//        delete this->p2;
+    }
+
     virtual void init(MapfEnv *env_param) {
         this->env = env_param;
     }
@@ -228,24 +236,25 @@ public:
                 l2.push_back(s->locations[i]);
             }
         }
-        s1 = p1->env->locations_to_state(l1);
-        s2 = p2->env->locations_to_state(l2);
+        s1 = this->p1->env->locations_to_state(l1);
+        s2 = this->p2->env->locations_to_state(l2);
 
-        v1 = p1->get_value(s1);
-        v2 = p2->get_value(s2);
+        v1 = this->p1->get_value(s1);
+        v2 = this->p2->get_value(s2);
 
         /* Sum only the states which are not goal states */
-        if (s1 == p1->env->goal_state) {
+        if (s1 == this->p1->env->goal_state) {
             sum += v1;
             ++relevant_values;
         }
-        if (s2 == p2->env->goal_state) {
+        if (s2 == this->p2->env->goal_state) {
             sum += v2;
             ++relevant_values;
         }
 
         delete s1;
         delete s2;
+
 
         if (0 == relevant_values) {
             return 0;
@@ -259,14 +268,19 @@ public:
 
 Policy *RtdpMerger::operator()(MapfEnv *env, float gamma, vector<vector<size_t>> groups, size_t group1, size_t group2,
                                Policy *policy1, Policy *policy2) {
+    /* Create the merged env */
     CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
     MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
+    /* This is for the destructor to not destroy the received policies */
+    joint_policy.policies.clear();
+
     Heuristic *solution_sum = new SolutionSumHeuristic((ValueFunctionPolicy *) policy1,
                                                        (ValueFunctionPolicy *) policy2,
                                                        groups[group1],
                                                        groups[group2]);
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
     policy->train();
+
 
     return policy;
 }

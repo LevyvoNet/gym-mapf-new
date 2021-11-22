@@ -30,7 +30,10 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
         }
 
         group_locations.clear();
+
+        /* Clear */
         delete group_state;
+        delete group_action;
     }
 
     /* Calculate the new action ID */

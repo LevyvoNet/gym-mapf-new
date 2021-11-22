@@ -112,10 +112,11 @@ Conflict *detect_single_conflict_couple(CrossedPolicy *joint_policy, size_t g1, 
     }
 
 l_cleanup:
-    if (nullptr!=new_state){
+    if (nullptr != new_state) {
         delete new_state;
     }
     delete merged_env;
+    delete expanded_states;
     return conflict;
 }
 

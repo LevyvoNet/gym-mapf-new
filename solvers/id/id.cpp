@@ -38,7 +38,7 @@ IdPolicy::IdPolicy(MapfEnv *env, float gamma, const string &name,
 }
 
 
-CrossedPolicy *merge_agents(MapfEnv *env,
+CrossedPolicy *merge_groups(MapfEnv *env,
                             float gamma,
                             PolicyMerger *low_level_merger,
                             CrossedPolicy *joint_policy,
@@ -109,7 +109,7 @@ void IdPolicy::train() {
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
-            curr_joint_policy = merge_agents(env, gamma, low_level_merger, prev_joint_policy, conflict);
+            curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
         }
     } while (nullptr != conflict);
 
