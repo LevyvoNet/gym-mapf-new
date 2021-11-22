@@ -27,6 +27,8 @@ add_library(gym_mapf_solvers SHARED
         heuristics/heuristic.cpp
         heuristics/dijkstra_heuristic.h
         heuristics/dijkstra_heuristic.cpp
+        heuristics/rtdp_dijkstra_heuristic.h
+        heuristics/rtdp_dijkstra_heuristic.cpp
         rtdp/rtdp.h
         rtdp/rtdp.cpp
         id/id.h

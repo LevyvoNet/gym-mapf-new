@@ -81,15 +81,17 @@ void DijkstraHeuristic::init(MapfEnv *env_param) {
 
 double DijkstraHeuristic::operator()(MultiAgentState *s) {
     double sum = 0;
+    size_t count = 0;
 
     for (size_t i = 0; i < this->env->n_agents; ++i) {
         if (s->locations[i] != this->env->goal_state->locations[i]) {
             sum += this->distance[i][this->env->grid->get_location(s->locations[i].row, s->locations[i].col).id];
+            ++count;
         }
     }
 
     /* If everyone is in goal, return 0 and don't add the goal reward in case there is one */
-    if (0 == sum) {
+    if (0 == count) {
         return 0;
     }
 

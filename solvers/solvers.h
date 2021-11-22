@@ -10,6 +10,7 @@
 #include "solvers/value_iteartion/value_iteration.h"
 #include "solvers/heuristics/heuristic.h"
 #include "solvers/heuristics/dijkstra_heuristic.h"
+#include "solvers/heuristics/rtdp_dijkstra_heuristic.h"
 #include "solvers/rtdp/rtdp.h"
 #include "solvers/id/id.h"
 #include "utils/utils.h"

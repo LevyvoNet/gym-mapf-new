@@ -17,8 +17,6 @@ private:
     vector<int> train_rewards;
     MultiAgentStateStorage<MultiAgentAction *> *cache;
 
-    virtual double get_value(MultiAgentState *s) override;
-
     void single_iteration();
     void clear_cache();
 
@@ -31,6 +29,8 @@ public:
     virtual void train() override;
 
     virtual MultiAgentAction *act(const MultiAgentState &state) override;
+
+    virtual double get_value(MultiAgentState *s) override;
 
 };
 

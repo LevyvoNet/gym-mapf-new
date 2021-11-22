@@ -114,24 +114,30 @@ public:
 class vi : public SolverCreator {
 public:
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new ValueIterationPolicy(env, gamma, "VI");
+        return new ValueIterationPolicy(env, gamma, "vi");
     }
 };
 
 class rtdp_dijkstra : public SolverCreator {
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new RtdpPolicy(env, gamma, "RTDP", new DijkstraHeuristic());
+        return new RtdpPolicy(env, gamma, "rtdp_dijkstra", new DijkstraHeuristic());
     }
 };
 
-class id_rtdp: public SolverCreator{
-    virtual Policy *operator()(MapfEnv *env, float gamma){
+class rtdp_dijkstra_rtdp : public SolverCreator {
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
+        return new RtdpPolicy(env, gamma, "rtdp_dijkstra_rtdp", new RtdpDijkstraHeuristic(gamma));
+    }
+};
+
+class id_rtdp : public SolverCreator {
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
         return new IdPolicy(env, gamma, "id_rtdp", new rtdp_dijkstra(), new RtdpMerger());
     }
 };
 
-class id_rtdp_default: public SolverCreator{
-    virtual Policy *operator()(MapfEnv *env, float gamma){
+class id_rtdp_default : public SolverCreator {
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
         return new IdPolicy(env, gamma, "id_rtdp_default", new rtdp_dijkstra(), nullptr);
     }
 };
@@ -152,11 +158,10 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 1 */
                 {
                         new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 2 */
                 {
-
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 }
 
         }
@@ -171,9 +176,13 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra(),
                         new id_rtdp_default(),
                         new id_rtdp(),
+                },
+                /* lvl 2 */
+                {
+                        new rtdp_dijkstra(),
+                        new rtdp_dijkstra_rtdp(),
                 }
         }
 );
