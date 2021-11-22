@@ -244,12 +244,12 @@ public:
             ++relevant_values;
         }
 
+        delete s1;
+        delete s2;
+
         if (0 == relevant_values) {
             return 0;
         }
-
-        delete s1;
-        delete s2;
 
         return sum - (relevant_values - 1) * env->reward_of_goal;
     }

@@ -70,9 +70,7 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
         steps++;
 
         /* Select the best action */
-        if (NULL!= selected_action){
-            delete selected_action;
-        }
+        delete selected_action;
         selected_action = this->act(*(this->env->s));
         /* Check if we are stuck */
         if (*selected_action == all_stay) {

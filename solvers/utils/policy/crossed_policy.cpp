@@ -28,7 +28,9 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
         for (size_t j = 0; j < this->groups[i].size(); ++j) {
             actions[this->groups[i][j]] = group_action->actions[j];
         }
+
         group_locations.clear();
+        delete group_state;
     }
 
     /* Calculate the new action ID */
@@ -41,6 +43,7 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
 
 CrossedPolicy::~CrossedPolicy() {
     for (Policy* p:this->policies){
+        delete p->env;
         delete p;
     }
 
