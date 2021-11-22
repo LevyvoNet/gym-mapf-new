@@ -39,6 +39,13 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
     return new MultiAgentAction(actions, action_id);
 }
 
+CrossedPolicy::~CrossedPolicy() {
+    for (Policy* p:this->policies){
+        delete p;
+    }
+
+}
+
 /** Utility Functions ********************************************************************************************/
 
 CrossedPolicy *solve_local_and_cross(MapfEnv *env, float gamma, SolverCreator *low_level_planner_creator, vector<vector<size_t>> *groups) {

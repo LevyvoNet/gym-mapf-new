@@ -126,5 +126,9 @@ MultiAgentAction *IdPolicy::act(const MultiAgentState &state) {
     return this->joint_policy->act(state);
 }
 
+IdPolicy::~IdPolicy() {
+    delete this->joint_policy;
+}
+
 
 

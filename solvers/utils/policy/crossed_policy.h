@@ -19,6 +19,8 @@ public:
     CrossedPolicy(MapfEnv *env, float gamma, const string &name, vector<vector<size_t>> groups,
                   vector<Policy *> policies);
 
+    ~CrossedPolicy();
+
     virtual MultiAgentAction *act(const MultiAgentState &state);
 
     virtual void train();

@@ -47,6 +47,8 @@ public:
     IdPolicy(MapfEnv *env, float gamma, const string &name,
              SolverCreator *low_level_planner_creator, PolicyMerger *low_level_merger);
 
+    ~IdPolicy();
+
     virtual MultiAgentAction *act(const MultiAgentState &state);
 
     virtual void train();
