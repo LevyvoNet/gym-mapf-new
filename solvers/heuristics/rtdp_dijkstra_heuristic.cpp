@@ -12,9 +12,11 @@ void RtdpDijkstraHeuristic::init(MapfEnv *env_param) {
     MapfEnv *local_env = nullptr;
     RtdpPolicy *local_policy = nullptr;
 
+    this->env = env_param;
+
     /* Calculate local policies for each agent */
     for (size_t agent = 0; agent < this->env->n_agents; ++agent) {
-        local_env = get_local_view(env_param, {agent});
+        local_env = get_local_view(this->env, {agent});
         local_policy = new RtdpPolicy(local_env, this->gamma, "", new DijkstraHeuristic());
         local_policy->train();
         this->local_policies.push_back(local_policy);
