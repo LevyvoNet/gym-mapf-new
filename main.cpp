@@ -161,7 +161,7 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 2 */
                 {
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 }
 
         }
@@ -182,16 +182,23 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra(),
+                        new rtdp_dijkstra(),
 //                        new rtdp_dijkstra_rtdp(),
                 }
         }
 );
 
 void benchmark_solver_on_env(Policy *policy) {
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     policy->train();
+    auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
+    cout<< "training took " << end/1000 << "seconds" << endl;
+
     TrainInfo *train_info = policy->get_train_info();
+    begin = std::chrono::steady_clock::now();
     EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
+    end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
+    cout<< "evaluation took " << end/1000 << "seconds" << endl;
 
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
