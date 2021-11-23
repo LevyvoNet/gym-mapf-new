@@ -50,12 +50,12 @@ void RtdpPolicy::single_iteration() {
         path.push_back(*s);
     }
 
-    for (int i = path.size() - 1; i >= 0; --i) {
-        this->select_max_value_action(path[i], &new_value, nullptr);
-        new_value_ptr = new double;
-        *new_value_ptr = new_value;
-        this->v->set(path[i], new_value_ptr);
-    }
+//    for (int i = path.size() - 1; i >= 0; --i) {
+//        this->select_max_value_action(path[i], &new_value, nullptr);
+//        new_value_ptr = new double;
+//        *new_value_ptr = new_value;
+//        this->v->set(path[i], new_value_ptr);
+//    }
 
     this->env->reset();
 
