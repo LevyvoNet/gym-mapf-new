@@ -14,6 +14,7 @@ Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
                                         Policy *policy2) {
     CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
     MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
+    joint_policy.policies.clear();
 
     Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
     policy->train();
