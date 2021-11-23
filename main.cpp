@@ -190,16 +190,9 @@ vector<vector<SolverCreator *>> solver_creators(
 );
 
 void benchmark_solver_on_env(Policy *policy) {
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     policy->train();
-    auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
-    cout << "training took " << end / 1000 << "seconds" << endl;
-
     TrainInfo *train_info = policy->get_train_info();
-    begin = std::chrono::steady_clock::now();
     EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
-    end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
-    cout << "evaluation took " << end / 1000 << "seconds" << endl;
 
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
