@@ -146,18 +146,18 @@ class id_rtdp_default : public SolverCreator {
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
                 },
                 /* lvl 1 */
                 {
-//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
                 },
                 /* lvl 2 */
                 {
@@ -170,20 +170,21 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi(),
+                        new vi(),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new id_rtdp_default(),
-//                        new id_rtdp(),
+                        new id_rtdp_default(),
+                        new id_rtdp(),
+                        new rtdp_dijkstra(),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra(),
-//                        new rtdp_dijkstra_rtdp(),
+
+                        new rtdp_dijkstra_rtdp(),
                 }
         }
 );
@@ -192,13 +193,13 @@ void benchmark_solver_on_env(Policy *policy) {
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     policy->train();
     auto end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
-    cout<< "training took " << end/1000 << "seconds" << endl;
+    cout << "training took " << end / 1000 << "seconds" << endl;
 
     TrainInfo *train_info = policy->get_train_info();
     begin = std::chrono::steady_clock::now();
     EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
     end = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - begin).count();
-    cout<< "evaluation took " << end/1000 << "seconds" << endl;
+    cout << "evaluation took " << end / 1000 << "seconds" << endl;
 
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
@@ -225,8 +226,8 @@ int main(int argc, char **argv) {
                     env = (*env_creator)();
                     policy = (*solver_creator)(env, 1.0);
                     benchmark_solver_on_env(policy);
-//                    delete env;
-//                    delete policy;
+                    delete env;
+                    delete policy;
                 }
             }
         }
