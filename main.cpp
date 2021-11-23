@@ -225,8 +225,8 @@ int main(int argc, char **argv) {
                     env = (*env_creator)();
                     policy = (*solver_creator)(env, 1.0);
                     benchmark_solver_on_env(policy);
-                    delete env;
-                    delete policy;
+//                    delete env;
+//                    delete policy;
                 }
             }
         }
