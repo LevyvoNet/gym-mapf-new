@@ -99,6 +99,7 @@ RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
 
 void RtdpPolicy::train() {
     /* Initialize the heuristic and measure the time for it */
+    std::chrono::steady_clock::time_point train_begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     this->h->init(this->env);
     std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
@@ -113,7 +114,6 @@ void RtdpPolicy::train() {
     float total_eval_time = 0;
 
     /* Run RTDP iterations until convergence */
-    std::chrono::steady_clock::time_point train_begin = std::chrono::steady_clock::now();
     while (iters_count < MAX_ITERATIONS) {
         for (size_t i = 0; i < BATCH_SIZE; ++i) {
             this->single_iteration();
@@ -141,7 +141,7 @@ void RtdpPolicy::train() {
     std::chrono::steady_clock::time_point train_end = std::chrono::steady_clock::now();
 
     /* Set the train info */
-    elapsed_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(train_end - train_begin).count();
+    elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(train_end - train_begin).count();
     elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
     total_eval_time = float(total_eval_time) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
