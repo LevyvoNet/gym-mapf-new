@@ -74,9 +74,9 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
         return false;
     }
 
-    if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
-        return false;
-    }
+//    if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
+//        return false;
+//    }
 
     return true;
 }
