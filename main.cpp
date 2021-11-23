@@ -178,10 +178,11 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
 //                        new id_rtdp_default(),
 //                        new id_rtdp(),
+                        new rtdp_dijkstra(),
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra(),
+
                         new rtdp_dijkstra_rtdp(),
                 }
         }
