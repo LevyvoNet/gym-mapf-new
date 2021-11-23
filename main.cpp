@@ -154,7 +154,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
 //                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-//                },
+                },
                 /* lvl 1 */
                 {
 //                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
