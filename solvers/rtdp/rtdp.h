@@ -16,6 +16,7 @@ private:
     Heuristic *h;
     vector<int> train_rewards;
     MultiAgentStateStorage<MultiAgentAction *> *cache;
+    bool in_train;
 
     void single_iteration();
     void clear_cache();

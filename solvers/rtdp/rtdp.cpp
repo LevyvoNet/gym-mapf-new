@@ -7,11 +7,10 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (300)
+#define MAX_ITERATIONS (10000)
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
-#define SUCCESS_RATE_EPSILON (0.05)
 #define MIN_SUCCESS_RATE (90)
 
 /** Private ****************************************************************************************************/
@@ -50,12 +49,13 @@ void RtdpPolicy::single_iteration() {
         path.push_back(*s);
     }
 
-//    for (int i = path.size() - 1; i >= 0; --i) {
-//        this->select_max_value_action(path[i], &new_value, nullptr);
-//        new_value_ptr = new double;
-//        *new_value_ptr = new_value;
-//        this->v->set(path[i], new_value_ptr);
-//    }
+    /* Backward update */
+    for (int i = path.size() - 1; i >= 0; --i) {
+        this->select_max_value_action(path[i], &new_value, nullptr);
+        new_value_ptr = new double;
+        *new_value_ptr = new_value;
+        this->v->set(path[i], new_value_ptr);
+    }
 
     this->env->reset();
 
@@ -74,9 +74,9 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
         return false;
     }
 
-//    if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
-//        return false;
-//    }
+    if ((std::abs(curr_eval_info->mdr - prev_eval_info->mdr) / std::abs(prev_eval_info->mdr)) >= MDR_EPSILON) {
+        return false;
+    }
 
     return true;
 }
@@ -93,7 +93,7 @@ RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
     this->h = h;
     this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, nullptr);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
-
+    this->in_train = true;
 }
 
 
@@ -127,7 +127,9 @@ void RtdpPolicy::train() {
         prev_eval_info = eval_info;
         std::chrono::steady_clock::time_point eval_begin = std::chrono::steady_clock::now();
         this->clear_cache();
+        this->in_train = false;
         eval_info = this->evaluate(100, 1000, 0);
+        this->in_train = true;
         std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
         total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(eval_end - eval_begin).count();
 
@@ -146,6 +148,9 @@ void RtdpPolicy::train() {
     (*(this->train_info->additional_data))["eval_time"] = std::to_string(round(total_eval_time * 100) / 100);
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
 
+    /* Finish training */
+    this->in_train= false;
+
 l_cleanup:
     if (nullptr != eval_info) {
         delete eval_info;
@@ -157,8 +162,16 @@ l_cleanup:
 
 double RtdpPolicy::get_value(MultiAgentState *s) {
     double *value = this->v->get(*s);
+    double h_value = 0;
     if (nullptr == value) {
-        return (*(this->h))(s);
+        h_value = (*(this->h))(s);
+        if (this->in_train){
+            value = new double;
+            *value=h_value;
+            this->v->set(*s, value);
+        }
+
+        return h_value;
     }
 
     return *value;
