@@ -193,6 +193,7 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 2 */
                 {
                         new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new EmptyGrid("empty_48X48_4-agents", 48, 4,0);
                 }
 
         }
@@ -243,10 +244,6 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     }
 
     std::cout << endl;
-
-//    /* TODO: in future we will be able to skip this (takes time) */
-//    delete env;
-//    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
