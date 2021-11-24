@@ -102,7 +102,7 @@ void RtdpPolicy::train() {
     std::chrono::steady_clock::time_point train_begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     this->h->init(this->env);
-    cout << "done with heuristic" << endl;
+    cout.flush();
     std::cout.flush();
     std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -222,10 +222,10 @@ public:
             p1(p1), p2(p2), g1(g1), g2(g2) {}
 
     ~SolutionSumHeuristic(){
-//        delete this->p1->env;
-//        delete this->p2->env;
-//        delete this->p1;
-//        delete this->p2;
+        delete this->p1->env;
+        delete this->p2->env;
+        delete this->p1;
+        delete this->p2;
     }
 
     virtual void init(MapfEnv *env_param) {

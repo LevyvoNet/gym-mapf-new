@@ -171,6 +171,13 @@ Location Grid::get_location(int row, int col) {
     return *this->id_to_loc[this->loc_to_id[row][col]];
 }
 
+Grid::~Grid() {
+    for (Location* l:this->id_to_loc){
+        delete l;
+    }
+
+}
+
 
 bool Location::operator==(const Location &other_loc) const {
     return (this->row == other_loc.row) && (this->col == other_loc.col);

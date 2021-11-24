@@ -69,6 +69,8 @@ public:
 
     Grid(std::vector<std::string> &map_lines);
 
+    ~Grid();
+
     Location get_location(int row, int col);
 
     Location execute(const Location &l, Action a);
