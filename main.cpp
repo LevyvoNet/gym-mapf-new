@@ -7,6 +7,9 @@
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
 
+/** Results ********************************************************************************************************/
+std::string RESULT_OK = "OK";
+std::string RESULT_COLLISION = "COLLISION";
 
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
@@ -190,11 +193,19 @@ vector<vector<SolverCreator *>> solver_creators(
         }
 );
 
-void benchmark_solver_on_env(Policy *policy) {
+std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator) {
+    /* Create the policy */
+    Policy *policy = nullptr;
+    MapfEnv *env = nullptr;
+    env = (*env_creator)();
+    policy = (*solver_creator)(env, 1.0);
+
+    /* Train and evaluate */
     policy->train();
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
 
+    /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
@@ -206,28 +217,27 @@ void benchmark_solver_on_env(Policy *policy) {
     }
 
     std::cout << endl;
+
+    /* TODO: in future we will be able to skip this (takes time) */
+    delete env;
+    delete policy;
+
+    if (eval_info->collision_happened) {
+        return RESULT_COLLISION;
+    }
+
+    return RESULT_OK;
 }
 
 int main(int argc, char **argv) {
-    Policy *policy = nullptr;
-    MapfEnv *env = nullptr;
-
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
             cout << endl << env_creator->name << endl;
             for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
-                    env = (*env_creator)();
-                    policy = (*solver_creator)(env, 1.0);
-                    benchmark_solver_on_env(policy);
-                    delete env;
-                    delete policy;
+                    benchmark_solver_on_env(env_creator, solver_creator);
                 }
             }
         }
     }
-
-    /* Delete all env creators */
-
-    /* Delete all solver creators */
 }
