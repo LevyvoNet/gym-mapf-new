@@ -294,12 +294,5 @@ Policy *RtdpMerger::operator()(MapfEnv *env, float gamma, vector<vector<size_t>>
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
     policy->train();
 
-    /* TDOO: delete this */
-    std::cout << " train_time: " << policy->get_train_info()->time;
-    for (auto item: *policy->get_train_info()->additional_data) {
-        std::cout << " " << item.first << ":" << item.second;
-    }
-    std::cout <<" ";
-
     return policy;
 }
