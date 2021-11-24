@@ -132,13 +132,13 @@ class rtdp_dijkstra_rtdp : public SolverCreator {
 
 class id_rtdp : public SolverCreator {
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new IdPolicy(env, gamma, "id_rtdp", new rtdp_dijkstra(), new RtdpMerger());
+        return new IdPolicy(env, gamma, "id_rtdp", new rtdp_dijkstra_rtdp(), new RtdpMerger());
     }
 };
 
 class id_rtdp_default : public SolverCreator {
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new IdPolicy(env, gamma, "id_rtdp_default", new rtdp_dijkstra(), nullptr);
+        return new IdPolicy(env, gamma, "id_rtdp_default", new rtdp_dijkstra_rtdp(), nullptr);
     }
 };
 
@@ -146,22 +146,22 @@ class id_rtdp_default : public SolverCreator {
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                         new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
                 },
                 /* lvl 1 */
                 {
-//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
                 },
                 /* lvl 2 */
                 {
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 }
 
         }
@@ -170,7 +170,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi(),
+                        new vi(),
 
                 },
 
@@ -178,13 +178,13 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
                         new id_rtdp_default(),
                         new id_rtdp(),
-//                        new rtdp_dijkstra(),
+                        new rtdp_dijkstra(),
 
                 },
                 /* lvl 2 */
                 {
 
-//                        new rtdp_dijkstra_rtdp(),
+                        new rtdp_dijkstra_rtdp(),
                 }
         }
 );
