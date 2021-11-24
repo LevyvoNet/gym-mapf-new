@@ -273,11 +273,6 @@ public:
             return 0;
         }
 
-        if (1 == relevant_values) {
-            int x=1;
-            relevant_values = relevant_values;
-        }
-
         return sum - (relevant_values - 1) * this->env->reward_of_goal;
     }
 
