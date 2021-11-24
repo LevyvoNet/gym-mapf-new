@@ -3,6 +3,8 @@
 //
 #include <iostream>
 #include <string>
+#include <unistd.h>
+#include <sys/types.h>
 
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
@@ -258,11 +260,18 @@ int main(int argc, char **argv) {
     vector<InstanceResult> results;
     std::string result;
     InstanceResult instance_result("", "", "");
+    int fds[2]={0};
+    pid_t pid=0;
 
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
             cout << endl << env_creator->name << endl;
             for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
+//                /* Open a pipe for the new child */
+//                pipe(fds);
+//
+//                pid = fork();
+
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
                     result = benchmark_solver_on_env(env_creator, solver_creator);
                     instance_result = InstanceResult(env_creator->name, solver_creator->name, result);
@@ -273,7 +282,7 @@ int main(int argc, char **argv) {
     }
 
     for (InstanceResult r: results) {
-        cout << r.env << ", " << r.solver << ", " << ": " << r.result;
+        cout << r.env << ", " << r.solver << ", " << ": " << r.result << endl;
     }
 
     return 0;
