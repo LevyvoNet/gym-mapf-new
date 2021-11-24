@@ -213,9 +213,9 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
 //                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp("id_rtdp"),
                 }
         }
 );
