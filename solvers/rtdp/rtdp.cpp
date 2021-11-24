@@ -7,7 +7,7 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (10000)
+#define MAX_ITERATIONS (200)
 #define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
@@ -102,6 +102,8 @@ void RtdpPolicy::train() {
     std::chrono::steady_clock::time_point train_begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     this->h->init(this->env);
+    cout << "done with heuristic" << endl;
+    std::cout.flush();
     std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
