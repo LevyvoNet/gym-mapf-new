@@ -256,11 +256,11 @@ public:
         v2 = this->p2->get_value(s2);
 
         /* Sum only the states which are not goal states */
-        if (s1 == this->p1->env->goal_state) {
+        if (s1 != this->p1->env->goal_state) {
             sum += v1;
             ++relevant_values;
         }
-        if (s2 == this->p2->env->goal_state) {
+        if (s2 != this->p2->env->goal_state) {
             sum += v2;
             ++relevant_values;
         }
@@ -294,10 +294,12 @@ Policy *RtdpMerger::operator()(MapfEnv *env, float gamma, vector<vector<size_t>>
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
     policy->train();
 
-    std::cout << " train_time:" << policy->get_train_info()->time;
+    /* TDOO: delete this */
+    std::cout << " train_time: " << policy->get_train_info()->time;
     for (auto item: *policy->get_train_info()->additional_data) {
         std::cout << " " << item.first << ":" << item.second;
     }
+    std::cout <<" ";
 
     return policy;
 }
