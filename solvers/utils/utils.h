@@ -16,6 +16,10 @@ public:
 
 class SolverCreator {
 public:
+    string name;
+
+    SolverCreator(string name):name(name){}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) = 0;
 };
 

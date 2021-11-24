@@ -11,6 +11,16 @@
 std::string RESULT_OK = "OK";
 std::string RESULT_COLLISION = "COLLISION";
 
+class InstanceResult {
+public:
+    std::string env;
+    std::string solver;
+    std::string result;
+
+    InstanceResult(std::string env, std::string solver, std::string result) :
+            solver(solver), env(env), result(result) {}
+};
+
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
 public:
@@ -116,32 +126,46 @@ public:
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
+    vi(string name) : SolverCreator(name) {}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new ValueIterationPolicy(env, gamma, "vi");
+        return new ValueIterationPolicy(env, gamma, this->name);
     }
 };
 
 class rtdp_dijkstra : public SolverCreator {
+public:
+    rtdp_dijkstra(string name) : SolverCreator(name) {}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new RtdpPolicy(env, gamma, "rtdp_dijkstra", new DijkstraHeuristic());
+        return new RtdpPolicy(env, gamma, this->name, new DijkstraHeuristic());
     }
 };
 
 class rtdp_dijkstra_rtdp : public SolverCreator {
+public:
+    rtdp_dijkstra_rtdp(string name) : SolverCreator(name) {}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new RtdpPolicy(env, gamma, "rtdp_dijkstra_rtdp", new RtdpDijkstraHeuristic(gamma));
+        return new RtdpPolicy(env, gamma, this->name, new RtdpDijkstraHeuristic(gamma));
     }
 };
 
 class id_rtdp : public SolverCreator {
+public:
+    id_rtdp(string name) : SolverCreator(name) {}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new IdPolicy(env, gamma, "id_rtdp", new rtdp_dijkstra_rtdp(), new RtdpMerger());
+        return new IdPolicy(env, gamma, this->name, new rtdp_dijkstra_rtdp(""), new RtdpMerger());
     }
 };
 
 class id_rtdp_default : public SolverCreator {
+public:
+    id_rtdp_default(string name) : SolverCreator(name) {}
+
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new IdPolicy(env, gamma, "id_rtdp_default", new rtdp_dijkstra_rtdp(), nullptr);
+        return new IdPolicy(env, gamma, this->name, new rtdp_dijkstra_rtdp(""), nullptr);
     }
 };
 
@@ -174,21 +198,21 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi(),
+                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra(),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
 
-                        new rtdp_dijkstra_rtdp(),
-                        new id_rtdp_default(),
-                        new id_rtdp(),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 }
         }
 );
@@ -229,15 +253,28 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     return RESULT_OK;
 }
 
+
 int main(int argc, char **argv) {
+    vector<InstanceResult> results;
+    std::string result;
+    InstanceResult instance_result("", "", "");
+
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
             cout << endl << env_creator->name << endl;
             for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
-                    benchmark_solver_on_env(env_creator, solver_creator);
+                    result = benchmark_solver_on_env(env_creator, solver_creator);
+                    instance_result = InstanceResult(env_creator->name, solver_creator->name, result);
+                    results.push_back(instance_result);
                 }
             }
         }
     }
+
+    for (InstanceResult r: results) {
+        cout << r.env << ", " << r.solver << ", " << ": " << r.result;
+    }
+
+    return 0;
 }
