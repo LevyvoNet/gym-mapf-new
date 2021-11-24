@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
                         exit(0);
                     }
 
-                    /* Parent process, read the result after the child is finished */
+                        /* Parent process, read the result after the child is finished */
                     else {
                         close(fds[1]);
                         waitpid(pid, nullptr, 0);
@@ -301,9 +301,18 @@ int main(int argc, char **argv) {
         }
     }
 
-    cout<< endl;
+    cout << endl;
+
+    bool error_occurred = false;
     for (InstanceResult r: results) {
-        cout << r.env << ", " << r.solver << ", " << ": " << r.result << endl;
+        if (r.result != RESULT_OK) {
+            cout << r.env << ", " << r.solver << ", " << ": " << r.result << endl;
+            error_occurred = true;
+        }
+    }
+
+    if (!error_occurred) {
+        cout << "-----------------------------------------Success-----------------------------------------" << endl;
     }
 
     return 0;
