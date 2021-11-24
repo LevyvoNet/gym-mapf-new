@@ -19,6 +19,11 @@ Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
     Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
     policy->train();
 
+    std::cout << " train_time:" << policy->get_train_info()->time;
+    for (auto item: *policy->get_train_info()->additional_data) {
+        std::cout << " " << item.first << ":" << item.second;
+    }
+
     return policy;
 }
 
