@@ -5,6 +5,7 @@
 #include <string>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/wait.h>
 
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
@@ -211,7 +212,6 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-
                         new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                         new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
@@ -244,9 +244,9 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
     std::cout << endl;
 
-    /* TODO: in future we will be able to skip this (takes time) */
-    delete env;
-    delete policy;
+//    /* TODO: in future we will be able to skip this (takes time) */
+//    delete env;
+//    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
@@ -260,27 +260,48 @@ int main(int argc, char **argv) {
     vector<InstanceResult> results;
     std::string result;
     InstanceResult instance_result("", "", "");
-    int fds[2]={0};
-    pid_t pid=0;
+    int fds[2] = {0};
+    pid_t pid = 0;
+    ssize_t written_bytes = 0;
+    char c_result[20];
 
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
             cout << endl << env_creator->name << endl;
             for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
-//                /* Open a pipe for the new child */
-//                pipe(fds);
-//
-//                pid = fork();
-
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
-                    result = benchmark_solver_on_env(env_creator, solver_creator);
-                    instance_result = InstanceResult(env_creator->name, solver_creator->name, result);
-                    results.push_back(instance_result);
+                    /* Open a pipe for the new child and fork*/
+                    pipe(fds);
+                    std::cout.flush();
+                    pid = fork();
+
+                    /* Child process, solve the instance and return the result */
+                    if (0 == pid) {
+                        close(fds[0]);
+                        result = benchmark_solver_on_env(env_creator, solver_creator);
+                        do {
+                            written_bytes = write(fds[1], result.c_str(), result.size() + 1);
+                        } while (written_bytes < result.size());
+                        close(fds[1]);
+                        exit(0);
+                    }
+
+                    /* Parent process, read the result after the child is finished */
+                    else {
+                        close(fds[1]);
+                        waitpid(pid, nullptr, 0);
+                        result = read(fds[0], c_result, 20);
+                        instance_result = InstanceResult(env_creator->name, solver_creator->name,
+                                                         std::string(c_result));
+                        results.push_back(instance_result);
+                    }
+
                 }
             }
         }
     }
 
+    cout<< endl;
     for (InstanceResult r: results) {
         cout << r.env << ", " << r.solver << ", " << ": " << r.result << endl;
     }
