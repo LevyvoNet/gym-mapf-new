@@ -13,21 +13,11 @@ MultiAgentState::MultiAgentState(const vector<Location> &locations, int64_t id) 
 }
 
 bool MultiAgentState::operator==(const MultiAgentState &other) const {
-//    size_t agent_idx = 0;
-//
-//    if (this->locations.size() != other.locations.size()) {
-//        return false;
-//    }
-//
-//    for (agent_idx = 0; agent_idx < this->locations.size(); ++agent_idx) {
-//
-//        if (this->locations[agent_idx] != other.locations[agent_idx]) {
-//            return false;
-//        }
-//    }
-//
-//    return true;
     return this->id == other.id;
+}
+
+bool MultiAgentState::operator!=(const MultiAgentState &other) const {
+    return this->id != other.id;
 }
 
 

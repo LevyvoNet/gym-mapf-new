@@ -19,6 +19,8 @@ public:
     MultiAgentState(const vector<Location> &locations, int64_t id);
 
     bool operator==(const MultiAgentState &other) const;
+
+    bool operator!=(const MultiAgentState &other) const;
 };
 
 

@@ -256,11 +256,11 @@ public:
         v2 = this->p2->get_value(s2);
 
         /* Sum only the states which are not goal states */
-        if (s1 != this->p1->env->goal_state) {
+        if (*s1 != *this->p1->env->goal_state) {
             sum += v1;
             ++relevant_values;
         }
-        if (s2 != this->p2->env->goal_state) {
+        if (*s2 != *this->p2->env->goal_state) {
             sum += v2;
             ++relevant_values;
         }
@@ -273,7 +273,12 @@ public:
             return 0;
         }
 
-        return sum - (relevant_values - 1) * env->reward_of_goal;
+        if (1 == relevant_values) {
+            int x=1;
+            relevant_values = relevant_values;
+        }
+
+        return sum - (relevant_values - 1) * this->env->reward_of_goal;
     }
 
 
