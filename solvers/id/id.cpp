@@ -95,6 +95,9 @@ void IdPolicy::train() {
     vector<vector<size_t>> groups(env->n_agents);
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end;
+    size_t conflicts_count = 0;
+    std::chrono::steady_clock::time_point conflict_begin;
+    auto conflict_detection_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin).count();
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
@@ -105,7 +108,11 @@ void IdPolicy::train() {
     /* Search for conflicts and merge iteratively */
     do {
         /* Check for conflict */
+        conflict_begin = std::chrono::steady_clock::now();
         conflict = detect_single_conflict(curr_joint_policy);
+        conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
+                std::chrono::steady_clock::now() - conflict_begin).count();
+
 
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
@@ -119,6 +126,11 @@ void IdPolicy::train() {
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
+
+    /* Set additional training info */
+    (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflict_count);
+    float conflict_time = float(conflict_detection_time_milliseconds) / 1000;
+    (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int)round( conflict_time* 100) / 100 );
 
     this->joint_policy = curr_joint_policy;
 }
