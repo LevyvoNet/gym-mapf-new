@@ -88,7 +88,6 @@ CrossedPolicy *merge_groups(MapfEnv *env,
 
 
 void IdPolicy::train() {
-    size_t conflict_count = 0;
     Conflict *conflict = nullptr;
     CrossedPolicy *curr_joint_policy = nullptr;
     CrossedPolicy *prev_joint_policy = nullptr;
@@ -97,8 +96,7 @@ void IdPolicy::train() {
     std::chrono::steady_clock::time_point end;
     size_t conflicts_count = 0;
     std::chrono::steady_clock::time_point conflict_begin;
-    auto conflict_detection_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-            begin - begin).count();
+    float conflict_detection_time_milliseconds = 0;
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
@@ -130,7 +128,7 @@ void IdPolicy::train() {
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
 
     /* Set additional training info */
-    (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflict_count);
+    (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflicts_count);
     float conflict_time = float(conflict_detection_time_milliseconds) / 1000;
     (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int) round(conflict_time * 100) / 100);
 
