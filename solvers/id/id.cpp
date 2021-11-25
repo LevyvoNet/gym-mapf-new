@@ -50,8 +50,8 @@ CrossedPolicy *merge_groups(MapfEnv *env,
     vector<Policy *> new_policies;
 
     /* Find the group of each agent */
-    int a1_group = conflict->g1;
-    int a2_group = conflict->g2;
+    int a1_group = get_group_of_agent(joint_policy->groups, conflict->agent1);
+    int a2_group = get_group_of_agent(joint_policy->groups, conflict->agent2);
 
     /* Merge the policies of both groups to a single one */
     new_joint_policy = (*low_level_merger)(env,
@@ -108,7 +108,7 @@ void IdPolicy::train() {
     do {
         /* Check for conflict */
         conflict_begin = std::chrono::steady_clock::now();
-        conflict = detect_single_conflict(curr_joint_policy);
+        conflict = detect_conflict(curr_joint_policy);
         conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - conflict_begin).count();
 

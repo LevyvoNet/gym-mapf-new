@@ -39,7 +39,7 @@ public:
         std::ostringstream map_name;
         map_name << "empty-" << this->grid_size << "-" << this->grid_size;
 
-        return create_mapf_env(map_name.str(), 1, this->n_agents, 0.2, -1000, this->goal_reward, -1);
+        return create_mapf_env(map_name.str(), 1, this->n_agents, 0.21, -1000, this->goal_reward, -1);
     }
 };
 
@@ -65,7 +65,7 @@ public:
                            2,
                            {g->get_location(2, 0), g->get_location(2, 5)},
                            {g->get_location(2, 5), g->get_location(2, 0)},
-                           0.2,
+                           0.21,
                            -1000,
                            goal_reward,
                            -1);
@@ -96,7 +96,7 @@ public:
                            2,
                            {g->get_location(2, 0), g->get_location(2, 4)},
                            {g->get_location(2, 4), g->get_location(2, 0)},
-                           0.2,
+                           0.21,
                            -1000,
                            goal_reward,
                            -1);
@@ -122,7 +122,7 @@ public:
     virtual MapfEnv *operator()() {
         std::ostringstream map_name;
         map_name << "room-" << this->room_size << "-" << this->room_size << "-" << this->n_rooms;
-        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.2, -1000, 0, -1);
+        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
     }
 };
 

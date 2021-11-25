@@ -87,11 +87,11 @@ MapfEnv *merge_groups_envs(CrossedPolicy *joint_policy, size_t g1, size_t g2) {
     return get_local_view(joint_policy->env, merged_agents);
 }
 
-int find_group_of_agent(size_t agent, const vector<vector<size_t>> &groups) {
-    for (size_t i = 0; i < groups.size(); ++i) {
-        for (size_t j = 0; j < groups[i].size(); ++j) {
-            if (groups[i][j] == agent) {
-                return i;
+int get_group_of_agent(const vector<vector<size_t>> &groups, size_t agent) {
+    for (size_t group_idx = 0; group_idx < groups.size(); ++group_idx) {
+        for (size_t a: groups[group_idx]) {
+            if (a == agent) {
+                return group_idx;
             }
         }
     }

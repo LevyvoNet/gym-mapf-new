@@ -34,4 +34,6 @@ CrossedPolicy *solve_local_and_cross(MapfEnv *env,
 
 MapfEnv *merge_groups_envs(CrossedPolicy *joint_policy, size_t g1, size_t g2);
 
+int get_group_of_agent(const vector<vector<size_t>> &groups, size_t agent);
+
 #endif //GYM_MAPF_CROSSED_POLICY_H

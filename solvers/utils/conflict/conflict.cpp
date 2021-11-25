@@ -4,20 +4,8 @@
 
 #include "conflict.h"
 
-int get_group_of_agent(const vector<vector<size_t>> &groups, size_t agent) {
-    for (size_t group_idx = 0; group_idx < groups.size(); ++group_idx) {
-        for (size_t a: groups[group_idx]) {
-            if (a == agent) {
-                return group_idx;
-            }
-        }
-    }
-
-    return -1;
-}
-
-
-Conflict *detect_single_conflict_couple(CrossedPolicy *joint_policy, size_t g1, size_t g2) {
+/** Old conflict **************************************************************************************************/
+ConflictOld *detect_single_conflict_couple(CrossedPolicy *joint_policy, size_t g1, size_t g2) {
     vector<Location> new_locations;
     vector<MultiAgentState> states_to_expand;
     MapfEnv *merged_env = nullptr;
@@ -33,7 +21,7 @@ Conflict *detect_single_conflict_couple(CrossedPolicy *joint_policy, size_t g1, 
     TransitionsList *transitions2 = nullptr;
     MultiAgentStateStorage<bool *> *expanded_states = nullptr;
     bool *expanded = nullptr;
-    Conflict *conflict = nullptr;
+    ConflictOld *conflict = nullptr;
 
     /* Merge into a single group and get its local view */
     merged_env = merge_groups_envs(joint_policy, g1, g2);
@@ -95,7 +83,7 @@ Conflict *detect_single_conflict_couple(CrossedPolicy *joint_policy, size_t g1, 
 
                 /* Check if the current transition represents a conflict */
                 if (is_collision_transition(&curr_state, new_state)) {
-                    conflict = new Conflict(g1, g2, curr_state, *new_state);
+                    conflict = new ConflictOld(g1, g2, curr_state, *new_state);
                     goto l_cleanup;
                 }
 
@@ -120,8 +108,8 @@ l_cleanup:
     return conflict;
 }
 
-Conflict *detect_single_conflict(CrossedPolicy *joint_policy) {
-    Conflict *conflict = nullptr;
+ConflictOld *detect_single_conflict(CrossedPolicy *joint_policy) {
+    ConflictOld *conflict = nullptr;
 
     for (size_t g1 = 0; g1 < joint_policy->groups.size(); ++g1) {
         for (size_t g2 = 0; g2 < joint_policy->groups.size(); ++g2) {
@@ -137,5 +125,111 @@ Conflict *detect_single_conflict(CrossedPolicy *joint_policy) {
     return conflict;
 }
 
-Conflict::Conflict(size_t g1, size_t g2, MultiAgentState prev_state, MultiAgentState next_state) :
+ConflictOld::ConflictOld(size_t g1, size_t g2, MultiAgentState prev_state, MultiAgentState next_state) :
         g1(g1), g2(g2), prev_state(prev_state), next_state(next_state) {}
+
+
+/** Shared States Conflict ****************************************************************************************/
+Conflict::Conflict(size_t agent1, size_t agent2) : agent1(agent1), agent2(agent2) {}
+
+tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_policy, size_t agent) {
+    tsl::hopscotch_set<Location> *reachable_locations = new tsl::hopscotch_set<Location>();
+    vector<MultiAgentState> states_to_expand;
+    MultiAgentState curr_state({}, 0);
+    size_t agent_idx_in_group = 0;
+    bool *expanded = nullptr;
+    MultiAgentStateStorage<bool *> *expanded_states = nullptr;
+    MultiAgentState *next_state = nullptr;
+    TransitionsList *transitions = nullptr;
+
+    /* Extract the agent's group policy */
+    size_t group = get_group_of_agent(joint_policy->groups, agent);
+    Policy *policy = joint_policy->policies[group];
+    for (size_t i = 0; i < joint_policy->groups[group].size(); ++i) {
+        if (joint_policy->groups[group][i] == agent) {
+            break;
+        }
+    }
+
+    /* Initialize */
+    expanded_states = new MultiAgentStateStorage<bool *>(policy->env->n_agents, nullptr);
+    expanded = new bool;
+    *expanded = false;
+    expanded_states->set(*policy->env->start_state, expanded);
+    states_to_expand.push_back(*policy->env->start_state);
+
+    do {
+        /* Pop the next state to expand and mark it */
+        curr_state = states_to_expand.back();
+        states_to_expand.pop_back();
+        expanded = new bool;
+        *expanded = true;
+        expanded_states->set(curr_state, expanded);
+        reachable_locations->insert(curr_state.locations[agent_idx_in_group]);
+
+        /* Iterate over the transitions given the current state and policy action.
+         * Add non-expanded states to states_to_expand and the agent locations to reachable_locations */
+        transitions = policy->env->get_transitions(curr_state, *policy->act(curr_state));
+        for (Transition *t: *transitions->transitions) {
+            reachable_locations->insert(t->next_state->locations[agent_idx_in_group]);
+
+
+            /* Add the new_state to expansion if needed */
+            expanded = expanded_states->get(*t->next_state);
+            if (nullptr == expanded) {
+                states_to_expand.push_back(*t->next_state);
+            }
+        }
+
+
+    } while (states_to_expand.size() > 0);
+
+l_cleanup:
+    return reachable_locations;
+
+}
+
+bool are_intersected(tsl::hopscotch_set<Location> *locs1, tsl::hopscotch_set<Location> *locs2) {
+    tsl::hopscotch_set<Location> *smaller = nullptr;
+    tsl::hopscotch_set<Location> *bigger = nullptr;
+
+    if (locs1->size() >= locs2->size()) {
+        bigger = locs1;
+        smaller = locs2;
+    } else {
+        bigger = locs2;
+        smaller = locs1;
+    }
+
+    for (Location l: *smaller) {
+        if (bigger->contains(l)) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool are_sharing_states(CrossedPolicy *joint_policy, size_t agent1, size_t agent2) {
+    tsl::hopscotch_set<Location> *locs1 = get_reachable_locations(joint_policy, agent1);
+    tsl::hopscotch_set<Location> *locs2 = get_reachable_locations(joint_policy, agent2);
+
+    return are_intersected(locs1, locs2);
+}
+
+Conflict *detect_conflict(CrossedPolicy *joint_policy) {
+    Conflict *conflict = nullptr;
+
+    for (size_t agent1 = 0; agent1 < joint_policy->env->n_agents; ++agent1) {
+        for (size_t agent2 = 0; agent2 < joint_policy->groups.size(); ++agent2) {
+            if (agent1 < agent2 && are_sharing_states(joint_policy, agent1, agent2)) {
+                conflict = new Conflict(agent1, agent2);
+                break;
+            }
+        }
+    }
+
+    return conflict;
+}
+
+
