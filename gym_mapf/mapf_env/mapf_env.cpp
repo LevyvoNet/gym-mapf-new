@@ -16,16 +16,17 @@
 #define NO_DISRUPTION (0)
 #define CLOCKWISE (1)
 #define COUNTERCLOCKWISE (2)
-#define INVALID_DISRUPTION (3)
+#define DELAY (3)
+#define INVALID_DISRUPTION (4)
 
 
 /** Globals ***************************************************************************************************/
-Action g_action_noise_to_action[5][3] = {
-        {STAY,  STAY,  STAY},
-        {UP,    RIGHT, LEFT},
-        {RIGHT, DOWN,  UP},
-        {DOWN,  LEFT,  RIGHT},
-        {LEFT,  UP,    DOWN}
+Action g_action_noise_to_action[5][4] = {
+        {STAY,  STAY,  STAY,  STAY},
+        {UP,    RIGHT, LEFT,  STAY},
+        {RIGHT, DOWN,  UP,    STAY},
+        {DOWN,  LEFT,  RIGHT, STAY},
+        {LEFT,  UP,    DOWN,  STAY}
 };
 
 /** Transition ***********************************************************************************************/
@@ -239,8 +240,8 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
     size_t curr_agent_idx = 0;
     double curr_prob = 0;
     unsigned long n_disruptions = (unsigned long) pow((double) INVALID_DISRUPTION, this->n_agents);
-    double disrupt_ratio = 0.5 * this->fail_prob / (1 - this->fail_prob);
-    double normal_ratio = 2 * (1 - this->fail_prob) / this->fail_prob;
+    double disrupt_ratio = (this->fail_prob / (1 - this->fail_prob)) / 3;
+    double normal_ratio = 3 * (1 - this->fail_prob) / this->fail_prob;
     /* TODO: make sure that this the default copy c'tor copies the underlying vector */
     MultiAgentAction t_action = MultiAgentAction(action);
     MultiAgentState *t_state = NULL;
@@ -325,7 +326,11 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
                    bool *is_collision) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::discrete_distribution<> d({1 - this->fail_prob, this->fail_prob / 2, this->fail_prob / 2});
+    std::discrete_distribution<> d({
+                                           1 - this->fail_prob,
+                                           this->fail_prob / 3,
+                                           this->fail_prob / 3,
+                                           this->fail_prob / 3});
     int noise_idx = 0;
     Action noised_action = STAY;
     size_t agent_idx = 0;
