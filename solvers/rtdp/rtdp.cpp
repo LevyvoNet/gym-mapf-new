@@ -187,18 +187,17 @@ RtdpPolicy::~RtdpPolicy() {
 
 MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
     MultiAgentAction *a = nullptr;
-    MultiAgentAction *all_stay = nullptr;
 
     a = this->cache->get(state);
     if (nullptr != a) {
         return new MultiAgentAction(a->actions, a->id);
     }
 
-    /* If this is an unfamiliar state, return all stay action */
-    if (nullptr == this->v->get(state)) {
-        MultiAgentActionIterator a_iter = this->env->action_space->begin();
-        return new MultiAgentAction(a_iter->actions, a_iter->id);
-    }
+//    /* If this is an unfamiliar state, return all stay action */
+//    if (nullptr == this->v->get(state)) {
+//        MultiAgentActionIterator a_iter = this->env->action_space->begin();
+//        return new MultiAgentAction(a_iter->actions, a_iter->id);
+//    }
 
     a = ValueFunctionPolicy::act(state);
     this->cache->set(state, new MultiAgentAction(a->actions, a->id));
