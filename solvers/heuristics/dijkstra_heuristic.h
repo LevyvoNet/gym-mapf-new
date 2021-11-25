@@ -13,6 +13,7 @@
 class DijkstraHeuristic : public Heuristic {
 private:
     int **distance;
+    size_t n_agents;
     MapfEnv *env;
 
     void dijkstra_single_agent(size_t agent_idx);

@@ -63,6 +63,7 @@ l_cleanup:
 /** Public *******************************************************************************/
 void DijkstraHeuristic::init(MapfEnv *env_param) {
     this->env = env_param;
+    this->n_agents = this->env->n_agents;
     this->distance = new int *[env->n_agents];
 
     /* Allocate the distance for each agent */
@@ -100,8 +101,8 @@ double DijkstraHeuristic::operator()(MultiAgentState *s) {
 }
 
 DijkstraHeuristic::~DijkstraHeuristic() {
-//    for (size_t i=0;i<this->env->n_agents;++i){
-//        delete this->distance[i];
-//    }
-    delete this->distance;
+    for (size_t i=0;i<this->n_agents;++i){
+        delete this->distance[i];
+    }
+//    delete this->distance;
 }

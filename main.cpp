@@ -194,7 +194,7 @@ vector<vector<EnvCreator *>> env_creators(
                 {
                         new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                         new EmptyGrid("empty_32X32_3-agents", 32, 3,0),
-                        new EmptyGrid("empty_32X32_3-agents", 32, 4,0),
+                        new EmptyGrid("empty_32X32_4-agents", 32, 4,0),
                         new EmptyGrid("empty_48X48_3-agents", 48, 3,0),
                         new EmptyGrid("empty_48X48_4-agents", 48, 4,0),
                 }
