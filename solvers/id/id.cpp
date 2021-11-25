@@ -129,7 +129,7 @@ void IdPolicy::train() {
 
     /* Set additional training info */
     (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflicts_count);
-    float conflict_time = float(conflict_detection_time_milliseconds) / 1000;
+    float conflict_time = conflict_detection_time_milliseconds / 1000;
     (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int) round(conflict_time * 100) / 100);
 
     this->joint_policy = curr_joint_policy;
