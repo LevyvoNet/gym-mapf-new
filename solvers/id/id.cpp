@@ -97,7 +97,8 @@ void IdPolicy::train() {
     std::chrono::steady_clock::time_point end;
     size_t conflicts_count = 0;
     std::chrono::steady_clock::time_point conflict_begin;
-    auto conflict_detection_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(begin-begin).count();
+    auto conflict_detection_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
+            begin - begin).count();
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
@@ -118,6 +119,7 @@ void IdPolicy::train() {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
             curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
+            ++conflicts_count;
         }
     } while (nullptr != conflict);
 
@@ -130,7 +132,7 @@ void IdPolicy::train() {
     /* Set additional training info */
     (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflict_count);
     float conflict_time = float(conflict_detection_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int)round( conflict_time* 100) / 100 );
+    (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int) round(conflict_time * 100) / 100);
 
     this->joint_policy = curr_joint_policy;
 }
