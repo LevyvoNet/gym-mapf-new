@@ -128,7 +128,7 @@ void IdPolicy::train() {
 
             ++conflicts_count;
         }
-    } while (groups.size() != 1 || nullptr != conflict);
+    } while (groups.size() != 1 && nullptr != conflict);
 
     /* Update train time measurement */
     end = std::chrono::steady_clock::now();
