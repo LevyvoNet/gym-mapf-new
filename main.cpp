@@ -226,14 +226,14 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                         new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp("id_rtdp"),
                 }
         }
 );
@@ -293,7 +293,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
