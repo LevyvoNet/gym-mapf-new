@@ -141,6 +141,7 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
     MultiAgentStateStorage<bool *> *expanded_states = nullptr;
     MultiAgentState *next_state = nullptr;
     TransitionsList *transitions = nullptr;
+    MultiAgentAction* action = nullptr;
 
     /* Extract the agent's group policy */
     size_t group = get_group_of_agent(joint_policy->groups, agent);
@@ -169,7 +170,9 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
 
         /* Iterate over the transitions given the current state and policy action.
          * Add non-expanded states to states_to_expand and the agent locations to reachable_locations */
-        transitions = policy->env->get_transitions(curr_state, *policy->act(curr_state));
+        action = policy->act(curr_state);
+        transitions = policy->env->get_transitions(curr_state, *action);
+        delete action;
         for (Transition *t: *transitions->transitions) {
             reachable_locations->insert(t->next_state->locations[agent_idx_in_group]);
 
@@ -177,14 +180,18 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
             /* Add the new_state to expansion if needed */
             expanded = expanded_states->get(*t->next_state);
             if (nullptr == expanded) {
+                expanded = new bool;
+                *expanded = false;
+                expanded_states->set(*t->next_state, expanded);
                 states_to_expand.push_back(*t->next_state);
             }
         }
 
-
     } while (states_to_expand.size() > 0);
 
 l_cleanup:
+    delete expanded_states;
+
     return reachable_locations;
 
 }
@@ -214,7 +221,11 @@ bool are_sharing_states(CrossedPolicy *joint_policy, size_t agent1, size_t agent
     tsl::hopscotch_set<Location> *locs1 = get_reachable_locations(joint_policy, agent1);
     tsl::hopscotch_set<Location> *locs2 = get_reachable_locations(joint_policy, agent2);
 
-    return are_intersected(locs1, locs2);
+
+    bool ret = are_intersected(locs1, locs2);
+    delete locs1;
+    delete locs2;
+    return ret;
 }
 
 Conflict *detect_conflict(CrossedPolicy *joint_policy) {
