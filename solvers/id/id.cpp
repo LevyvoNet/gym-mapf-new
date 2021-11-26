@@ -119,7 +119,7 @@ void IdPolicy::train() {
             curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
             ++conflicts_count;
         }
-    } while (nullptr != conflict);
+    } while (groups.size() != 1 || nullptr != conflict);
 
     /* Update train time measurement */
     end = std::chrono::steady_clock::now();
