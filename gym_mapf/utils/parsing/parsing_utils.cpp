@@ -116,3 +116,92 @@ MapfEnv *create_mapf_env(std::string map_name,
                        living_reward
     );
 }
+
+
+MapfEnv *create_sanity_mapf_env(size_t n_rooms,
+                                size_t room_size,
+                                size_t n_agents,
+                                float fail_prob,
+                                int collision_reward,
+                                int goal_reward,
+                                int living_reward) {
+    std::string single_line = "";
+    vector<std::string> single_room;
+    vector<std::string> grid_lines;
+    size_t n_agents_per_room = n_agents / n_rooms;
+    size_t n_agents_last_room = n_agents - (n_agents_per_room * (n_rooms - 1));
+    std::vector<Location> start_locations;
+    std::vector<Location> goal_locations;
+
+    /* Initialize the single room lines */
+    for (size_t i = 0; i < room_size; ++i) {
+        single_line += ".";
+    }
+    for (size_t i = 0; i < room_size; ++i) {
+        single_room.push_back(single_line);
+    }
+
+    /* Init grid lines with a single room */
+    grid_lines = single_room;
+
+    /* Concatenate n-1 rooms with a border to grid_lines */
+    for (size_t i = 1; i <= n_rooms - 1; ++i) {
+
+        /* Concatenate a whole room to grid_lines */
+        for (size_t line = 0; line < grid_lines.size() - 1; ++line) {
+            grid_lines[line] += "@@" + single_line;
+        }
+        /* In the last line the buffer between the rooms should be open */
+        grid_lines[grid_lines.size() - 1] += ".." + single_line;
+    }
+
+    /* Create the grid from grid lines */
+    Grid *grid = new Grid(grid_lines);
+
+    /* Locate the agents inside the rooms */
+    std::ostringstream map_name_stream;
+    map_name_stream << "empty-" << room_size << "-" << room_size;
+    std::string map_name = map_name_stream.str();
+    for (size_t i = 0; i < n_rooms; ++i) {
+        size_t scen_id = (i % 25) + 1;
+        vector<Location> curr_room_start_locations;
+        vector<Location> curr_room_goal_locations;
+        std::ostringstream scen_file_string_stream;
+        scen_file_string_stream << get_maps_dir() << "/" << map_name << "/" << map_name << "-even-" << scen_id
+                                << ".scen";
+        if (i != n_rooms - 1) {
+            parse_scen_file(scen_file_string_stream.str(),
+                            n_agents_per_room,
+                            grid,
+                            &curr_room_start_locations,
+                            &curr_room_goal_locations);
+        } else {
+            parse_scen_file(scen_file_string_stream.str(),
+                            n_agents_last_room,
+                            grid,
+                            &curr_room_start_locations,
+                            &curr_room_goal_locations);
+        }
+
+        /* Set the locations according to the current room offset */
+        for (Location l: curr_room_start_locations) {
+            Location shifted_location = grid->get_location(l.row, l.col + i * (room_size + 2));
+            start_locations.push_back(shifted_location);
+        }
+        for (Location l: curr_room_goal_locations) {
+            Location shifted_location = grid->get_location(l.row, l.col + i * (room_size + 2));
+            goal_locations.push_back(shifted_location);
+        }
+    }
+
+
+    return new MapfEnv(grid,
+                       n_agents,
+                       start_locations,
+                       goal_locations,
+                       fail_prob,
+                       collision_reward,
+                       goal_reward,
+                       living_reward
+    );
+}

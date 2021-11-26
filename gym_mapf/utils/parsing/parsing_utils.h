@@ -17,6 +17,8 @@ std::vector<std::string> parse_map_file(string file_path);
 void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<Location> *start_locations,
                      vector<Location> *goal_locations);
 
+
+
 MapfEnv* create_mapf_env(std::string map_name,
                          size_t scen_id,
                          size_t n_agents,
@@ -24,5 +26,13 @@ MapfEnv* create_mapf_env(std::string map_name,
                          int collision_reward,
                          int goal_reward,
                          int living_reward);
+
+MapfEnv *create_sanity_mapf_env(size_t n_rooms,
+                                size_t room_size,
+                                size_t n_agents,
+                                float fail_prob,
+                                int collision_reward,
+                                int goal_reward,
+                                int living_reward);
 
 #endif //GYM_MAPF_PARSING_UTILS_H
