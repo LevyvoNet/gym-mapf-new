@@ -104,9 +104,6 @@ void IdPolicy::train() {
     }
     curr_joint_policy = solve_local_and_cross(this->env, this->gamma, this->low_level_planner_creator, &groups);
 
-    cout << "After solve local" << endl;
-    cout.flush();
-
     /* Search for conflicts and merge iteratively */
     do {
         /* Check for conflict */
@@ -115,17 +112,10 @@ void IdPolicy::train() {
         conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - conflict_begin).count();
 
-        cout << "After conflict" << endl;
-        cout.flush();
-
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
             curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
-
-            cout << "After merging" << endl;
-            cout.flush();
-
             ++conflicts_count;
         }
     } while (groups.size() != 1 && nullptr != conflict);
