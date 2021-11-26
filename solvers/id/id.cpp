@@ -105,7 +105,7 @@ void IdPolicy::train() {
         conflict = detect_conflict(curr_joint_policy);
         conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - conflict_begin).count();
-        
+
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
