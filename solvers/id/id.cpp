@@ -9,7 +9,7 @@ Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
                                         float gamma,
                                         size_t group1,
                                         size_t group2,
-                                        CrossedPolicy *joint_policy)  {
+                                        CrossedPolicy *joint_policy) {
     MapfEnv *merged_env = merge_groups_envs(joint_policy, group1, group2);
 
     Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
@@ -98,9 +98,6 @@ void IdPolicy::train() {
     }
     curr_joint_policy = solve_local_and_cross(this->env, this->gamma, this->low_level_planner_creator, &groups);
 
-    cout << "After solve local" << endl;
-    cout.flush();
-
     /* Search for conflicts and merge iteratively */
     do {
         /* Check for conflict */
@@ -108,18 +105,11 @@ void IdPolicy::train() {
         conflict = detect_conflict(curr_joint_policy);
         conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
                 std::chrono::steady_clock::now() - conflict_begin).count();
-
-        cout << "After conflict" << endl;
-        cout.flush();
-
+        
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
             curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
-
-            cout << "After merging" << endl;
-            cout.flush();
-
             ++conflicts_count;
         }
     } while (groups.size() != 1 && nullptr != conflict);
