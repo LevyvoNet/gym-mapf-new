@@ -193,24 +193,24 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                         new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 }
 
@@ -231,8 +231,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-                        new id_rtdp_default("id_rtdp_default"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
                 }
         }
@@ -264,9 +264,9 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     std::cout << endl;
 
 //    /* NOTE: this is redundant when running in fork */
-//    delete env->grid;
-//    delete env;
-//    delete policy;
+    delete env->grid;
+    delete env;
+    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
