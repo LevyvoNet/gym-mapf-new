@@ -211,7 +211,7 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 2 */
                 {
 //                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 8, 3),
                 }
 
         }
