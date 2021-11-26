@@ -19,6 +19,7 @@ private:
     bool in_train;
 
     void single_iteration();
+
     void clear_cache();
 
 public:
@@ -36,15 +37,13 @@ public:
 };
 
 
-class RtdpMerger: public PolicyMerger {
+class RtdpMerger : public PolicyMerger {
 public:
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
-                               vector<vector<size_t>> groups,
                                size_t group1,
                                size_t group2,
-                               Policy* policy1,
-                               Policy* policy2);
+                               CrossedPolicy *joint_policy);
 };
 
 #endif //GYM_MAPF_RTDP_H

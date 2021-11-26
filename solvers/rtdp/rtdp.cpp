@@ -108,7 +108,7 @@ void RtdpPolicy::train() {
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
             init_end - init_begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["init_time"] = std::to_string((int)round(elapsed_time_seconds * 100) / 100);
+    (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(elapsed_time_seconds * 100) / 100);
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
@@ -147,11 +147,11 @@ void RtdpPolicy::train() {
     elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
     total_eval_time = float(total_eval_time) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
-    (*(this->train_info->additional_data))["eval_time"] = std::to_string((int)round(total_eval_time * 100) / 100);
+    (*(this->train_info->additional_data))["eval_time"] = std::to_string((int) round(total_eval_time * 100) / 100);
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
 
     /* Finish training */
-    this->in_train= false;
+    this->in_train = false;
 
 l_cleanup:
     if (nullptr != eval_info) {
@@ -167,9 +167,9 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
     double h_value = 0;
     if (nullptr == value) {
         h_value = (*(this->h))(s);
-        if (this->in_train){
+        if (this->in_train) {
             value = new double;
-            *value=h_value;
+            *value = h_value;
             this->v->set(*s, value);
         }
 
@@ -220,7 +220,7 @@ public:
                          vector<size_t> g2) :
             p1(p1), p2(p2), g1(g1), g2(g2) {}
 
-    ~SolutionSumHeuristic(){
+    ~SolutionSumHeuristic() {
         delete this->p1->env;
         delete this->p2->env;
         delete this->p1;
@@ -280,18 +280,19 @@ public:
 
 };
 
-Policy *RtdpMerger::operator()(MapfEnv *env, float gamma, vector<vector<size_t>> groups, size_t group1, size_t group2,
-                               Policy *policy1, Policy *policy2) {
+Policy *RtdpMerger::operator()(MapfEnv *env,
+                               float gamma,
+                               size_t group1,
+                               size_t group2,
+                               CrossedPolicy *joint_policy) {
     /* Create the merged env */
-    CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
-    MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
+    MapfEnv *merged_env = merge_groups_envs(joint_policy, group1, group2);
     /* This is for the destructor to not destroy the received policies */
-    joint_policy.policies.clear();
 
-    Heuristic *solution_sum = new SolutionSumHeuristic((ValueFunctionPolicy *) policy1,
-                                                       (ValueFunctionPolicy *) policy2,
-                                                       groups[group1],
-                                                       groups[group2]);
+    Heuristic *solution_sum = new SolutionSumHeuristic((ValueFunctionPolicy *) joint_policy->policies[group1],
+                                                       (ValueFunctionPolicy *) joint_policy->policies[group2],
+                                                       joint_policy->groups[group1],
+                                                       joint_policy->groups[group2]);
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
     policy->train();
 

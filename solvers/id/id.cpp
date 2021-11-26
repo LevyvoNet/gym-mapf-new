@@ -7,14 +7,10 @@
 /** Default Policy Merger***************************************************************************************/
 Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
                                         float gamma,
-                                        vector<vector<size_t>> groups,
                                         size_t group1,
                                         size_t group2,
-                                        Policy *policy1,
-                                        Policy *policy2) {
-    CrossedPolicy joint_policy(env, gamma, "", groups, {policy1, policy2});
-    MapfEnv *merged_env = merge_groups_envs(&joint_policy, group1, group2);
-    joint_policy.policies.clear();
+                                        CrossedPolicy *joint_policy)  {
+    MapfEnv *merged_env = merge_groups_envs(joint_policy, group1, group2);
 
     Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
     policy->train();
@@ -56,11 +52,9 @@ CrossedPolicy *merge_groups(MapfEnv *env,
     /* Merge the policies of both groups to a single one */
     new_joint_policy = (*low_level_merger)(env,
                                            gamma,
-                                           joint_policy->groups,
                                            a1_group,
                                            a2_group,
-                                           joint_policy->policies[a1_group],
-                                           joint_policy->policies[a2_group]);
+                                           joint_policy);
 
     /* Create the new groups */
     for (size_t i = 0; i < joint_policy->groups.size(); ++i) {

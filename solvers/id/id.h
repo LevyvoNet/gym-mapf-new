@@ -16,14 +16,12 @@ class PolicyMerger {
 public:
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
-                               vector<vector<size_t>> groups,
                                size_t group1,
                                size_t group2,
-                               Policy* policy1,
-                               Policy* policy2) = 0;
+                               CrossedPolicy *joint_policy) = 0;
 };
 
-class DefaultPolicyMerger:public PolicyMerger {
+class DefaultPolicyMerger : public PolicyMerger {
 public:
     SolverCreator *low_level_planner_creator;
 
@@ -31,11 +29,9 @@ public:
 
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
-                               vector<vector<size_t>> groups,
                                size_t group1,
                                size_t group2,
-                               Policy* policy1,
-                               Policy* policy2);
+                               CrossedPolicy *joint_policy);
 };
 
 class IdPolicy : public Policy {
