@@ -171,7 +171,7 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
     do {
         ++i;
         if (i % 1000 == 0) {
-            cout << i << " states expanded. " << "There are " << states_to_expand.size() << " more";
+            cout << i << " states expanded. " << "There are " << states_to_expand.size() << " more" << endl;
             cout.flush();
         }
 
