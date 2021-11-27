@@ -3,6 +3,7 @@
 //
 #include <iostream>
 #include <string>
+#include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -311,7 +312,7 @@ int main(int argc, char **argv) {
 
                         /* Parent process, read the result after the child is finished */
                     else {
-                        result = RESULT_ERROR;
+                        memset(c_result, 0, 20);
                         close(fds[1]);
                         waitpid_result = waitpid(pid, nullptr, 0);
                         read_result = read(fds[0], c_result, 20);
