@@ -277,11 +277,15 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
         }
 
     }
+
     transitions = new TransitionsList();
     if (this->is_terminal_state(state, cache)) {
         transitions->transitions->push_back(
                 new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
-        (*state_cache->m)[action] = transitions;
+
+        if (cache) {
+            (*state_cache->m)[action] = transitions;
+        }
         return transitions;
     }
 
