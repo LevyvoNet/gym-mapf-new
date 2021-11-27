@@ -311,6 +311,7 @@ int main(int argc, char **argv) {
 
                         /* Parent process, read the result after the child is finished */
                     else {
+                        result = RESULT_ERROR;
                         close(fds[1]);
                         waitpid_result = waitpid(pid, nullptr, 0);
                         read_result = read(fds[0], c_result, 20);
