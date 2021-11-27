@@ -159,6 +159,8 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
     expanded_states->set(*policy->env->start_state, expanded);
     states_to_expand.push_back(*policy->env->start_state);
 
+    /* Disable cache of the env, we don't want to save all the data we are generating here */
+
     do {
         /* Pop the next state to expand and mark it */
         curr_state = states_to_expand.back();
@@ -171,11 +173,10 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
         /* Iterate over the transitions given the current state and policy action.
          * Add non-expanded states to states_to_expand and the agent locations to reachable_locations */
         action = policy->act(curr_state);
-        transitions = policy->env->get_transitions(curr_state, *action);
+        transitions = policy->env->get_transitions(curr_state, *action, false);
         delete action;
         for (Transition *t: *transitions->transitions) {
             reachable_locations->insert(t->next_state->locations[agent_idx_in_group]);
-
 
             /* Add the new_state to expansion if needed */
             expanded = expanded_states->get(*t->next_state);
@@ -186,6 +187,8 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
                 states_to_expand.push_back(*t->next_state);
             }
         }
+
+        delete transitions;
 
     } while (states_to_expand.size() > 0);
 

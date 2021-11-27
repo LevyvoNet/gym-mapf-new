@@ -76,9 +76,10 @@ public:
 class MapfEnv {
 private:
     void calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
-                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision);
+                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
+                                bool cache);
 
-    int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action);
+    int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action, bool cache);
 
     /* Caches */
     /* TODO: add another hierarchical structure for multi agent actions as well */
@@ -117,11 +118,13 @@ public:
 
     ~MapfEnv();
 
-    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action);
+    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache=true);
 
-    void step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done, bool *is_collision);
+    void step(const MultiAgentAction &action,
+              MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
+              bool cache=true);
 
-    bool is_terminal_state(const MultiAgentState &state);
+    bool is_terminal_state(const MultiAgentState &state, bool cache);
 
     MultiAgentState *reset();
 

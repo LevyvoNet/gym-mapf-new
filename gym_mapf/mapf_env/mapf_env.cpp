@@ -131,22 +131,24 @@ bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgent
     return false;
 }
 
-int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action) {
+int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action, bool cache) {
     size_t agent_idx = 0;
     int living_reward = 0;
     int *new_value = nullptr;
+    ActionToIntStorage *state_cache = nullptr;
 
     /* Try to fetch from cache */
-    ActionToIntStorage *state_cache = this->living_reward_cache->get(*prev_state);
-    if (nullptr != state_cache) {
-        if (state_cache->m->find(*action) != state_cache->m->end()) {
-            return *(*state_cache->m)[*action];
+    if (cache) {
+        state_cache = this->living_reward_cache->get(*prev_state);
+        if (nullptr != state_cache) {
+            if (state_cache->m->find(*action) != state_cache->m->end()) {
+                return *(*state_cache->m)[*action];
+            }
+        } else {
+            state_cache = new ActionToIntStorage();
+            this->living_reward_cache->set(*prev_state, state_cache);
         }
-    } else {
-        state_cache = new ActionToIntStorage();
-        this->living_reward_cache->set(*prev_state, state_cache);
     }
-
 
     for (agent_idx = 0; agent_idx < this->n_agents; agent_idx++) {
         if ((prev_state->locations[agent_idx] == this->goal_state->locations[agent_idx]) &&
@@ -159,20 +161,22 @@ int MapfEnv::calc_living_reward(const MultiAgentState *prev_state, const MultiAg
 
     new_value = new int;
     *new_value = living_reward;
-    (*state_cache->m)[*action] = new_value;
+    if (cache) {
+        (*state_cache->m)[*action] = new_value;
+    }
     return living_reward;
 
 }
 
 void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
                                      const MultiAgentState *next_state, int *reward, bool *done,
-                                     bool *is_collision) {
+                                     bool *is_collision, bool cache) {
     *reward = 0;
     *done = false;
     *is_collision = false;
     int living_reward = 0;
 
-    living_reward = this->calc_living_reward(prev_state, action);
+    living_reward = this->calc_living_reward(prev_state, action, cache);
 
     if (is_collision_transition(prev_state, next_state)) {
         *reward = living_reward + this->reward_of_collision;
@@ -193,17 +197,20 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
     *is_collision = false;
 }
 
-bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
+bool MapfEnv::is_terminal_state(const MultiAgentState &state, bool cache) {
     size_t i = 0;
     size_t j = 0;
     bool *cached = NULL;
+    bool result = false;
 
-    cached = this->is_terminal_cache->get(state);
-    if (NULL != cached) {
-        return *cached;
-    } else {
-        cached = new bool;
-        this->is_terminal_cache->set(state, cached);
+    if (cache) {
+        cached = this->is_terminal_cache->get(state);
+        if (NULL != cached) {
+            return *cached;
+        } else {
+            cached = new bool;
+            this->is_terminal_cache->set(state, cached);
+        }
     }
 
 
@@ -211,7 +218,7 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
     for (i = 0; i < this->n_agents; i++) {
         for (j = 0; j < this->n_agents; j++) {
             if ((i != j) && (state.locations[i] == state.locations[j])) {
-                *cached = true;
+                result = true;
                 goto l_cleanup;
             }
         }
@@ -220,20 +227,25 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state) {
 
     /* Goal state */
     if (state == *this->goal_state) {
-        *cached = true;
+        result = true;
         goto l_cleanup;
     }
 
     /* None of the conditions satisfied, this state is not terminal */
-    *cached = false;
+    result = false;
 
 l_cleanup:
-    return *cached;
+    if (cached) {
+        *cached = result;
+    }
+    return result;
 }
 
 /* TODO: calculate next state and living reward as part of the main loop instead of helper functions (inline it) */
 /* TODO: sum all of the transitions to the same next_state to a single one with the sum of probabilities */
-TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const MultiAgentAction &action) {
+TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
+                                          const MultiAgentAction &action,
+                                          bool cache) {
     TransitionsList *transitions = NULL;
     vector<int> disruptions(this->n_agents);
     unsigned int i = 0;
@@ -250,20 +262,23 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
     bool t_collision = false;
     size_t j = 0;
     vector<Location> *t_state_locations = NULL;
+    ActionToTransitionStorage *state_cache = nullptr;
 
     /* Try to fetch from cache */
-    ActionToTransitionStorage *state_cache = this->transition_cache->get(state);
-    if (NULL != state_cache) {
-        if (state_cache->m->find(action) != state_cache->m->end()) {
-            return (*state_cache->m)[action];
+    if (cache) {
+        state_cache = this->transition_cache->get(state);
+        if (NULL != state_cache) {
+            if (state_cache->m->find(action) != state_cache->m->end()) {
+                return (*state_cache->m)[action];
+            }
+        } else {
+            state_cache = new ActionToTransitionStorage();
+            this->transition_cache->set(state, state_cache);
         }
-    } else {
-        state_cache = new ActionToTransitionStorage();
-        this->transition_cache->set(state, state_cache);
-    }
 
+    }
     transitions = new TransitionsList();
-    if (this->is_terminal_state(state)) {
+    if (this->is_terminal_state(state, cache)) {
         transitions->transitions->push_back(
                 new Transition(1.0, new MultiAgentState(state.locations, state.id), 0, true, false));
         (*state_cache->m)[action] = transitions;
@@ -312,18 +327,24 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state, const Mu
         t_state_locations = nullptr;
 
         /* We have the probability and the disrupted action, calculate the next state and reward from it */
-        this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision);
+        this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision, cache);
 
         /* Add the transition to the result */
         transitions->transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
     }
 
-    (*state_cache->m)[action] = transitions;
+    if (cache) {
+        (*state_cache->m)[action] = transitions;
+    }
     return transitions;
 }
 
-void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, int *reward, bool *done,
-                   bool *is_collision) {
+void MapfEnv::step(const MultiAgentAction &action,
+                   MultiAgentState *next_state,
+                   int *reward,
+                   bool *done,
+                   bool *is_collision,
+                   bool cache) {
     std::random_device rd;
     std::mt19937 gen(rd());
     std::discrete_distribution<> d({
@@ -336,7 +357,7 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     size_t agent_idx = 0;
     MultiAgentState *next_state_local = nullptr;
 
-    if (this->is_terminal_state(*this->s)) {
+    if (this->is_terminal_state(*this->s, cache)) {
         *next_state = *this->s;
         *reward = 0;
         *done = true;
@@ -353,7 +374,7 @@ void MapfEnv::step(const MultiAgentAction &action, MultiAgentState *next_state, 
     next_state->id = next_state_local->id;
 
     /* Set the reward and done */
-    this->calc_transition_reward(this->s, &action, next_state, reward, done, is_collision);
+    this->calc_transition_reward(this->s, &action, next_state, reward, done, is_collision, cache);
 
     /* Update the current state of the env */
     this->s->id = next_state_local->id;
