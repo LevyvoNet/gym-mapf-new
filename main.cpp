@@ -13,6 +13,7 @@
 /** Results ********************************************************************************************************/
 std::string RESULT_OK = "OK";
 std::string RESULT_COLLISION = "COLLISION";
+std::string RESULT_ERROR = "ERROR"
 
 class InstanceResult {
 public:
@@ -278,7 +279,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
 int main(int argc, char **argv) {
     vector<InstanceResult> results;
-    std::string result;
+    std::string result=RESULT_ERROR;
     InstanceResult instance_result("", "", "");
     int fds[2] = {0};
     pid_t pid = 0;
