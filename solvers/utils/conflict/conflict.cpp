@@ -141,7 +141,7 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
     MultiAgentStateStorage<bool *> *expanded_states = nullptr;
     MultiAgentState *next_state = nullptr;
     TransitionsList *transitions = nullptr;
-    MultiAgentAction* action = nullptr;
+    MultiAgentAction *action = nullptr;
 
     /* Extract the agent's group policy */
     size_t group = get_group_of_agent(joint_policy->groups, agent);
@@ -152,6 +152,13 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
         }
     }
 
+    cout << "get_reachable_locations for group [";
+    for (size_t x: joint_policy->groups[group]) {
+        cout << x << ",";
+    }
+    cout << "]" << endl;
+    cout.flush();
+
     /* Initialize */
     expanded_states = new MultiAgentStateStorage<bool *>(policy->env->n_agents, nullptr);
     expanded = new bool;
@@ -160,8 +167,14 @@ tsl::hopscotch_set<Location> *get_reachable_locations(CrossedPolicy *joint_polic
     states_to_expand.push_back(*policy->env->start_state);
 
     /* Disable cache of the env, we don't want to save all the data we are generating here */
-
+    unsigned long i = 0;
     do {
+        ++i;
+        if (i % 1000 == 0) {
+            cout << i << " states expanded. " << "There are " << states_to_expand.size() << " more";
+            cout.flush();
+        }
+
         /* Pop the next state to expand and mark it */
         curr_state = states_to_expand.back();
         states_to_expand.pop_back();
