@@ -13,7 +13,7 @@
 /** Results ********************************************************************************************************/
 std::string RESULT_OK = "OK";
 std::string RESULT_COLLISION = "COLLISION";
-std::string RESULT_ERROR = "ERROR"
+std::string RESULT_ERROR = "ERROR";
 
 class InstanceResult {
 public:
