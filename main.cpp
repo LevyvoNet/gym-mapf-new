@@ -351,7 +351,7 @@ int main(int argc, char **argv) {
     bool error_occurred = false;
     for (InstanceResult r: results) {
         if (r.result != RESULT_OK) {
-            cout << r.env << ", " << r.solver << ", " << ": " << r.result << endl;
+            cout << r.env << ", " << r.solver << ": " << r.result << endl;
             error_occurred = true;
         }
     }
