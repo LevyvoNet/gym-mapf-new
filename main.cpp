@@ -205,15 +205,15 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                         new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
@@ -266,7 +266,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
-    std::cout << " total_time" << eval_info->mean_episode_time + train_info->time;
+    std::cout << " total_time:" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
     std::cout << " train_time:" << train_info->time;
     std::cout << " solver:" << policy->name;
@@ -309,7 +309,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
