@@ -36,7 +36,7 @@ bool GridArea::contains(const Location &l) {
 GridArea::GridArea(int top_row, int bottom_row, int left_col, int right_col) :
         top_row(top_row), bottom_row(bottom_row), left_col(left_col), right_col(right_col) {}
 
-bool GridArea::operator==(const GridArea &other) const{
+bool GridArea::operator==(const GridArea &other) const {
     return ((this->top_row == other.top_row) &&
             (this->bottom_row == other.bottom_row) &&
             (this->left_col == other.left_col) &&
@@ -323,6 +323,19 @@ void OnlineReplanPolicy::reset() {
     Policy::reset();
 
     this->replans_count = 0;
+
+    /* Delete old replans */
+    for (auto item: *this->replans) {
+        for (auto nested_item: *item.second) {
+            delete nested_item.second->env;
+            delete (nested_item.second);
+        }
+
+        delete item.second;
+    }
+
+    this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
+
 }
 
 MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state) {
