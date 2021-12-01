@@ -278,10 +278,10 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
     std::cout << endl;
 
-    /* NOTE: this is redundant when running in fork */
-    delete env->grid;
-    delete env;
-    delete policy;
+//    /* NOTE: this is redundant when running in fork */
+//    delete env->grid;
+//    delete env;
+//    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-//                    pid = fork();
+                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
