@@ -15,6 +15,7 @@
 std::string RESULT_OK = "OK";
 std::string RESULT_COLLISION = "COLLISION";
 std::string RESULT_ERROR = "ERROR";
+std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 
 class InstanceResult {
 public:
@@ -261,7 +262,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train();
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(1, 1000, 0);
+    EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
 
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
@@ -277,10 +278,10 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
     std::cout << endl;
 
-//    /* NOTE: this is redundant when running in fork */
-//    delete env->grid;
-//    delete env;
-//    delete policy;
+    /* NOTE: this is redundant when running in fork */
+    delete env->grid;
+    delete env;
+    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
@@ -300,6 +301,7 @@ int main(int argc, char **argv) {
     char c_result[20];
     int waitpid_result = 0;
     int read_result = 0;
+    int child_status = -1;
 
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
@@ -326,11 +328,17 @@ int main(int argc, char **argv) {
                     else {
                         memset(c_result, 0, 20);
                         close(fds[1]);
-                        waitpid_result = waitpid(pid, nullptr, 0);
-                        read_result = read(fds[0], c_result, 20);
-                        instance_result = InstanceResult(env_creator->name, solver_creator->name,
-                                                         std::string(c_result));
-                        results.push_back(instance_result);
+                        waitpid_result = waitpid(pid, &child_status, 0);
+                        if (child_status != 0) {
+                            instance_result = InstanceResult(env_creator->name,
+                                                             solver_creator->name,
+                                                             RESULT_CHILD_ERROR);
+                        } else {
+                            read_result = read(fds[0], c_result, 20);
+                            instance_result = InstanceResult(env_creator->name, solver_creator->name,
+                                                             std::string(c_result));
+                            results.push_back(instance_result);
+                        }
                     }
 
                 }
