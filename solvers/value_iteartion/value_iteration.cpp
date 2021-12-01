@@ -18,7 +18,8 @@ ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const stri
 
 void ValueIterationPolicy::train() {
     size_t i = 0;
-    MultiAgentStateIterator s = this->env->observation_space->begin();
+    MultiAgentStateIterator* s_ptr = this->env->observation_space->begin();
+    MultiAgentStateIterator s = *s_ptr;
     MultiAgentActionIterator a = this->env->action_space->begin();
     double q_sa = 0;
     double v_s = -std::numeric_limits<double>::max();
@@ -28,7 +29,8 @@ void ValueIterationPolicy::train() {
     std::chrono::steady_clock::time_point end;
     double *prev_v = NULL;
     MultiAgentActionIterator action_end = this->env->action_space->end();
-    MultiAgentStateIterator state_end = this->env->observation_space->end();
+    MultiAgentStateIterator* state_end_ptr = this->env->observation_space->end();
+    MultiAgentStateIterator state_end = *state_end_ptr;
 
 
     for (i = 0; i < MAX_ITERATIONS; i++) {
@@ -78,6 +80,9 @@ void ValueIterationPolicy::train() {
     auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
     float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
+
+    delete s_ptr;
+    delete state_end_ptr;
 }
 
 

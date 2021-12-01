@@ -167,7 +167,7 @@ GridIterator Grid::end() const {
     return GridIterator(this, NULL);
 }
 
-Location Grid::get_location(int row, int col) {
+Location Grid::get_location(int row, int col) const{
     return *this->id_to_loc[this->loc_to_id[row][col]];
 }
 

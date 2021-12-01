@@ -53,9 +53,9 @@ public:
     ~TransitionsList();
 };
 
-class ActionToIntStorage{
+class ActionToIntStorage {
 public:
-    tsl::hopscotch_map<MultiAgentAction, int *> * m;
+    tsl::hopscotch_map<MultiAgentAction, int *> *m;
 
     ActionToIntStorage();
 
@@ -63,15 +63,16 @@ public:
 
 };
 
-class ActionToTransitionStorage{
+class ActionToTransitionStorage {
 public:
-    tsl::hopscotch_map<MultiAgentAction, TransitionsList *> * m;
+    tsl::hopscotch_map<MultiAgentAction, TransitionsList *> *m;
 
     ActionToTransitionStorage();
 
     ~ActionToTransitionStorage();
 
 };
+
 
 class MapfEnv {
 private:
@@ -84,8 +85,8 @@ private:
     /* Caches */
     /* TODO: add another hierarchical structure for multi agent actions as well */
     MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
-    MultiAgentStateStorage<ActionToIntStorage*> *living_reward_cache;
-    MultiAgentStateStorage<bool*> *is_terminal_cache;
+    MultiAgentStateStorage<ActionToIntStorage *> *living_reward_cache;
+    MultiAgentStateStorage<bool *> *is_terminal_cache;
 
 public:
     /* Parameters */
@@ -118,11 +119,11 @@ public:
 
     ~MapfEnv();
 
-    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache=true);
+    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache = true);
 
     void step(const MultiAgentAction &action,
               MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
-              bool cache=true);
+              bool cache = true);
 
     bool is_terminal_state(const MultiAgentState &state, bool cache);
 
@@ -132,15 +133,15 @@ public:
 
     MultiAgentState *locations_to_state(const vector<Location> &locations);
 
-    MultiAgentAction *actions_to_action(const vector<Action> &actions);
-
     MultiAgentState *id_to_state(int64_t id);
 
     MultiAgentAction *id_to_action(int64_t id);
 };
 
-MapfEnv* get_local_view(MapfEnv*, vector<size_t> agents);
+MapfEnv *get_local_view(MapfEnv *, vector<size_t> agents);
 
 bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
+
+MultiAgentAction *actions_to_action(const vector<Action> &actions);
 
 #endif //GYM_MAPF_MAPF_ENV_H

@@ -59,7 +59,7 @@ TEST(MapfEnvTests, TransitionCache) {
 
     MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.2, REWARD_OF_COLLISION, REWARD_OF_GOAL,
                                REWARD_OF_LIVING);
-    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
+    MultiAgentAction *action = actions_to_action({RIGHT, UP});
     TransitionsList *transitions = env->get_transitions(*env->s, *action);
     transitions = env->get_transitions(*env->s, *action);
 
@@ -83,7 +83,7 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
 
     MapfEnv *env = new MapfEnv(&g, 2, start_locations, goal_locations, 0.3, REWARD_OF_COLLISION, REWARD_OF_GOAL,
                                REWARD_OF_LIVING);
-    MultiAgentAction *action = env->actions_to_action({RIGHT, UP});
+    MultiAgentAction *action = actions_to_action({RIGHT, UP});
 
     /* Set the expected transitions */
     list<Transition *> expected_transitions(
@@ -243,7 +243,7 @@ TEST(MapfEnvTests, CollisionStateTerminalNegativeReward) {
                 REWARD_OF_GOAL,
                 REWARD_OF_LIVING);
 
-    MultiAgentAction *action = env.actions_to_action({RIGHT, LEFT});
+    MultiAgentAction *action = actions_to_action({RIGHT, LEFT});
     list<Transition *> *transitions = env.get_transitions(*env.s, *action)->transitions;
 
     /* Round the probabilities to 2 decimal points */
@@ -273,25 +273,25 @@ TEST(MapfEnvTests, ActionFromTerminalStateHasNoEffect) {
 
 
     /* Execute the first step */
-    env.step(*env.actions_to_action({RIGHT}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({RIGHT}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING);
     ASSERT_EQ(done, false);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(0, 1)}));
 
     /* Execute the second step - this one reaches the goal */
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING + REWARD_OF_GOAL);
     ASSERT_EQ(done, true);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(1, 1)}));
 
     /* Now, after the game is finished - do another step and make sure it has not effect. */
-    env.step(*env.actions_to_action({UP}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({UP}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 0);
     ASSERT_EQ(done, true);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(1, 1)}));
 
     /* Another time like I'm trying to reach the goal */
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 0);
     ASSERT_EQ(done, true);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(1, 1)}));
@@ -313,7 +313,7 @@ TEST(MapfEnvTests, SwitchStopIsCollision) {
     bool collision = false;
 
     /* Execute an action which switches the locations of the agents - this should be a collision */
-    env.step(*env.actions_to_action({RIGHT, LEFT}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({RIGHT, LEFT}), next_state, &reward, &done, &collision);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(0, 1), g.get_location(0, 0)}));
     ASSERT_EQ(reward, 2 * REWARD_OF_LIVING + REWARD_OF_COLLISION);
     ASSERT_EQ(done, true);
@@ -329,7 +329,7 @@ TEST(MapfEnvTests, SameTestTransitionsProbabilitySummed) {
     MapfEnv env(&g, 1, {g.get_location(0, 0)}, {g.get_location(1, 1)}, 0.1, REWARD_OF_COLLISION, REWARD_OF_GOAL,
                 REWARD_OF_LIVING);
 
-    list<Transition *> *transitions = env.get_transitions(*env.s, *env.actions_to_action({STAY, STAY}))->transitions;
+    list<Transition *> *transitions = env.get_transitions(*env.s, *actions_to_action({STAY, STAY}))->transitions;
 
     list<Transition *> expected_transitions(
             {
@@ -364,13 +364,13 @@ TEST(MapfEnvTests, RewardMultiagentSoc) {
     bool collision = false;
 
     /* First step */
-    env.step(*env.actions_to_action({RIGHT, UP, RIGHT}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({RIGHT, UP, RIGHT}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 3 * REWARD_OF_LIVING);
     ASSERT_EQ(done, false);
     total_reward += reward;
 
     /* Second step */
-    env.step(*env.actions_to_action({STAY, UP, STAY}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({STAY, UP, STAY}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING + REWARD_OF_GOAL);
     ASSERT_EQ(done, true);
     ASSERT_EQ(*next_state, *env.goal_state);
@@ -404,7 +404,7 @@ TEST(MapfEnvTests, RewardMultiagentSocStayBeforeGoal) {
     bool collision = false;
 
     /* First step */
-    env.step(*env.actions_to_action({RIGHT, STAY, STAY}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({RIGHT, STAY, STAY}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 3 * REWARD_OF_LIVING);
     ASSERT_EQ(done, false);
 }
@@ -432,13 +432,13 @@ TEST(MapfEnvTests, RewardMultiagentSocSingleAgent) {
     bool collision = false;
 
     /* Step down 4 times */
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     total_reward += reward;
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     total_reward += reward;
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     total_reward += reward;
-    env.step(*env.actions_to_action({DOWN}), next_state, &reward, &done, &collision);
+    env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     total_reward += reward;
 
     ASSERT_EQ(*next_state, *env.goal_state);
@@ -460,8 +460,8 @@ TEST(MafpEnvTests, StateSpaceIteration) {
                 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     list<MultiAgentState *> states;
-    MultiAgentStateIterator iter = env.observation_space->begin();
-    MultiAgentStateIterator end = env.observation_space->end();
+    MultiAgentStateIterator iter = *env.observation_space->begin();
+    MultiAgentStateIterator end = *env.observation_space->end();
     for (iter.reach_begin(); iter != end; ++iter) {
         states.push_back(new MultiAgentState(iter->locations, iter->id));
     }

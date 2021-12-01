@@ -43,7 +43,7 @@ protected:
 
     virtual void eval_episode_info_update();
 
-    virtual void eval_episode_info_process();
+    virtual void eval_episodes_info_process();
 
 public:
     std::string name;
@@ -53,7 +53,7 @@ public:
 
     virtual ~Policy();
 
-    void reset();
+    virtual void reset();
 
     TrainInfo *get_train_info();
 

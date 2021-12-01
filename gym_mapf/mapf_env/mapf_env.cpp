@@ -406,20 +406,6 @@ MultiAgentState *MapfEnv::locations_to_state(const vector<Location> &locations) 
     return new MultiAgentState(locations, sum);
 }
 
-MultiAgentAction *MapfEnv::actions_to_action(const vector<Action> &actions) {
-    int mul = 1;
-    int sum = 0;
-    int n_options = ACTIONS_COUNT;
-
-    sum += actions[0] * mul;
-
-    for (size_t i = 1; i < actions.size(); ++i) {
-        mul *= n_options;
-        sum += actions[i] * mul;
-    }
-
-    return new MultiAgentAction(actions, sum);
-}
 
 MultiAgentState *MapfEnv::id_to_state(int64_t id) {
     int orig_id = id;
@@ -510,4 +496,19 @@ MapfEnv *get_local_view(MapfEnv *env, vector<size_t> agents) {
                        env->reward_of_collision,
                        env->reward_of_goal,
                        env->reward_of_living);
+}
+
+MultiAgentAction *actions_to_action(const vector<Action> &actions) {
+    int mul = 1;
+    int sum = 0;
+    int n_options = ACTIONS_COUNT;
+
+    sum += actions[0] * mul;
+
+    for (size_t i = 1; i < actions.size(); ++i) {
+        mul *= n_options;
+        sum += actions[i] * mul;
+    }
+
+    return new MultiAgentAction(actions, sum);
 }

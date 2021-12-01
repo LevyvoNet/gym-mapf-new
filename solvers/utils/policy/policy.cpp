@@ -43,7 +43,7 @@ void Policy::eval_episode_info_update() {
 
 }
 
-void Policy::eval_episode_info_process() {
+void Policy::eval_episodes_info_process() {
 
 }
 
@@ -134,7 +134,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
 
 
     /* Give the inheriting policy a change to process data collected from all of the episodes */
-    this->eval_episode_info_process();
+    this->eval_episodes_info_process();
 
     this->reset();
 

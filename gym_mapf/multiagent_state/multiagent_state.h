@@ -25,7 +25,7 @@ public:
 
 
 class MultiAgentStateIterator {
-private:
+protected:
     MultiAgentState *ptr;
     size_t n_agents;
     vector<GridIterator> iters;
@@ -37,15 +37,15 @@ public:
 
     ~MultiAgentStateIterator();
 
-    void reach_end();
+    virtual void reach_end();
 
-    void reach_begin();
+    virtual void reach_begin();
 
     MultiAgentState *operator->() const;
 
     MultiAgentState operator*() const;
 
-    MultiAgentStateIterator &operator++();
+    virtual MultiAgentStateIterator &operator++();
 
     bool operator==(const MultiAgentStateIterator &other) const;
 
@@ -53,16 +53,16 @@ public:
 };
 
 class MultiAgentStateSpace {
-private:
+protected:
     size_t n_agents;
     const Grid *grid;
 
 public:
     MultiAgentStateSpace(const Grid *grid, size_t n_agents);
 
-    MultiAgentStateIterator begin();
+    virtual MultiAgentStateIterator* begin();
 
-    MultiAgentStateIterator end();
+    virtual MultiAgentStateIterator* end();
 };
 
 #endif //GYM_MAPF_MULTIAGENT_STATE_H

@@ -71,7 +71,7 @@ public:
 
     ~Grid();
 
-    Location get_location(int row, int col);
+    Location get_location(int row, int col) const;
 
     Location execute(const Location &l, Action a);
 

@@ -22,7 +22,6 @@ bool MultiAgentState::operator!=(const MultiAgentState &other) const {
 
 
 /** MultiAgentStateIterator ****************************************************************************************/
-
 MultiAgentStateIterator::MultiAgentStateIterator(const Grid *grid, size_t n_agents) {
     this->grid = grid;
     this->n_agents = n_agents;
@@ -120,13 +119,13 @@ void MultiAgentStateIterator::reach_begin(){
 }
 
 /** MultiAgentStateSpace ***************************************************************************************/
-MultiAgentStateIterator MultiAgentStateSpace::begin() {
-    return MultiAgentStateIterator(this->grid, this->n_agents);
+MultiAgentStateIterator* MultiAgentStateSpace::begin() {
+    return new MultiAgentStateIterator(this->grid, this->n_agents);
 }
 
-MultiAgentStateIterator MultiAgentStateSpace::end() {
-    MultiAgentStateIterator iter = MultiAgentStateIterator(this->grid, this->n_agents);
-    iter.reach_end();
+MultiAgentStateIterator* MultiAgentStateSpace::end() {
+    MultiAgentStateIterator* iter = new MultiAgentStateIterator(this->grid, this->n_agents);
+    iter->reach_end();
 
     return iter;
 }

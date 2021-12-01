@@ -255,6 +255,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
+    std::cout << "total_time" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
     std::cout << " train_time:" << train_info->time;
     std::cout << " solver:" << policy->name;
@@ -280,7 +281,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
 int main(int argc, char **argv) {
     vector<InstanceResult> results;
-    std::string result=RESULT_ERROR;
+    std::string result = RESULT_ERROR;
     InstanceResult instance_result("", "", "");
     int fds[2] = {0};
     pid_t pid = 0;
