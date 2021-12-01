@@ -191,6 +191,16 @@ public:
     }
 };
 
+class online_replan : public SolverCreator {
+    int k;
+public:
+    online_replan(string name, int k) : SolverCreator(name), k(k) {}
+
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
+        return new OnlineReplanPolicy(env, gamma, this->name, new rtdp_dijkstra_rtdp(""), this->k);
+    }
+};
+
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
@@ -222,20 +232,21 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi("vi"),
+//                        new vi("vi"),
+                        new online_replan("online_replan_3", 3),
 
                 },
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp("id_rtdp"),
                 }
         }
 );
@@ -255,7 +266,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate;
-    std::cout << "total_time" << eval_info->mean_episode_time + train_info->time;
+    std::cout << " total_time" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
     std::cout << " train_time:" << train_info->time;
     std::cout << " solver:" << policy->name;

@@ -10,9 +10,19 @@ vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
     size_t h = 0;
     for (size_t i = 0; i < v.size(); ++i) {
-        h += pow(v[i], PRIMES[i % PRIMES.size()]);
+        h += pow(PRIMES[(i + 1) % PRIMES.size()], v[i]);
     }
 
+    return h;
+}
+
+
+size_t hash<GridArea>::operator()(const GridArea &area) const {
+    size_t h = 0;
+    h += pow(PRIMES[1], area.top_row);
+    h += pow(PRIMES[2], area.bottom_row);
+    h += pow(PRIMES[3], area.left_col);
+    h += pow(PRIMES[4], area.right_col);
     return h;
 }
 
@@ -25,6 +35,13 @@ bool GridArea::contains(const Location &l) {
 
 GridArea::GridArea(int top_row, int bottom_row, int left_col, int right_col) :
         top_row(top_row), bottom_row(bottom_row), left_col(left_col), right_col(right_col) {}
+
+bool GridArea::operator==(const GridArea &other) const{
+    return ((this->top_row == other.top_row) &&
+            (this->bottom_row == other.bottom_row) &&
+            (this->left_col == other.left_col) &&
+            (this->right_col == other.right_col));
+}
 
 
 void AreaMultiAgentStateIterator::set_locations(vector<Location> locations) {
@@ -127,8 +144,8 @@ vector<vector<size_t>> OnlineReplanPolicy::divide_to_groups(const MultiAgentStat
     vector<vector<size_t>> direct_neighbours(this->env->n_agents);
 
     /* Calculate the direct neighbours */
-    for (size_t i = 0; i < direct_neighbours.size(); ++i) {
-        for (size_t j = 0; j < direct_neighbours.size(); ++j) {
+    for (size_t i = 0; i < this->env->n_agents; ++i) {
+        for (size_t j = 0; j < this->env->n_agents; ++j) {
             /* Don't need to check symmetrical cases */
             if (i >= j) {
                 continue;
@@ -160,6 +177,7 @@ vector<vector<size_t>> OnlineReplanPolicy::divide_to_groups(const MultiAgentStat
         /* Calculate the connectivity component of the current agent */
         vector<size_t> new_group;
         std::stack<size_t> stack;
+        stack.push(agent);
         while (stack.size() > 0) {
             size_t curr_agent = stack.top();
             stack.pop();
@@ -185,9 +203,6 @@ vector<vector<size_t>> OnlineReplanPolicy::divide_to_groups(const MultiAgentStat
 }
 
 Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
-
-
-
     /* Calculate the conflict area */
     int top_row = this->env->grid->max_row;
     int bottom_row = 0;
@@ -212,6 +227,12 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     /* Solve the environment using value iteration */
     ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "");
     policy->train();
+
+    /* Save the new policy in replans cache */
+    if (!this->replans->contains(group)) {
+        (*this->replans)[group] = new tsl::hopscotch_map<GridArea, Policy *>();
+    }
+    (*(*this->replans)[group])[conflict_area] = policy;
 
     return policy;
 }
@@ -274,7 +295,9 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        SolverCreator *low_level_planner_creator,
                                        int k) :
         Policy(env, gamma, name),
-        k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr), replans_count(0) {}
+        k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr), replans_count(0) {
+    this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
+}
 
 OnlineReplanPolicy::~OnlineReplanPolicy() {
     delete this->local_policy;

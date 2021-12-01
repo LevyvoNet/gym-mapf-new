@@ -19,7 +19,6 @@ public:
     size_t operator()(const vector<size_t> &v) const;
 };
 
-
 class GridArea {
 public:
     int top_row;
@@ -30,30 +29,39 @@ public:
     GridArea(int top_row, int bottom_row, int left_col, int right_col);
 
     bool contains(const Location &l);
+
+    bool operator==(const GridArea& other) const;
 };
 
-class AreaMultiAgentStateIterator: public MultiAgentStateIterator {
+template<>
+class std::hash<GridArea> {
+public:
+    size_t operator()(const GridArea &area) const;
+};
+
+class AreaMultiAgentStateIterator : public MultiAgentStateIterator {
 protected:
     GridArea area;
+
     void set_locations(vector<Location> locations);
 
 public:
-    AreaMultiAgentStateIterator(const Grid* grid, GridArea area, size_t n_agents);
+    AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
 
     virtual void reach_begin() override;
 
     virtual MultiAgentStateIterator &operator++() override;
 };
 
-class AreaMultiAgentStateSpace: public MultiAgentStateSpace{
+class AreaMultiAgentStateSpace : public MultiAgentStateSpace {
 protected:
     GridArea area;
 public:
-    AreaMultiAgentStateSpace(const Grid* grid, GridArea area, size_t n_agents);
+    AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents);
 
-    virtual AreaMultiAgentStateIterator* begin() override;
+    virtual AreaMultiAgentStateIterator *begin() override;
 
-    virtual AreaMultiAgentStateIterator* end() override;
+    virtual AreaMultiAgentStateIterator *end() override;
 };
 
 class OnlineReplanPolicy : public Policy {

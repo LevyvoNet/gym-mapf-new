@@ -13,6 +13,7 @@
 #include "solvers/heuristics/rtdp_dijkstra_heuristic.h"
 #include "solvers/rtdp/rtdp.h"
 #include "solvers/id/id.h"
+#include "solvers/online_replan/online_replan.h"
 #include "utils/utils.h"
 
 #endif //GYM_MAPF_SOLVERS_H
