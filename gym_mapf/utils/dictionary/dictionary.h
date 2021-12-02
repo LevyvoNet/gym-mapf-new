@@ -16,7 +16,7 @@ public:
 
     double get(int64_t key);
 
-    double set(int64_t key, double value);
+    void set(int64_t key, double value);
 };
 
 #endif //GYM_MAPF_DICTIONARY_H

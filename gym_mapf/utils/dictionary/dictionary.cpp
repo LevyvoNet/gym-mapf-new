@@ -16,7 +16,7 @@ double Dictionary::get(int64_t key) {
     return (*this->d)[key];
 }
 
-double Dictionary::set(int64_t key, double value) {
+void Dictionary::set(int64_t key, double value) {
     (*this->d)[key] = value;
 }
 

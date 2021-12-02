@@ -66,7 +66,7 @@ void ValueIterationPolicy::train() {
             }
 
             /* Update the value table and the diff */
-            max_diff = max(prev_v->get((*s)->id)- v_s, max_diff);
+            max_diff = max(abs(prev_v->get((*s)->id)- v_s), max_diff);
             this->v->set((*s)->id, v_s);
         }
 
