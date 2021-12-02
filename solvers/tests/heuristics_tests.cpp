@@ -135,12 +135,12 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
 
         if (s_iter->locations[0] != env.goal_state->locations[0]) {
             all_in_goal = false;
-            expected_reward += vi_policy0.get_value(vi_policy0.env->locations_to_state(s_iter->locations)) - env.reward_of_goal;
+            expected_reward += vi_policy0.get_value(vi_policy0.env->locations_to_state({s_iter->locations[0]})) - env.reward_of_goal;
         }
 
         if (s_iter->locations[1] != env.goal_state->locations[1]) {
             all_in_goal = false;
-            expected_reward += vi_policy1.get_value(vi_policy1.env->locations_to_state(s_iter->locations)) - env.reward_of_goal;
+            expected_reward += vi_policy1.get_value(vi_policy1.env->locations_to_state({s_iter->locations[1]})) - env.reward_of_goal;
         }
 
         if (!all_in_goal) {
