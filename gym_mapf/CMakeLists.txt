@@ -31,6 +31,8 @@ add_library(gym_mapf SHARED
         multiagent_state/multiagent_state.cpp
         utils/state_storage/state_storage.h
         utils/state_storage/state_storage.cpp
+        utils/dictionary/dictionary.h
+        utils/dictionary/dictionary.cpp
         )
 
 target_include_directories(gym_mapf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

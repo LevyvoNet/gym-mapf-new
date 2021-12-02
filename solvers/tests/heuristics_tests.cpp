@@ -148,9 +148,6 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
         }
 
         MultiAgentState s = *s_iter;
-        if (h(&s) != expected_reward) {
-            cout << "wow" << endl;
-        }
         ASSERT_EQ(h(&s), expected_reward);
     }
 

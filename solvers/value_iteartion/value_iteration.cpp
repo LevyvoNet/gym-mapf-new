@@ -11,9 +11,10 @@
 ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : ValueFunctionPolicy(env,
                                                                                                                 gamma,
                                                                                                                 name) {
-    this->default_value = 0;
-    this->v = new MultiAgentStateStorage<double*>(this->env->n_agents, &this->default_value);
+//    this->default_value = 0;
+    this->v = new Dictionary(0);
 //    this->v = new double[this->env->nS];
+//    this->v = new tsl::hopscotch_map<int64_t, double>();
 //    std::fill(this->v, this->v + this->env->nS, 0);
 }
 
@@ -27,10 +28,11 @@ void ValueIterationPolicy::train() {
     double max_diff = 0;
     std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
     std::chrono::steady_clock::time_point end;
-    MultiAgentStateStorage<double*> *prev_v = NULL;
+    Dictionary *prev_v = NULL;
     MultiAgentActionIterator action_end = this->env->action_space->end();
     MultiAgentStateIterator *state_end = this->env->observation_space->end();
     int states_count = 0;
+    double value = 0;
 
     for (i = 0; i < MAX_ITERATIONS; i++) {
         /* Perform a full iteration */
@@ -39,7 +41,7 @@ void ValueIterationPolicy::train() {
             delete prev_v;
         }
         prev_v = this->v;
-        this->v = new MultiAgentStateStorage<double*>(this->env->n_agents, &this->default_value);
+        this->v = new Dictionary(0);
         /* Update the value of current state */
         states_count = 0;
         for (s->reach_begin(); *s != *state_end; ++*s) {
@@ -55,7 +57,7 @@ void ValueIterationPolicy::train() {
                         break;
                     }
 
-                    q_sa += t->p * (t->reward + this->gamma * (*prev_v->get(*t->next_state)));
+                    q_sa += t->p * (t->reward + this->gamma * prev_v->get(t->next_state->id));
                 }
 
                 if (q_sa > v_s) {
@@ -64,12 +66,8 @@ void ValueIterationPolicy::train() {
             }
 
             /* Update the value table and the diff */
-            if (std::abs((*prev_v->get(**s)) - v_s) > max_diff) {
-                max_diff = std::abs((*prev_v->get(**s)) - v_s);
-            }
-            double *new_value = new double;
-            *new_value = v_s;
-            this->v->set(**s, new_value);
+            max_diff = max(prev_v->get((*s)->id)- v_s, max_diff);
+            this->v->set((*s)->id, v_s);
         }
 
         if (max_diff <= MDR_EPSILON) {
@@ -90,8 +88,7 @@ void ValueIterationPolicy::train() {
 
 
 double ValueIterationPolicy::get_value(MultiAgentState *s) {
-    return *this->v->get(*s);
-//    return this->v[s->id];
+    return this->v->get(s->id);
 }
 
 ValueIterationPolicy::~ValueIterationPolicy() {
