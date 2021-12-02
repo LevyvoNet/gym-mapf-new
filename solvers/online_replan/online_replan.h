@@ -45,6 +45,8 @@ protected:
 
     void set_locations(vector<Location> locations);
 
+    void _reach_begin();
+
 public:
     AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
 
@@ -75,6 +77,8 @@ private:
     Policy *replan(const vector<size_t> &group, const MultiAgentState &s);
 
     int calc_distance(const Location &l1, const Location &l2);
+
+    void delete_replans();
 
     tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *> *replans;
 

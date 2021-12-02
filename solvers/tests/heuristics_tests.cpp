@@ -33,7 +33,7 @@ TEST(HeuristicsTest, DijkstraSimpleEnv) {
 
     for (s_iter.reach_begin(); s_iter != s_end; ++s_iter) {
         MultiAgentState s = *s_iter;
-        ASSERT_EQ(h(&s), vi_policy.v[s_iter->id]);
+        ASSERT_EQ(h(&s), vi_policy.get_value(&s));
     }
 
 }
@@ -62,7 +62,7 @@ TEST(HeuristicsTest, DijkstraLargeGoalReward) {
 
     for (s_iter.reach_begin(); s_iter != s_end; ++s_iter) {
         MultiAgentState s = *s_iter;
-        ASSERT_EQ(h(&s), vi_policy.v[s_iter->id]);
+        ASSERT_EQ(h(&s), vi_policy.get_value(&s));
     }
 
 }
@@ -83,7 +83,7 @@ TEST(HeuristicsTest, DijkstraRoomEnv) {
     for (MultiAgentStateIterator s_iter = *env->observation_space->begin();
          s_iter != *env->observation_space->end(); ++s_iter) {
         MultiAgentState s = *s_iter;
-        ASSERT_EQ(h(&s), vi_policy.v[s_iter->id]);
+        ASSERT_EQ(h(&s),vi_policy.get_value(&s));
     }
 
 }
@@ -135,12 +135,12 @@ TEST(HeuristicsTest, DijkstraTwoAgents) {
 
         if (s_iter->locations[0] != env.goal_state->locations[0]) {
             all_in_goal = false;
-            expected_reward += vi_policy0.v[s_iter->locations[0].id] - env.reward_of_goal;
+            expected_reward += vi_policy0.get_value(vi_policy0.env->locations_to_state(s_iter->locations)) - env.reward_of_goal;
         }
 
         if (s_iter->locations[1] != env.goal_state->locations[1]) {
             all_in_goal = false;
-            expected_reward += vi_policy1.v[s_iter->locations[1].id] - env.reward_of_goal;
+            expected_reward += vi_policy1.get_value(vi_policy1.env->locations_to_state(s_iter->locations)) - env.reward_of_goal;
         }
 
         if (!all_in_goal) {

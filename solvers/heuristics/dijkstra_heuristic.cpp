@@ -102,7 +102,7 @@ double DijkstraHeuristic::operator()(MultiAgentState *s) {
 
 DijkstraHeuristic::~DijkstraHeuristic() {
     for (size_t i=0;i<this->n_agents;++i){
-        delete this->distance[i];
+        delete[] this->distance[i];
     }
-//    delete this->distance;
+//    delete[] this->distance;
 }

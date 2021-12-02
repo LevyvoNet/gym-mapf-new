@@ -82,21 +82,21 @@ public:
 
 
 class GridIterator {
-private:
+public:
     Location *ptr;
     const Grid *grid;
-
-public:
 
     GridIterator(const Grid *grid);
 
     GridIterator(const Grid *grid, Location *loc);
 
+    GridIterator(const Grid *grid, int64_t id);
+
     Location *operator->();
 
     Location operator*() const;
 
-    GridIterator& operator++();
+    GridIterator &operator++();
 
     bool operator==(const GridIterator &other) const;
 

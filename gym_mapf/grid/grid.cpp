@@ -62,6 +62,11 @@ GridIterator::GridIterator(const Grid *grid, Location *loc) {
     this->ptr = loc;
 }
 
+GridIterator::GridIterator(const Grid *grid,int64_t id) {
+    this->grid = grid;
+    this->ptr = this->grid->id_to_loc[id];
+}
+
 
 Grid::Grid(std::vector<std::string> &map_lines) {
     std::size_t i = 0;
@@ -164,7 +169,7 @@ GridIterator Grid::begin() const {
 }
 
 GridIterator Grid::end() const {
-    return GridIterator(this, NULL);
+    return GridIterator(this, (Location*)NULL);
 }
 
 Location Grid::get_location(int row, int col) const{

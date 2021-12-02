@@ -214,7 +214,7 @@ vector<vector<EnvCreator *>> env_creators(
                         new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                         new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
@@ -233,8 +233,8 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
-                        new online_replan("online_replan_3", 3),
+                        new vi("vi"),
+//                        new online_replan("online_replan_3", 3),
 
                 },
 
@@ -262,7 +262,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train();
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
+    EvaluationInfo *eval_info = policy->evaluate(2, 1000, 0);
 
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
@@ -278,10 +278,10 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
     std::cout << endl;
 
-//    /* NOTE: this is redundant when running in fork */
-//    delete env->grid;
-//    delete env;
-//    delete policy;
+    /* NOTE: this is redundant when running in fork */
+    delete env->grid;
+    delete env;
+    delete policy;
 
     if (eval_info->collision_happened) {
         return RESULT_COLLISION;
@@ -311,7 +311,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
@@ -337,8 +337,8 @@ int main(int argc, char **argv) {
                             read_result = read(fds[0], c_result, 20);
                             instance_result = InstanceResult(env_creator->name, solver_creator->name,
                                                              std::string(c_result));
-                            results.push_back(instance_result);
                         }
+                        results.push_back(instance_result);
                     }
 
                 }

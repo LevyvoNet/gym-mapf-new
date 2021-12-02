@@ -8,15 +8,18 @@
 #include <unordered_map>
 #include <chrono>
 #include <cmath>
+#include <string.h>
 
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/utils/policy/value_function_policy.h>
+#include <gym_mapf/utils/state_storage/state_storage.h>
 
 class ValueIterationPolicy : public ValueFunctionPolicy {
 public:
     double default_value;
-    double *v;
-
+//    double *v;
+//    tsl::hopscotch_map<int64_t, double> *v;
+    MultiAgentStateStorage<double*> *v;
 
     ValueIterationPolicy(MapfEnv *env, float gamma, const string &name);
 
