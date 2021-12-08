@@ -313,7 +313,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-//                    pid = fork();
+                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
