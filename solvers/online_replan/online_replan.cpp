@@ -76,7 +76,7 @@ Location inc_area_iterator(const Location *l, GridArea area, const Grid *grid) {
             col = area.left_col;
             ++row;
         }
-    } while (grid->loc_to_id[row][col] == ILLEGAL_LOCATION && row <= area.bottom_row);
+    } while (row <= area.bottom_row && grid->loc_to_id[row][col] == ILLEGAL_LOCATION);
 
     /* We have reached the end */
     if (row > area.bottom_row) {

@@ -236,6 +236,7 @@ vector<vector<SolverCreator *>> solver_creators(
                         new vi("vi"),
                         new online_replan("online_replan_3", 3),
                         new online_replan("online_replan_6", 6),
+                        new online_replan("online_replan_10", 10),
 
                 },
 
@@ -312,7 +313,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
