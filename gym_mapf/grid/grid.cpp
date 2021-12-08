@@ -28,7 +28,7 @@ Location GridIterator::operator*() const {
     return *(this->ptr);
 }
 
-GridIterator& GridIterator::operator++() {
+GridIterator &GridIterator::operator++() {
     if (this->grid->id_to_loc.size() <= this->ptr->id + 1) {
         this->ptr = NULL;
     } else {
@@ -62,7 +62,7 @@ GridIterator::GridIterator(const Grid *grid, Location *loc) {
     this->ptr = loc;
 }
 
-GridIterator::GridIterator(const Grid *grid,int64_t id) {
+GridIterator::GridIterator(const Grid *grid, int64_t id) {
     this->grid = grid;
     this->ptr = this->grid->id_to_loc[id];
 }
@@ -87,7 +87,7 @@ Grid::Grid(std::vector<std::string> &map_lines) {
                 id_to_loc.push_back(new Location(i, j, loc_id));
                 this->loc_to_id[i].push_back(loc_id);
                 loc_id++;
-            }else {
+            } else {
                 this->loc_to_id[i].push_back(ILLEGAL_LOCATION);
             }
         }
@@ -169,18 +169,26 @@ GridIterator Grid::begin() const {
 }
 
 GridIterator Grid::end() const {
-    return GridIterator(this, (Location*)NULL);
+    return GridIterator(this, (Location *) NULL);
 }
 
-Location Grid::get_location(int row, int col) const{
+Location Grid::get_location(int row, int col) const {
     return *this->id_to_loc[this->loc_to_id[row][col]];
 }
 
 Grid::~Grid() {
-    for (Location* l:this->id_to_loc){
+    for (Location *l: this->id_to_loc) {
         delete l;
     }
 
+}
+
+bool Grid::is_legal(const Location &l) const{
+    if (l.row < 0 || l.row > this->max_row || l.col < 0 || l.col > this->max_col) {
+        return 0;
+    }
+
+    return this->loc_to_id[l.row][l.col] != ILLEGAL_LOCATION;
 }
 
 
@@ -194,7 +202,6 @@ Location::Location(int row, int col, int64_t id) {
     this->col = col;
     this->id = id;
 }
-
 
 
 bool Location::operator!=(const Location &other_loc) const {

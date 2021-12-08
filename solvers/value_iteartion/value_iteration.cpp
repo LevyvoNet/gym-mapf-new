@@ -70,10 +70,22 @@ void ValueIterationPolicy::train() {
             this->v->set((*s)->id, v_s);
         }
 
+//        for (s->reach_begin(); *s != *state_end; ++*s) {
+//            cout << this->v->get((*s)->id) << " ";
+//        }
+//        cout << endl;
+
         if (max_diff <= MDR_EPSILON) {
             break;
         }
     }
+
+//    for (s->reach_begin(); *s != *state_end; ++*s) {
+//        cout << this->v->get((*s)->id) << " ";
+//        if (this->v->get((*s)->id) < 0){
+//            cout << "fuck" << endl;
+//        }
+//    }
 
     /* Update the training time in train_info */
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i + 1);
@@ -83,7 +95,6 @@ void ValueIterationPolicy::train() {
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
 
     /* NOTE: there are two pointers which are leaking at the end (s_ptr and state_end_ptr) */
-    cout << "iterated over " << states_count << " states" << endl;
 }
 
 

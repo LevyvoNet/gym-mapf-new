@@ -11,6 +11,8 @@
 #define REWARD_OF_GOAL (100)
 #define REWARD_OF_LIVING (-1)
 
+#include <list>
+
 using namespace std;
 
 template<typename T>

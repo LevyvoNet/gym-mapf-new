@@ -8,6 +8,7 @@
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/utils/policy/value_function_policy.h>
 #include "solvers/heuristics/heuristic.h"
+#include "solvers/heuristics/solution_sum_heuristic.h"
 #include "solvers/id/id.h"
 
 class RtdpPolicy : public ValueFunctionPolicy {

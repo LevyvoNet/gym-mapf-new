@@ -5,6 +5,8 @@
 #ifndef GYM_MAPF_UTILS_H
 #define GYM_MAPF_UTILS_H
 
+using namespace std;
+
 class EnvCreator {
 public:
     string name;

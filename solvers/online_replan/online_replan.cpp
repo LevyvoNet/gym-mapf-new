@@ -7,13 +7,25 @@
 /** Utilities ***************************************************************************************************/
 vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
-size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
+size_t hash<vector<size_t>>
+::operator()(
+        const vector<size_t> &v
+) const {
     size_t h = 0;
-    for (size_t i = 0; i < v.size(); ++i) {
-        h += pow(PRIMES[(i + 1) % PRIMES.size()], v[i]);
+    for (
+            size_t i = 0;
+            i < v.
+
+                    size();
+
+            ++i) {
+        h +=
+                pow(PRIMES[(i + 1) % PRIMES.size()], v[i]
+                );
     }
 
-    return h;
+    return
+            h;
 }
 
 
@@ -43,22 +55,9 @@ bool GridArea::operator==(const GridArea &other) const {
             (this->right_col == other.right_col));
 }
 
-
-void AreaMultiAgentStateIterator::set_locations(vector<Location> locations) {
-    int mul = 1;
-    int sum = 0;
-    int n_options = this->grid->id_to_loc.size();
-
-    sum += locations[0].id * mul;
-
-    for (size_t i = 1; i < this->n_agents; ++i) {
-        mul *= n_options;
-        sum += locations[i].id * mul;
-    }
-
-    this->ptr->locations = locations;
-    this->ptr->id = sum;
-}
+/** Area state iterator ******************************************************************************************/
+#define END_OF_AREA_ID (-222)
+#define IS_END_OF_AREA(l) (l.id == END_OF_AREA_ID)
 
 AreaMultiAgentStateIterator::AreaMultiAgentStateIterator(const Grid *grid,
                                                          GridArea area,
@@ -67,15 +66,47 @@ AreaMultiAgentStateIterator::AreaMultiAgentStateIterator(const Grid *grid,
     this->_reach_begin();
 }
 
+Location inc_area_iterator(const Location *l, GridArea area, const Grid *grid) {
+    int row = l->row;
+    int col = l->col;
+
+    do {
+        ++col;
+        if (col > area.right_col) {
+            col = area.left_col;
+            ++row;
+        }
+    } while (grid->loc_to_id[row][col] == ILLEGAL_LOCATION && row <= area.bottom_row);
+
+    /* We have reached the end */
+    if (row > area.bottom_row) {
+        return Location(area.top_row, area.left_col, END_OF_AREA_ID);
+    }
+
+    return grid->get_location(row, col);
+}
+
+Location area_first_legal_location(const Grid *grid, GridArea area) {
+    int first_location_row = area.top_row;
+    int first_location_col = area.left_col;
+
+    if (grid->loc_to_id[first_location_row][first_location_col] == ILLEGAL_LOCATION) {
+        Location temp_loc = Location(first_location_row, first_location_col, -1);
+        return inc_area_iterator(&temp_loc, area, grid);
+    } else {
+
+        return grid->get_location(first_location_row, first_location_col);
+    }
+}
 
 void AreaMultiAgentStateIterator::_reach_begin() {
-    /* Start from the top left corner of the area */
-    Location top_left_location = this->grid->get_location(this->area.top_row,
-                                                          this->area.left_col);
+    /* Start from the first legal location of the area */
+    Location first_location = area_first_legal_location(this->grid, this->area);
+
     vector<Location> locations;
     for (size_t i = 0; i < this->n_agents; ++i) {
-        locations.push_back(top_left_location);
-        this->iters[i] = GridIterator(this->grid, top_left_location.id);
+        locations.push_back(first_location);
+        this->iters[i] = GridIterator(this->grid, first_location.id);
     }
     this->set_locations(locations);
 }
@@ -87,17 +118,161 @@ void AreaMultiAgentStateIterator::reach_begin() {
 MultiAgentStateIterator &AreaMultiAgentStateIterator::operator++() {
     size_t agent_idx = 0;
     bool carry = false;
-    bool carry_happened = false;
 
+    /* Increment the first agent, then handle the "carry" */
+    do {
+        Location new_location = inc_area_iterator(this->iters[agent_idx].ptr, this->area, this->grid);
+        if IS_END_OF_AREA(new_location) {
+            Location first_location = area_first_legal_location(this->grid, this->area);
+            new_location = first_location;
+            carry = true;
+        } else {
+            carry = false;
+        }
+        this->iters[agent_idx] = GridIterator(this->grid, new_location.id);
+
+        this->ptr->locations[agent_idx] = *(this->iters[agent_idx]);
+        agent_idx++;
+
+    } while ((agent_idx < this->n_agents) && carry);
+
+    /* Check if we are out because of reaching the last state. If so, return the end */
+    if (agent_idx == this->n_agents && carry) {
+        this->reach_end();
+    }
+
+    this->set_locations(this->ptr->locations);
+
+    return *this;
+}
+
+
+AreaMultiAgentStateSpace::AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents) :
+        MultiAgentStateSpace(grid, n_agents), area(area) {}
+
+AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::begin() {
+    return new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+}
+
+AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::end() {
+    AreaMultiAgentStateIterator *iter = new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+    iter->reach_end();
+
+    return iter;
+}
+
+/** Girth state iterator *****************************************************************************************/
+
+Location inc_grid_iterator_by_girth_aux(const Location *l, GridArea area, const Grid *grid) {
+    int orig_row = l->row;
+    int orig_col = l->col;
+
+    Location loc = *l;
+
+    do {
+        /* top row, move right */
+        if (loc.row == area.top_row - 1 && loc.col < area.right_col + 1) {
+            ++loc.col;
+            continue;
+        }
+
+        /* top row right corner, move down */
+        if (loc.row == area.top_row - 1 && loc.col == area.right_col + 1) {
+            ++loc.row;
+            continue;
+        }
+
+        /* right col, move down */
+        if (loc.col == area.right_col + 1 && loc.row < area.bottom_row + 1) {
+            ++loc.row;
+            continue;
+        }
+
+        /* right col bottom corner, move left */
+        if (loc.col == area.right_col + 1 && loc.row == area.bottom_row + 1) {
+            --loc.col;
+            continue;
+        }
+
+        /* bottom row, move left */
+        if (loc.row == area.bottom_row + 1 && loc.col > area.left_col - 1) {
+            --loc.col;
+            continue;
+        }
+
+        /* bottom row left corner, move up */
+        if (loc.row == area.bottom_row + 1 && loc.col == area.left_col - 1) {
+            --loc.row;
+            continue;
+        }
+
+        /* left col, move up */
+        if (loc.col == area.left_col - 1 && loc.row > area.top_row - 1) {
+            --loc.row;
+            continue;
+        }
+    } while (!grid->is_legal(loc) && !(loc.row == orig_row && loc.col == orig_col));
+
+    if (loc.row == orig_row && loc.col == orig_col) {
+        return Location(area.top_row - 1, area.left_col - 1, -1);
+    }
+
+    return grid->get_location(loc.row, loc.col);
+}
+
+Location girth_first_legal_location(const Grid *grid, GridArea area) {
+    Location first_location = Location(area.top_row - 1, area.left_col - 1, -1);
+    if (area.top_row - 1 < 0 || area.left_col - 1 < 0 || area.top_row - 1 > grid->max_row ||
+        area.left_col - 1 > grid->max_col) {
+        first_location = inc_grid_iterator_by_girth_aux(&first_location, area, grid);
+    }
+
+    return first_location;
+
+}
+
+void GirthMultiAgentStateIterator::_reach_begin() {
+    Location first_location = girth_first_legal_location(this->grid, this->area);
+
+    if ((first_location.row == this->area.top_row - 1) &&
+        (first_location.col == this->area.left_col - 1) &&
+        (!this->grid->is_legal(first_location))) {
+        this->reach_end();
+        return;
+    }
+
+    /* Set the ID for the first location properly */
+    first_location = this->grid->get_location(first_location.row, first_location.col);
+
+    vector<Location> locations;
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        locations.push_back(first_location);
+        this->iters[i] = GridIterator(this->grid, first_location.id);
+    }
+    this->set_locations(locations);
+}
+
+GirthMultiAgentStateIterator::GirthMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents) :
+        MultiAgentStateIterator(grid, n_agents), area(area) {
+    this->_reach_begin();
+}
+
+void GirthMultiAgentStateIterator::reach_begin() {
+    this->_reach_begin();
+}
+
+MultiAgentStateIterator &GirthMultiAgentStateIterator::operator++() {
+    size_t agent_idx = 0;
+    bool carry = false;
+    Location first_location = girth_first_legal_location(this->grid, this->area);
+    GridIterator end = GridIterator(this->grid, &first_location);
     /* Increment the first agent, then handle the "carry" */
 
     do {
-        ++(this->iters[agent_idx]);
-        if (this->iters[agent_idx] == this->grid->end() || !this->area.contains(*this->iters[agent_idx])) {
-            Location top_left_location  =this->grid->get_location(this->area.top_row,this->area.left_col);
-            this->iters[agent_idx] = GridIterator(this->grid, top_left_location.id);
+        Location new_location = inc_grid_iterator_by_girth_aux(this->iters[agent_idx].ptr, this->area, this->grid);
+        this->iters[agent_idx] = GridIterator(this->grid, new_location.id);
+        if (this->iters[agent_idx] == end) {
             carry = true;
-            carry_happened = true;
         } else {
             carry = false;
         }
@@ -114,25 +289,22 @@ MultiAgentStateIterator &AreaMultiAgentStateIterator::operator++() {
         this->reach_end();
     }
 
-    if (!carry_happened) {
-        this->ptr->id++;
-    } else {
-        this->set_locations(this->ptr->locations);
-    }
+    this->set_locations(this->ptr->locations);
 
     return *this;
 }
 
+GirthMultiAgentStateSpace::GirthMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents) :
+        MultiAgentStateSpace(grid, n_agents), area(area) {
 
-AreaMultiAgentStateSpace::AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents) :
-        MultiAgentStateSpace(grid, n_agents), area(area) {}
-
-AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::begin() {
-    return new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
 }
 
-AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::end() {
-    AreaMultiAgentStateIterator *iter = new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+GirthMultiAgentStateIterator *GirthMultiAgentStateSpace::begin() {
+    return new GirthMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+}
+
+GirthMultiAgentStateIterator *GirthMultiAgentStateSpace::end() {
+    GirthMultiAgentStateIterator *iter = new GirthMultiAgentStateIterator(this->grid, this->area, this->n_agents);
     iter->reach_end();
 
     return iter;
@@ -205,11 +377,10 @@ vector<vector<size_t>> OnlineReplanPolicy::divide_to_groups(const MultiAgentStat
     return groups;
 }
 
-Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
-    /* Calculate the conflict area */
-    int top_row = this->env->grid->max_row;
+GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const MultiAgentState &s) {
+    int top_row = grid->max_row;
     int bottom_row = 0;
-    int left_col = this->env->grid->max_col;
+    int left_col = grid->max_col;
     int right_col = 0;
     for (size_t agent: group) {
         top_row = min(top_row, s.locations[agent].row);
@@ -217,18 +388,44 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
         left_col = min(left_col, s.locations[agent].col);
         right_col = max(right_col, s.locations[agent].col);
     }
-    GridArea conflict_area = GridArea(top_row, bottom_row, left_col, right_col);
+
+    return GridArea(top_row, bottom_row, left_col, right_col);
+}
+
+Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
+    /* Calculate the conflict area */
+    GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
 
     /* Generate state space from the conflict area */
-    MultiAgentStateSpace *sub_state_space = new AreaMultiAgentStateSpace(this->env->grid, conflict_area, group.size());
-
+    AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid, conflict_area,
+                                                                                       group.size());
 
     /* Create an environment and set its state space to be our sub-space */
     MapfEnv *area_env = get_local_view(this->env, group);
-    area_env->observation_space = sub_state_space;
-
-    /* Solve the environment using value iteration */
+    area_env->observation_space = conflict_area_state_space;
     ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "");
+
+    /* Set the girth of the area with a fixed value composed of the single agents values */
+    GirthMultiAgentStateSpace *girth_space = new GirthMultiAgentStateSpace(this->env->grid, conflict_area,
+                                                                           group.size());
+    GirthMultiAgentStateIterator *girth_iter = girth_space->begin();
+    GirthMultiAgentStateIterator *girth_space_end = girth_space->end();
+    vector<ValueFunctionPolicy *> policies;
+    vector<vector<size_t>> agents_groups;
+    for (size_t agent: group) {
+        policies.push_back((ValueFunctionPolicy *)
+                                   this->local_policy->policies[agent]);
+        agents_groups.push_back({agent});
+    }
+    SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
+    h->init(this->env);
+
+    for (; *girth_iter != *girth_space_end; ++(*girth_iter)) {
+        MultiAgentState temp_state = **girth_iter;
+        policy->v->set((*girth_iter)->id, (*h)(&temp_state));
+    }
+
+    /* Solve the env by value iteration */
     policy->train();
 
     /* Save the new policy in replans cache */
@@ -238,8 +435,8 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     (*(*this->replans)[group])[conflict_area] = policy;
 
 
-    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
-         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << endl;
+//    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
+//         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << endl;
 
     return policy;
 }
@@ -266,6 +463,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     vector<Location> casted_locations;
     MultiAgentState *group_state = nullptr;
     MultiAgentAction *a = nullptr;
+    bool replanned_now = false;
 
 
     /* In case of a single agent just return from the local policy */
@@ -277,7 +475,11 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
         if (nullptr == policy) {
             /* Replan for this group */
             policy = this->replan(group, s);
+            replanned_now = true;
         }
+//        else {
+//            cout << "found replan" << endl;
+//        }
     }
 
     /* Extract the action from the retrieved policy */
@@ -286,6 +488,10 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     }
     group_state = policy->env->locations_to_state(casted_locations);
     a = policy->act(*group_state);
+
+//    if (a->id == 0) {
+//        cout << "oh no " << replanned_now << endl;
+//    }
 
 l_cleanup:
     delete group_state;
@@ -372,9 +578,9 @@ void OnlineReplanPolicy::delete_replans() {
             Policy *policy = nested_item.second;
             delete policy->env;
             delete policy;
-            cout << "released for group sized " << item.first.size() << " and conflict starts at "
-                 << nested_item.first.top_row << "," << nested_item.first.left_col << " ends at " <<
-                 nested_item.first.bottom_row << "," << nested_item.first.right_col << endl;
+//            cout << "released for group sized " << item.first.size() << " and conflict starts at "
+//                 << nested_item.first.top_row << "," << nested_item.first.left_col << " ends at " <<
+//                 nested_item.first.bottom_row << "," << nested_item.first.right_col << endl;
         }
 
         delete item.second;

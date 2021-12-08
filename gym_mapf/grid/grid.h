@@ -78,6 +78,8 @@ public:
     GridIterator begin() const;
 
     GridIterator end() const;
+
+    bool is_legal(const Location& l) const;
 };
 
 

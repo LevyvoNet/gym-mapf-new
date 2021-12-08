@@ -50,6 +50,8 @@ public:
     bool operator==(const MultiAgentStateIterator &other) const;
 
     bool operator!=(const MultiAgentStateIterator &other) const;
+
+    void set_locations(vector<Location> locations);
 };
 
 class MultiAgentStateSpace {

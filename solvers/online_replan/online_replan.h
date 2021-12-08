@@ -5,12 +5,18 @@
 #ifndef GYM_MAPF_ONLINE_REPLAN_H
 #define GYM_MAPF_ONLINE_REPLAN_H
 
+#include <gym_mapf/grid/grid.h>
 #include <solvers/utils/policy/policy.h>
 #include <solvers/utils/policy/crossed_policy.h>
 #include <solvers/utils/utils.h>
 #include <solvers/value_iteartion/value_iteration.h>
+#include <solvers/heuristics/solution_sum_heuristic.h>
 #include <stack>
 #include <cmath>
+
+/** Internal ********************************************************************/
+class GridArea; /* Forward Declaration */
+GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const MultiAgentState &s);
 
 
 template<>
@@ -30,7 +36,7 @@ public:
 
     bool contains(const Location &l);
 
-    bool operator==(const GridArea& other) const;
+    bool operator==(const GridArea &other) const;
 };
 
 template<>
@@ -40,14 +46,11 @@ public:
 };
 
 class AreaMultiAgentStateIterator : public MultiAgentStateIterator {
-protected:
+public:
     GridArea area;
-
-    void set_locations(vector<Location> locations);
 
     void _reach_begin();
 
-public:
     AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
 
     virtual void reach_begin() override;
@@ -64,6 +67,33 @@ public:
     virtual AreaMultiAgentStateIterator *begin() override;
 
     virtual AreaMultiAgentStateIterator *end() override;
+};
+
+
+class GirthMultiAgentStateIterator : public MultiAgentStateIterator {
+
+public:
+    GridArea area;
+
+    GirthMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual MultiAgentStateIterator &operator++() override;
+
+    void _reach_begin();
+
+    virtual void reach_begin() override;
+};
+
+class GirthMultiAgentStateSpace : public MultiAgentStateSpace {
+protected:
+    GridArea area;
+
+public:
+    GirthMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual GirthMultiAgentStateIterator *begin() override;
+
+    virtual GirthMultiAgentStateIterator *end() override;
 };
 
 class OnlineReplanPolicy : public Policy {

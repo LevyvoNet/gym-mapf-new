@@ -29,6 +29,8 @@ add_library(gym_mapf_solvers SHARED
         heuristics/dijkstra_heuristic.cpp
         heuristics/rtdp_dijkstra_heuristic.h
         heuristics/rtdp_dijkstra_heuristic.cpp
+        heuristics/solution_sum_heuristic.h
+        heuristics/solution_sum_heuristic.cpp
         rtdp/rtdp.h
         rtdp/rtdp.cpp
         id/id.h
@@ -49,6 +51,7 @@ add_executable(
         solvers_ut
 
         tests/heuristics_tests.cpp
+        tests/online_tests.cpp
 )
 
 target_link_libraries(

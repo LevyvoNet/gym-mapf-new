@@ -206,80 +206,6 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
 }
 
 /** RTDP merger ************************************************************************************************/
-class SolutionSumHeuristic : public Heuristic {
-public:
-    ValueFunctionPolicy *p1;
-    ValueFunctionPolicy *p2;
-    vector<size_t> g1;
-    vector<size_t> g2;
-    MapfEnv *env;
-
-    SolutionSumHeuristic(ValueFunctionPolicy *p1,
-                         ValueFunctionPolicy *p2,
-                         vector<size_t> g1,
-                         vector<size_t> g2) :
-            p1(p1), p2(p2), g1(g1), g2(g2) {}
-
-    ~SolutionSumHeuristic() {
-        delete this->p1->env;
-        delete this->p2->env;
-        delete this->p1;
-        delete this->p2;
-    }
-
-    virtual void init(MapfEnv *env_param) {
-        this->env = env_param;
-    }
-
-
-    virtual double operator()(MultiAgentState *s) {
-        MultiAgentState *s1 = nullptr;
-        MultiAgentState *s2 = nullptr;
-        vector<Location> l1;
-        vector<Location> l2;
-        double v1 = 0;
-        double v2 = 0;
-        double sum = 0;
-        size_t relevant_values = 0;
-
-        /* Extract the local states of the two groups from the merged state */
-        for (size_t i = 0; i < s->locations.size(); ++i) {
-            if (i < this->g1.size()) {
-                l1.push_back(s->locations[i]);
-            } else {
-                l2.push_back(s->locations[i]);
-            }
-        }
-        s1 = this->p1->env->locations_to_state(l1);
-        s2 = this->p2->env->locations_to_state(l2);
-
-        v1 = this->p1->get_value(s1);
-        v2 = this->p2->get_value(s2);
-
-        /* Sum only the states which are not goal states */
-        if (*s1 != *this->p1->env->goal_state) {
-            sum += v1;
-            ++relevant_values;
-        }
-        if (*s2 != *this->p2->env->goal_state) {
-            sum += v2;
-            ++relevant_values;
-        }
-
-        delete s1;
-        delete s2;
-
-
-        if (0 == relevant_values) {
-            return 0;
-        }
-
-        return sum - (relevant_values - 1) * this->env->reward_of_goal;
-    }
-
-
-};
-
 Policy *RtdpMerger::operator()(MapfEnv *env,
                                float gamma,
                                size_t group1,
@@ -289,10 +215,14 @@ Policy *RtdpMerger::operator()(MapfEnv *env,
     MapfEnv *merged_env = merge_groups_envs(joint_policy, group1, group2);
     /* This is for the destructor to not destroy the received policies */
 
-    Heuristic *solution_sum = new SolutionSumHeuristic((ValueFunctionPolicy *) joint_policy->policies[group1],
-                                                       (ValueFunctionPolicy *) joint_policy->policies[group2],
-                                                       joint_policy->groups[group1],
-                                                       joint_policy->groups[group2]);
+    Heuristic *solution_sum = new SolutionSumHeuristic(
+            {
+                    (ValueFunctionPolicy *) joint_policy->policies[group1],
+                    (ValueFunctionPolicy *) joint_policy->policies[group2]},
+            {
+                    joint_policy->groups[group1],
+                    joint_policy->groups[group2]});
+
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
     policy->train();
 
