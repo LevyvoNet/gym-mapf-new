@@ -235,7 +235,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
                         new vi("vi"),
                         new online_replan("online_replan_3", 3),
-                        new online_replan("online_replan_6", 6);
+                        new online_replan("online_replan_6", 6),
 
                 },
 
