@@ -20,6 +20,8 @@ public:
     vector<float> episodes_rewards;
     vector<float> episodes_times;
 
+    std::unordered_map<std::string, std::string> *additional_data;
+
     EvaluationInfo();
 };
 
@@ -43,7 +45,7 @@ protected:
 
     virtual void eval_episode_info_update();
 
-    virtual void eval_episodes_info_process();
+    virtual void eval_episodes_info_process(EvaluationInfo* eval_info);
 
 public:
     std::string name;

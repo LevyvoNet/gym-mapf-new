@@ -274,7 +274,11 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     std::cout << " train_time:" << train_info->time;
     std::cout << " solver:" << policy->name;
 
+    /* Additional data */
     for (auto item: *train_info->additional_data) {
+        std::cout << " " << item.first << ":" << item.second;
+    }
+    for (auto item: *eval_info->additional_data) {
         std::cout << " " << item.first << ":" << item.second;
     }
 

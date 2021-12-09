@@ -117,7 +117,8 @@ public:
     int k;
     CrossedPolicy *local_policy;
     int replans_count;
-
+    int episodes_count;
+    int replans_sum;
 
     OnlineReplanPolicy(MapfEnv *env,
                        float gamma,
@@ -133,7 +134,7 @@ public:
 
     virtual MultiAgentAction *act(const MultiAgentState &state) override;
 
-    virtual void eval_episodes_info_process() override;
+    virtual void eval_episodes_info_process(EvaluationInfo* eval_info) override;
 
     virtual void eval_episode_info_update() override;
 };

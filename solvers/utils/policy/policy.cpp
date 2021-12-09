@@ -37,13 +37,14 @@ EvaluationInfo::EvaluationInfo() {
     this->success_rate = 0;
     this->mean_episode_time = 0;
     this->collision_happened = false;
+    this->additional_data = new std::unordered_map<std::string, std::string>;
 }
 
 void Policy::eval_episode_info_update() {
 
 }
 
-void Policy::eval_episodes_info_process() {
+void Policy::eval_episodes_info_process(EvaluationInfo* eval_info) {
 
 }
 
@@ -134,7 +135,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
 
 
     /* Give the inheriting policy a change to process data collected from all of the episodes */
-    this->eval_episodes_info_process();
+    this->eval_episodes_info_process(eval_info);
 
     this->reset();
 

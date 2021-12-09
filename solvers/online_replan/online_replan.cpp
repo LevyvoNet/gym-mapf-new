@@ -228,7 +228,7 @@ Location girth_first_legal_location(const Grid *grid, GridArea area) {
 }
 
 void GirthMultiAgentStateIterator::_reach_begin() {
-     Location first_location = girth_first_legal_location(this->grid, this->area);
+    Location first_location = girth_first_legal_location(this->grid, this->area);
 
     if ((first_location.row == this->area.top_row - 1) &&
         (first_location.col == this->area.left_col - 1) &&
@@ -427,7 +427,7 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
         (*this->replans)[group] = new tsl::hopscotch_map<GridArea, Policy *>();
     }
     (*(*this->replans)[group])[conflict_area] = policy;
-
+    ++this->replans_count;
 
 //    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
 //         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << endl;
@@ -555,14 +555,14 @@ MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state) {
     return actions_to_action(selected_actions);
 }
 
-void OnlineReplanPolicy::eval_episodes_info_process() {
-    /* TODO: implement this */
-    Policy::eval_episodes_info_process();
+void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
+    float replans_mean = float(this->replans_sum) / this->episodes_count;
+    (*eval_info->additional_data)["replans_mean"] = std::to_string(replans_mean);
 }
 
 void OnlineReplanPolicy::eval_episode_info_update() {
-    /* TODO: implement this */
-    Policy::eval_episode_info_update();
+    this->replans_sum += this->replans_count;
+    ++this->episodes_count;
 }
 
 void OnlineReplanPolicy::delete_replans() {
