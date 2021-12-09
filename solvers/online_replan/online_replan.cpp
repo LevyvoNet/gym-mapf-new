@@ -7,10 +7,7 @@
 /** Utilities ***************************************************************************************************/
 vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
-size_t hash<vector<size_t>>
-::operator()(
-        const vector<size_t> &v
-) const {
+size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
     size_t h = 0;
     for (
             size_t i = 0;
@@ -24,8 +21,7 @@ size_t hash<vector<size_t>>
                 );
     }
 
-    return
-            h;
+    return h;
 }
 
 
@@ -213,7 +209,7 @@ Location inc_grid_iterator_by_girth_aux(const Location *l, GridArea area, const 
         }
     } while (!grid->is_legal(loc) && !(loc.row == orig_row && loc.col == orig_col));
 
-    if (loc.row == orig_row && loc.col == orig_col) {
+    if (loc.row == orig_row && loc.col == orig_col && !grid->is_legal(loc)) {
         return Location(area.top_row - 1, area.left_col - 1, -1);
     }
 
@@ -232,7 +228,7 @@ Location girth_first_legal_location(const Grid *grid, GridArea area) {
 }
 
 void GirthMultiAgentStateIterator::_reach_begin() {
-    Location first_location = girth_first_legal_location(this->grid, this->area);
+     Location first_location = girth_first_legal_location(this->grid, this->area);
 
     if ((first_location.row == this->area.top_row - 1) &&
         (first_location.col == this->area.left_col - 1) &&
@@ -281,8 +277,6 @@ MultiAgentStateIterator &GirthMultiAgentStateIterator::operator++() {
         agent_idx++;
 
     } while ((agent_idx < this->n_agents) && carry);
-
-
 
     /* Check if we are out because of reaching the last state. If so, return the end */
     if (agent_idx == this->n_agents && carry) {

@@ -51,8 +51,7 @@ public:
     }
 };
 
-TEST(OnlineReplanTest, ConflictAreaConstructionIteration
-) {
+TEST(OnlineReplanTest, ConflictAreaConstructionIteration) {
     std::vector<std::string> lines{{'.', '.', '.', '.', '.', '.', '.', '.'},
                                    {'.', '@', '.', '.', '.', '.', '.', '.'},
                                    {'.', '.', '.', '.', '.', '.', '.', '.'},
@@ -84,65 +83,160 @@ TEST(OnlineReplanTest, ConflictAreaConstructionIteration
     vector<Location> expected_init_locations{grid.get_location(1, 2),
                                              grid.get_location(1, 2),
                                              grid.get_location(1, 2)};
-    area_iter->
-            set_locations(expected_init_locations);
+    area_iter->set_locations(expected_init_locations);
     MultiAgentState expected_init_state = **area_iter;
     ASSERT_EQ(init_state, expected_init_state
     );
 
 }
 
-//TEST(OnlineReplanTest, CorridorSwitch) {
-//    std::vector<std::string> lines{{'.', '.', '.', '.', '.'},
-//                                   {'@', '@', '.', '@', '@'}};
-//    Grid grid(lines);
-//
-//    MapfEnv env = MapfEnv(&grid,
-//                          2,
-//                          {grid.get_location(0, 0), grid.get_location(0, 4)},
-//                          {grid.get_location(0, 4), grid.get_location(0, 0)},
-//                          0.2,
-//                          1,
-//                          0,
-//                          -1);
-//    int k = 2;
-//
-//    OnlineReplanPolicy online_policy = OnlineReplanPolicy(&env, 1.0, "", new rtdp_dijkstra_rtdp(""), k);
-//
-//    online_policy.train();
-//
-//    EvaluationInfo *eval_info = online_policy.evaluate(1, 100, 1);
-//
-//    /* Assert a single re-plan was made */
-//
-//}
-//
-//TEST(OnineReplanTest, WholeEnvConflictArea) {
-//    std::vector<std::string> lines{{'.', '.', '.', '.', '.'},
-//                                   {'@', '@', '.', '@', '@'}};
-//    Grid grid(lines);
-//
-//    MapfEnv env = MapfEnv(&grid,
-//                          2,
-//                          {grid.get_location(0, 0), grid.get_location(0, 4)},
-//                          {grid.get_location(0, 4), grid.get_location(0, 0)},
-//                          0.2,
-//                          1,
-//                          0,
-//                          -1);
-//    int k = 10;
-//
-//    OnlineReplanPolicy online_policy = OnlineReplanPolicy(&env, 1.0, "", new rtdp_dijkstra_rtdp(""), k);
-//
-//    online_policy.train();
-//
-//    EvaluationInfo *eval_info = online_policy.evaluate(1, 100, 1);
-//
-//    /* Assert a single re-plan was made */
-//}
 
-TEST(OnlineReplanTest, GirthStatesNormalIteration
-) {
+TEST(OnineReplanTest, SingleLocationGirthArea) {
+    std::vector<std::string> lines{{'.', '.', '.', '.', '.'},
+                                   {'@', '@', '.', '@', '@'}};
+    Grid grid(lines);
+
+    MapfEnv env = MapfEnv(&grid,
+                          2,
+                          {grid.get_location(0, 0), grid.get_location(0, 4)},
+                          {grid.get_location(0, 4), grid.get_location(0, 0)},
+                          0.2,
+                          1,
+                          0,
+                          -1);
+
+    MultiAgentState *interesting_state = env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 4)});
+    GridArea area = construct_conflict_area(&grid, {0, 1}, *interesting_state);
+
+
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&grid, area, 2);
+    list<MultiAgentState *> girth_states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        girth_states.push_back(s);
+    }
+
+    list<MultiAgentState *> girth_expected_states{
+            env.locations_to_state({grid.get_location(1, 2), grid.get_location(1, 2)})
+    };
+
+    ASSERT_TRUE(list_equal_no_order(girth_states, girth_expected_states));
+
+
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&grid, area, 2);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> area_expected_states{
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 4), grid.get_location(0, 0)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 4), grid.get_location(0, 1)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 4), grid.get_location(0, 2)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 3)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 3)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 3)}),
+            env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 3)}),
+            env.locations_to_state({grid.get_location(0, 4), grid.get_location(0, 3)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 4)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 4)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 4)}),
+            env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 4)}),
+            env.locations_to_state({grid.get_location(0, 4), grid.get_location(0, 4)}),
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, area_expected_states));
+
+
+}
+
+TEST(OnineReplanTest, EmptyGirthWholeEnvConflictArea) {
+    std::vector<std::string> lines{{'.', '.', '.'},
+                                   {'.', '@', '@'}};
+    Grid grid(lines);
+
+    MapfEnv env = MapfEnv(&grid,
+                          2,
+                          {grid.get_location(1, 0), grid.get_location(0, 2)},
+                          {grid.get_location(0, 0), grid.get_location(0, 1)},
+                          0.2,
+                          1,
+                          0,
+                          -1);
+
+    MultiAgentState *interesting_state = env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 2)});
+    GridArea area = construct_conflict_area(&grid, {0, 1}, *interesting_state);
+
+
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&grid, area, 2);
+    list<MultiAgentState *> girth_states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        girth_states.push_back(s);
+    }
+
+    list<MultiAgentState *> girth_expected_states{};
+
+    ASSERT_TRUE(list_equal_no_order(girth_states, girth_expected_states));
+
+
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&grid, area, 2);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> area_expected_states{
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 0)}),
+            env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 0)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 1)}),
+            env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 1)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 2)}),
+            env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 2)}),
+
+            env.locations_to_state({grid.get_location(0, 0), grid.get_location(1, 0)}),
+            env.locations_to_state({grid.get_location(0, 1), grid.get_location(1, 0)}),
+            env.locations_to_state({grid.get_location(0, 2), grid.get_location(1, 0)}),
+            env.locations_to_state({grid.get_location(1, 0), grid.get_location(1, 0)}),
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, area_expected_states));
+
+
+}
+
+TEST(OnlineReplanTest, GirthStatesNormalIteration) {
     std::vector<std::string> lines{{'.', '.', '.', '.'},
                                    {'.', '.', '.', '.'},
                                    {'.', '.', '.', '.'},
@@ -164,11 +258,7 @@ TEST(OnlineReplanTest, GirthStatesNormalIteration
 
     list<MultiAgentState *> states;
     GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
-    for (; *girth_iter != *girth_space.
-
-            end();
-
-           ++*girth_iter) {
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
         MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
         states.
                 push_back(s);
@@ -390,13 +480,11 @@ TEST(OnlineReplanTest, GirthStatesNormalIteration
 
     };
 
-    ASSERT_TRUE(list_equal_no_order(states, expected_states)
-    );
+    ASSERT_TRUE(list_equal_no_order(states, expected_states));
 
 }
 
-TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirth
-) {
+TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirth) {
     vector<std::string> map_lines({
                                           "..@...",
                                           "..@...",
@@ -598,7 +686,7 @@ TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirth
     AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2);
     list<MultiAgentState *> area_states;
     AreaMultiAgentStateIterator *area_iter = area_space.begin();
-    for (; *area_iter != *area_space.end();++*area_iter) {
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
         MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
         area_states.push_back(s);
     }
@@ -630,8 +718,7 @@ TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirth
     );
 }
 
-TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirthDifferentRows
-) {
+TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirthDifferentRows) {
     vector<std::string> map_lines({
                                           "..@...",
                                           "..@...",
