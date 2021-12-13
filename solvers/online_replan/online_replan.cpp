@@ -547,6 +547,7 @@ void OnlineReplanPolicy::reset() {
     Policy::reset();
 
     this->replans_count = 0;
+    this->replans_sum = 0;
 
     this->delete_replans();
 
