@@ -225,6 +225,10 @@ vector<vector<EnvCreator *>> env_creators(
                 {
                         new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                         new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+                },
+                /* lvl 3 */
+                {
+                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
                 }
 
         }
@@ -247,9 +251,11 @@ vector<vector<SolverCreator *>> solver_creators(
                         new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                         new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
+                },
+                /* lvl 3 */
+                {
                         new online_replan("online_replan_3", 3),
                         new online_replan("online_replan_6", 6),
-                        new online_replan("online_replan_10", 10),
                 }
         }
 );
