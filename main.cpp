@@ -234,22 +234,22 @@ vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
                         new vi("vi"),
-                        new online_replan("online_replan_3", 3),
-                        new online_replan("online_replan_6", 6),
-                        new online_replan("online_replan_10", 10),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-//                        new id_rtdp_default("id_rtdp_default"),
-//                        new id_rtdp("id_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
+                        new online_replan("online_replan_3", 3),
+                        new online_replan("online_replan_6", 6),
+                        new online_replan("online_replan_10", 10),
                 }
         }
 );
@@ -362,9 +362,11 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (!error_occurred) {
+    if (error_occurred) {
         cout << "-----------------------------------------Success-----------------------------------------" << endl;
+        return 1;
     }
 
+    cout << "-----------------------------------------Success-----------------------------------------" << endl;
     return 0;
 }
