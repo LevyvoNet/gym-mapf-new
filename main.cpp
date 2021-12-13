@@ -264,7 +264,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train();
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
+    EvaluationInfo *eval_info = policy->evaluate(30, 1000, 0);
 
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;

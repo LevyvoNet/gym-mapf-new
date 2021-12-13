@@ -506,15 +506,11 @@ TEST(OnlineReplanTest, SymmetricalBottleneckAreaGirth) {
 
     GridArea conflict_area = GridArea(2, 2, 1, 4);
 
-/* Calculate girth states */
+    /* Calculate girth states */
     GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&g, conflict_area, 2);
     list<MultiAgentState *> girth_states;
     GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
-    for (; *girth_iter != *girth_space.
-
-            end();
-
-           ++*girth_iter) {
+    for (; *girth_iter != *girth_space.end();++*girth_iter) {
         MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
         girth_states.
                 push_back(s);

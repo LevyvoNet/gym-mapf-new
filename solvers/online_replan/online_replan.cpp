@@ -386,9 +386,24 @@ GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const 
     return GridArea(top_row, bottom_row, left_col, right_col);
 }
 
+GridArea pad_area(Grid* grid, GridArea area, int k){
+    int extra_rows = max(k - (area.bottom_row - area.top_row + 1), 0);
+    int extra_cols = max(k - (area.right_col - area.left_col + 1), 0);
+
+    int top_row = max(0, (int)floor(area.top_row - extra_rows/2.0));
+    int left_col = max(0, (int)floor(area.left_col  - extra_cols/2.0));
+    int bottom_row = min(grid->max_row, (size_t)ceil(area.bottom_row + extra_rows/2.0));
+    int right_col = min(grid->max_col, (size_t)ceil(area.right_col + extra_cols/2.0));
+
+    return GridArea(top_row, bottom_row, left_col, right_col);
+}
+
 Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
     /* Calculate the conflict area */
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
+
+    /* Pad the area TODO: is it good? */
+    conflict_area = pad_area(this->env->grid, conflict_area, this->k);
 
     /* Generate state space from the conflict area */
     AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid, conflict_area,
