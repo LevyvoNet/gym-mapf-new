@@ -119,6 +119,7 @@ public:
     int replans_count;
     int episodes_count;
     int replans_sum;
+    size_t replans_max_size;
 
     OnlineReplanPolicy(MapfEnv *env,
                        float gamma,

@@ -20,4 +20,8 @@ void Dictionary::set(int64_t key, double value) {
     (*this->d)[key] = value;
 }
 
+Dictionary::~Dictionary() {
+    delete this->d;
+}
+
 

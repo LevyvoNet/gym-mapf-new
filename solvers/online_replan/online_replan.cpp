@@ -443,6 +443,7 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     }
     (*(*this->replans)[group])[conflict_area] = policy;
     ++this->replans_count;
+    this->replans_max_size = max(group.size(), this->replans_max_size);
 
 //    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
 //         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << endl;
@@ -518,7 +519,7 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        int k) :
         Policy(env, gamma, name),
         k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
-        replans_count(0),replans_sum(0),episodes_count(0) {
+        replans_count(0),replans_sum(0),episodes_count(0),replans_max_size(0) {
     this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
 }
 
@@ -573,6 +574,7 @@ MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state) {
 void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     float replans_mean = float(this->replans_sum) / this->episodes_count;
     (*eval_info->additional_data)["replans_mean"] = std::to_string(replans_mean);
+    (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
 void OnlineReplanPolicy::eval_episode_info_update() {

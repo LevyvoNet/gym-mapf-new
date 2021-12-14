@@ -14,6 +14,8 @@ public:
 
     Dictionary(double default_value);
 
+    ~Dictionary();
+
     double get(int64_t key);
 
     void set(int64_t key, double value);

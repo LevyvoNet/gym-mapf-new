@@ -229,6 +229,9 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 3 */
                 {
                         new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
+                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
+                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new EmptyGrid("empty_48X48_8_agents", 48, 8, 0),
                 }
 
         }
@@ -254,8 +257,10 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
+                        new online_replan("online_replan_2", 2),
                         new online_replan("online_replan_3", 3),
-                        new online_replan("online_replan_6", 6),
+                        new online_replan("online_replan_4", 4),
+//                        new online_replan("online_replan_6", 6),
                 }
         }
 );
@@ -270,7 +275,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train();
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(30, 1000, 0);
+    EvaluationInfo *eval_info = policy->evaluate(100, 1000, 0);
 
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
