@@ -105,9 +105,11 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
 
 EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, double min_success_rate) {
     EvaluationInfo *eval_info = new EvaluationInfo();
+    bool collision_happened = false;
 
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
         this->evaluate_single_episode(max_steps, eval_info);
+        collision_happened = collision_happened || eval_info->collision_happened;
 
         /* Give the inheriting policy a change to collect inner data about the last episode */
         this->eval_episode_info_update();
@@ -133,6 +135,8 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes, std::size_t max_steps, 
         /* Calculate success rate */
         eval_info->success_rate = round((float(eval_info->episodes_rewards.size()) / float(n_episodes)) * 100);
     }
+
+    eval_info->collision_happened = collision_happened;
 
 
     /* Give the inheriting policy a change to process data collected from all of the episodes */
