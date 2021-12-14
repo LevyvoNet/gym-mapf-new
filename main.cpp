@@ -230,7 +230,7 @@ vector<vector<EnvCreator *>> env_creators(
                 {
                         new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
                         new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-//                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
 //                        new EmptyGrid("empty_48X48_8_agents", 48, 8, 0),
                 }
 
