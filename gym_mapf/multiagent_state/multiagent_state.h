@@ -14,7 +14,7 @@ class MultiAgentState {
 public:
     /* TODO: make this a pointer */
     vector<Location> locations;
-    int64_t id;
+    uint64_t id;
 
     MultiAgentState(const vector<Location> &locations, int64_t id);
 

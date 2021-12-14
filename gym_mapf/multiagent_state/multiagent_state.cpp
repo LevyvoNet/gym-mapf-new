@@ -119,8 +119,8 @@ void MultiAgentStateIterator::reach_begin(){
 }
 
 void MultiAgentStateIterator::set_locations(vector<Location> locations) {
-    int mul = 1;
-    int sum = 0;
+    uint64_t mul = 1;
+    uint64_t sum = 0;
     int n_options = this->grid->id_to_loc.size();
 
     sum += locations[0].id * mul;

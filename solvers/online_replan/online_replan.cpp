@@ -517,7 +517,8 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        SolverCreator *low_level_planner_creator,
                                        int k) :
         Policy(env, gamma, name),
-        k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr), replans_count(0) {
+        k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
+        replans_count(0),replans_sum(0),episodes_count(0) {
     this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
 }
 
@@ -547,8 +548,6 @@ void OnlineReplanPolicy::reset() {
     Policy::reset();
 
     this->replans_count = 0;
-    this->replans_sum = 0;
-
     this->delete_replans();
 
     this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();

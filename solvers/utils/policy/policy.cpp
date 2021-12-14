@@ -95,6 +95,7 @@ void Policy::evaluate_single_episode(std::size_t max_steps, EvaluationInfo *eval
             auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
             float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
             eval_info->episodes_times.push_back(round(elapsed_time_seconds * 100) / 100);
+            break;
         }
 
     } while (steps < max_steps);
