@@ -334,7 +334,9 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
         this->calc_transition_reward(&state, &t_action, t_state, &t_reward, &t_done, &t_collision, cache);
 
         /* Add the transition to the result */
-        transitions->transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
+        if (curr_prob > 0) {
+            transitions->transitions->push_back(new Transition(curr_prob, t_state, t_reward, t_done, t_collision));
+        }
     }
 
     if (cache) {
@@ -351,11 +353,10 @@ void MapfEnv::step(const MultiAgentAction &action,
                    bool cache) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::discrete_distribution<> d({
-                                           1 - this->fail_prob,
-                                           this->fail_prob / 3,
-                                           this->fail_prob / 3,
-                                           this->fail_prob / 3});
+    std::discrete_distribution<> d({1 - this->fail_prob,
+                                    this->fail_prob / 3,
+                                    this->fail_prob / 3,
+                                    this->fail_prob / 3});
     int noise_idx = 0;
     Action noised_action = STAY;
     size_t agent_idx = 0;
@@ -392,18 +393,9 @@ MultiAgentState *MapfEnv::reset() {
 }
 
 MultiAgentState *MapfEnv::locations_to_state(const vector<Location> &locations) {
-    uint64_t mul = 1;
-    uint64_t sum = 0;
-    int n_options = this->grid->id_to_loc.size();
+    uint64_t id = this->grid->calculate_multi_locations_id(locations);
 
-    sum += locations[0].id * mul;
-
-    for (size_t i = 1; i < locations.size(); ++i) {
-        mul *= n_options;
-        sum += locations[i].id * mul;
-    }
-
-    return new MultiAgentState(locations, sum);
+    return new MultiAgentState(locations, id);
 }
 
 

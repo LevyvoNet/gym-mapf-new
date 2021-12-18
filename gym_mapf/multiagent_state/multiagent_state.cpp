@@ -119,19 +119,8 @@ void MultiAgentStateIterator::reach_begin(){
 }
 
 void MultiAgentStateIterator::set_locations(vector<Location> locations) {
-    uint64_t mul = 1;
-    uint64_t sum = 0;
-    int n_options = this->grid->id_to_loc.size();
-
-    sum += locations[0].id * mul;
-
-    for (size_t i = 1; i < this->n_agents; ++i) {
-        mul *= n_options;
-        sum += locations[i].id * mul;
-    }
-
     this->ptr->locations = locations;
-    this->ptr->id = sum;
+    this->ptr->id = this->grid->calculate_multi_locations_id(locations);
 }
 
 /** MultiAgentStateSpace ***************************************************************************************/

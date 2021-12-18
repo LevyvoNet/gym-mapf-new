@@ -8,15 +8,22 @@
 #define MAX_ITERATIONS (1000)
 #define MDR_EPSILON (0.01)
 
-ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name) : ValueFunctionPolicy(env,
-                                                                                                                gamma,
-                                                                                                                name) {
-//    this->default_value = 0;
-    this->v = new Dictionary(0);
-//    this->v = new double[this->env->nS];
-//    this->v = new tsl::hopscotch_map<int64_t, double>();
-//    std::fill(this->v, this->v + this->env->nS, 0);
+/** Private ***************************************************************************************************/
+
+
+ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const string &name, Dictionary *const_vals)
+        : ValueFunctionPolicy(env,
+                              gamma,
+                              name) {
+    if (nullptr == const_vals) {
+        this->const_vals = new Dictionary(0);
+    } else {
+        this->const_vals = const_vals;
+    }
+
+    this->v = this->const_vals->clone();
 }
+
 
 void ValueIterationPolicy::train() {
     size_t i = 0;
@@ -41,7 +48,7 @@ void ValueIterationPolicy::train() {
             delete prev_v;
         }
         prev_v = this->v;
-        this->v = new Dictionary(0);
+        this->v = this->const_vals->clone();
         /* Update the value of current state */
         states_count = 0;
         for (s->reach_begin(); *s != *state_end; ++*s) {
@@ -52,6 +59,12 @@ void ValueIterationPolicy::train() {
                 q_sa = 0;
                 transitions = this->env->get_transitions(**s, *a)->transitions;
                 for (Transition *t: *transitions) {
+//                    if (t->next_state->locations[0] == this->env->grid->get_location(2, 5) ||
+//                        t->next_state->locations[1] == this->env->grid->get_location(2, 0)) {
+//                        cout << "wow" << endl;
+//
+//                    }
+
                     if (t->is_collision) {
                         q_sa = -std::numeric_limits<double>::max();
                         break;
@@ -59,14 +72,17 @@ void ValueIterationPolicy::train() {
 
                     q_sa += t->p * (t->reward + this->gamma * prev_v->get(t->next_state->id));
                 }
+                v_s = max(v_s, q_sa);
 
-                if (q_sa > v_s) {
-                    v_s = q_sa;
-                }
+//                if ((*s)->id == 220) {
+//                    cout << "wow" << endl;
+//                }
             }
 
+
+
             /* Update the value table and the diff */
-            max_diff = max(abs(prev_v->get((*s)->id)- v_s), max_diff);
+            max_diff = max(abs(prev_v->get((*s)->id) - v_s), max_diff);
             this->v->set((*s)->id, v_s);
         }
 

@@ -183,12 +183,27 @@ Grid::~Grid() {
 
 }
 
-bool Grid::is_legal(const Location &l) const{
+bool Grid::is_legal(const Location &l) const {
     if (l.row < 0 || l.row > this->max_row || l.col < 0 || l.col > this->max_col) {
         return 0;
     }
 
     return this->loc_to_id[l.row][l.col] != ILLEGAL_LOCATION;
+}
+
+uint64_t Grid::calculate_multi_locations_id(vector<Location> locations) const{
+    uint64_t mul = 1;
+    uint64_t sum = 0;
+    int n_options = this->id_to_loc.size();
+
+    sum += locations[0].id * mul;
+
+    for (size_t i = 1; i < locations.size(); ++i) {
+        mul *= n_options;
+        sum += locations[i].id * mul;
+    }
+
+    return sum;
 }
 
 
@@ -206,6 +221,11 @@ Location::Location(int row, int col, int64_t id) {
 
 bool Location::operator!=(const Location &other_loc) const {
     return (this->row != other_loc.row) || (this->col != other_loc.col);
+}
+
+std::ostream &operator<<(std::ostream &os, const Location &l) {
+    os << "(" << l.row << "," << l.col << ")";
+    return os;
 }
 
 

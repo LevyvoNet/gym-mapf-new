@@ -9,9 +9,12 @@
 #include <string>
 #include <unordered_map>
 #include <cmath>
+#include <iostream>
 
 #define ILLEGAL_LOCATION (-1)
 #define ACTIONS_COUNT (5)
+
+using namespace std;
 
 class Cell {
 public:
@@ -31,6 +34,8 @@ public:
     bool operator==(const Location &other_loc) const;
 
     bool operator!=(const Location &other_loc) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const Location& l);
 
 };
 
@@ -80,6 +85,8 @@ public:
     GridIterator end() const;
 
     bool is_legal(const Location& l) const;
+
+    uint64_t calculate_multi_locations_id(vector<Location> locations) const;
 };
 
 

@@ -4,6 +4,7 @@
 
 #include "online_replan.h"
 
+#define BONUS_VALUE (100)
 /** Utilities ***************************************************************************************************/
 vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
@@ -386,16 +387,31 @@ GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const 
     return GridArea(top_row, bottom_row, left_col, right_col);
 }
 
-GridArea pad_area(Grid* grid, GridArea area, int k){
+GridArea pad_area(Grid *grid, GridArea area, int k) {
     int extra_rows = max(k - (area.bottom_row - area.top_row + 1), 0);
     int extra_cols = max(k - (area.right_col - area.left_col + 1), 0);
 
-    int top_row = max(0, (int)floor(area.top_row - extra_rows/2.0));
-    int left_col = max(0, (int)floor(area.left_col  - extra_cols/2.0));
-    int bottom_row = min(grid->max_row, (size_t)ceil(area.bottom_row + extra_rows/2.0));
-    int right_col = min(grid->max_col, (size_t)ceil(area.right_col + extra_cols/2.0));
+    int top_row = max(0, (int) floor(area.top_row - extra_rows / 2.0));
+    int left_col = max(0, (int) floor(area.left_col - extra_cols / 2.0));
+    int bottom_row = min(grid->max_row, (size_t) ceil(area.bottom_row + extra_rows / 2.0));
+    int right_col = min(grid->max_col, (size_t) ceil(area.right_col + extra_cols / 2.0));
 
     return GridArea(top_row, bottom_row, left_col, right_col);
+}
+
+tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k) {
+    tsl::hopscotch_set<Location> res;
+    Location curr_location = start;
+    for (size_t i = 1; i <= k; ++i) {
+        MultiAgentState *curr_state = p->env->locations_to_state({curr_location});
+        MultiAgentAction *a = p->act(*curr_state);
+        curr_location = p->env->grid->execute(curr_location, a->actions[0]);
+        delete a;
+        res.insert(curr_location);
+    }
+
+
+    return res;
 }
 
 Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
@@ -412,30 +428,51 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     /* Create an environment and set its state space to be our sub-space */
     MapfEnv *area_env = get_local_view(this->env, group);
     area_env->observation_space = conflict_area_state_space;
-    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "");
 
     /* Set the girth of the area with a fixed value composed of the single agents values */
-    GirthMultiAgentStateSpace *girth_space = new GirthMultiAgentStateSpace(this->env->grid, conflict_area,
-                                                                           group.size());
-    GirthMultiAgentStateIterator *girth_iter = girth_space->begin();
-    GirthMultiAgentStateIterator *girth_space_end = girth_space->end();
     vector<ValueFunctionPolicy *> policies;
     vector<vector<size_t>> agents_groups;
+    vector<tsl::hopscotch_set<Location>> intended_locations;
     for (size_t agent: group) {
-        policies.push_back((ValueFunctionPolicy *)
-                                   this->local_policy->policies[agent]);
+        Policy *agent_policy = this->local_policy->policies[agent];
+        policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
+        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], this->k + 1));
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
     h->init(this->env);
 
-    for (; *girth_iter != *girth_space_end; ++(*girth_iter)) {
-        MultiAgentState temp_state = **girth_iter;
-        policy->v->set((*girth_iter)->id, (*h)(&temp_state));
+    /* Only a single one outside the area */
+    GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, conflict_area, 1);
+    GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
+    AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
+    AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
+    Dictionary* girth_values = new Dictionary(0);
+    for (; *area_iter != *area_end; ++*area_iter) {
+        for (size_t agent: group) {
+            GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
+            for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
+                MultiAgentState temp_state = **area_iter;
+                temp_state.locations[agent] = girth_iter->ptr->locations[0];
+                temp_state.id = this->env->grid->calculate_multi_locations_id(temp_state.locations);
+
+                double value = (*h)(&temp_state);
+
+                if (intended_locations[agent].find(temp_state.locations[agent]) != intended_locations[agent].end()) {
+                    value += BONUS_VALUE;
+                }
+
+                girth_values->set(temp_state.id, value);
+            }
+        }
     }
 
+
+
     /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "", girth_values);
     policy->train();
+    delete girth_values;
 
     /* Save the new policy in replans cache */
     if (!this->replans->contains(group)) {
@@ -445,8 +482,9 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     ++this->replans_count;
     this->replans_max_size = max(group.size(), this->replans_max_size);
 
-//    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
-//         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << endl;
+    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
+         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
+    cout << "locations are" << s.locations[0] << ", " << s.locations[1] << endl;
 
     return policy;
 }
@@ -473,7 +511,6 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     vector<Location> casted_locations;
     MultiAgentState *group_state = nullptr;
     MultiAgentAction *a = nullptr;
-    bool replanned_now = false;
 
 
     /* In case of a single agent just return from the local policy */
@@ -485,11 +522,8 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
         if (nullptr == policy) {
             /* Replan for this group */
             policy = this->replan(group, s);
-            replanned_now = true;
         }
-//        else {
-//            cout << "found replan" << endl;
-//        }
+
     }
 
     /* Extract the action from the retrieved policy */
@@ -499,9 +533,6 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     group_state = policy->env->locations_to_state(casted_locations);
     a = policy->act(*group_state);
 
-//    if (a->id == 0) {
-//        cout << "oh no " << replanned_now << endl;
-//    }
 
 l_cleanup:
     delete group_state;
@@ -519,7 +550,7 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        int k) :
         Policy(env, gamma, name),
         k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
-        replans_count(0),replans_sum(0),episodes_count(0),replans_max_size(0) {
+        replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
     this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
 }
 
@@ -589,13 +620,11 @@ void OnlineReplanPolicy::delete_replans() {
             Policy *policy = nested_item.second;
             delete policy->env;
             delete policy;
-//            cout << "released for group sized " << item.first.size() << " and conflict starts at "
-//                 << nested_item.first.top_row << "," << nested_item.first.left_col << " ends at " <<
-//                 nested_item.first.bottom_row << "," << nested_item.first.right_col << endl;
         }
 
         delete item.second;
     }
+    cout << "--------------------------------" << endl;
 
     delete this->replans;
 }

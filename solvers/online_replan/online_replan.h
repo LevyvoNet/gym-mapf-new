@@ -5,14 +5,18 @@
 #ifndef GYM_MAPF_ONLINE_REPLAN_H
 #define GYM_MAPF_ONLINE_REPLAN_H
 
+#include <set>
+#include <stack>
+#include <cmath>
+
+#include <tsl/hopscotch_set.h>
+
 #include <gym_mapf/grid/grid.h>
 #include <solvers/utils/policy/policy.h>
 #include <solvers/utils/policy/crossed_policy.h>
 #include <solvers/utils/utils.h>
 #include <solvers/value_iteartion/value_iteration.h>
 #include <solvers/heuristics/solution_sum_heuristic.h>
-#include <stack>
-#include <cmath>
 
 /** Internal ********************************************************************/
 class GridArea; /* Forward Declaration */

@@ -19,6 +19,10 @@ public:
     double get(int64_t key);
 
     void set(int64_t key, double value);
+
+    bool contains(int64_t key);
+
+    Dictionary* clone();
 };
 
 #endif //GYM_MAPF_DICTIONARY_H

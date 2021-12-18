@@ -23,10 +23,8 @@ public:
     bool operator!=(const MultiAgentState &other) const;
 };
 
-
 class MultiAgentStateIterator {
 protected:
-    MultiAgentState *ptr;
     size_t n_agents;
     vector<GridIterator> iters;
     const Grid *grid;
@@ -52,6 +50,8 @@ public:
     bool operator!=(const MultiAgentStateIterator &other) const;
 
     void set_locations(vector<Location> locations);
+
+    MultiAgentState *ptr;
 };
 
 class MultiAgentStateSpace {

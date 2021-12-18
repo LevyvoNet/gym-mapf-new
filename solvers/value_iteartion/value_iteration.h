@@ -18,9 +18,10 @@ public:
 //    double default_value;
 //    double *v;
     Dictionary* v;
+    Dictionary* const_vals;
 //    MultiAgentStateStorage<double*> *v;
 
-    ValueIterationPolicy(MapfEnv *env, float gamma, const string &name);
+    ValueIterationPolicy(MapfEnv *env, float gamma, const string &name, Dictionary* const_vals=nullptr);
 
     virtual ~ValueIterationPolicy() override;
 
