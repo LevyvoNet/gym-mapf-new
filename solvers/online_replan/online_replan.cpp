@@ -482,9 +482,9 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     ++this->replans_count;
     this->replans_max_size = max(group.size(), this->replans_max_size);
 
-    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
-         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
-    cout << "locations are" << s.locations[0] << ", " << s.locations[1] << endl;
+//    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
+//         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
+//    cout << "locations are" << s.locations[0] << ", " << s.locations[1] << endl;
 
     return policy;
 }
@@ -624,7 +624,6 @@ void OnlineReplanPolicy::delete_replans() {
 
         delete item.second;
     }
-    cout << "--------------------------------" << endl;
 
     delete this->replans;
 }
