@@ -260,7 +260,7 @@ vector<vector<SolverCreator *>> solver_creators(
                         new online_replan("online_replan_2", 2),
                         new online_replan("online_replan_3", 3),
                         new online_replan("online_replan_4", 4),
-                        new online_replan("online_replan_6", 6),
+//                        new online_replan("online_replan_6", 6),
                 }
         }
 );
