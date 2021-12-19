@@ -415,6 +415,7 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
 }
 
 Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
+    cout << "replanning for a group of size " << group.size() << endl;
     /* Calculate the conflict area */
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
 
