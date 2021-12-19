@@ -229,9 +229,9 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 3 */
                 {
                         new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
-//                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
-//                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-//                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
+                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
+                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
                 }
 
         }
@@ -257,8 +257,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
-//                        new online_replan("online_replan_2", 2),
-                        new online_replan("online_replan_3", 3),
+                        new online_replan("online_replan_2", 2),
+//                        new online_replan("online_replan_3", 3),
 //                        new online_replan("online_replan_4", 4),
                 }
         }
