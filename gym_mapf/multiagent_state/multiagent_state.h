@@ -21,6 +21,8 @@ public:
     bool operator==(const MultiAgentState &other) const;
 
     bool operator!=(const MultiAgentState &other) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const MultiAgentState& s);
 };
 
 class MultiAgentStateIterator {

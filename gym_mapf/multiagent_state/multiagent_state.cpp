@@ -20,6 +20,17 @@ bool MultiAgentState::operator!=(const MultiAgentState &other) const {
     return this->id != other.id;
 }
 
+std::ostream &operator<<(ostream &os, const MultiAgentState &s) {
+    os << "[";
+    size_t i=0;
+    for (;i<s.locations.size()-1; ++i){
+        os << s.locations[i] << ", ";
+    }
+
+    os << s.locations[i] << "]";
+    return os;
+}
+
 
 /** MultiAgentStateIterator ****************************************************************************************/
 MultiAgentStateIterator::MultiAgentStateIterator(const Grid *grid, size_t n_agents) {
@@ -47,7 +58,7 @@ MultiAgentState MultiAgentStateIterator::operator*() const {
     return *(this->ptr);
 }
 
-MultiAgentStateIterator& MultiAgentStateIterator::operator++() {
+MultiAgentStateIterator &MultiAgentStateIterator::operator++() {
     size_t agent_idx = 0;
     bool carry = false;
 
@@ -108,7 +119,7 @@ void MultiAgentStateIterator::reach_end() {
     }
 }
 
-void MultiAgentStateIterator::reach_begin(){
+void MultiAgentStateIterator::reach_begin() {
     vector<Location> locs;
     for (size_t i = 0; i < this->n_agents; ++i) {
         this->iters[i] = this->grid->begin();
@@ -124,12 +135,12 @@ void MultiAgentStateIterator::set_locations(vector<Location> locations) {
 }
 
 /** MultiAgentStateSpace ***************************************************************************************/
-MultiAgentStateIterator* MultiAgentStateSpace::begin() {
+MultiAgentStateIterator *MultiAgentStateSpace::begin() {
     return new MultiAgentStateIterator(this->grid, this->n_agents);
 }
 
-MultiAgentStateIterator* MultiAgentStateSpace::end() {
-    MultiAgentStateIterator* iter = new MultiAgentStateIterator(this->grid, this->n_agents);
+MultiAgentStateIterator *MultiAgentStateSpace::end() {
+    MultiAgentStateIterator *iter = new MultiAgentStateIterator(this->grid, this->n_agents);
     iter->reach_end();
 
     return iter;

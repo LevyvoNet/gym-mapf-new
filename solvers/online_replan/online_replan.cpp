@@ -436,7 +436,7 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     for (size_t agent: group) {
         Policy *agent_policy = this->local_policy->policies[agent];
         policies.push_back((ValueFunctionPolicy *) agent_policy);
-        agents_groups.push_back({group[agent]});
+        agents_groups.push_back({agent});
         intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], 2 * this->k));
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
@@ -483,9 +483,16 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     ++this->replans_count;
     this->replans_max_size = max(group.size(), this->replans_max_size);
 
-//    cout << "replanned for group sized " << group.size() << " and conflict starts at " << conflict_area.top_row << ","
-//         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
-//    cout << "locations are" << s.locations[0] << ", " << s.locations[1] << endl;
+    /* debug print */
+    cout << "replanned for group [";
+    for (size_t agent: group){
+        cout << agent << ", ";
+    }
+    cout << "]";
+    cout  << " and conflict starts at " << conflict_area.top_row << ","
+         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
+
+    cout << "full state is " << s << endl;
 
     return policy;
 }
@@ -625,6 +632,8 @@ void OnlineReplanPolicy::delete_replans() {
 
         delete item.second;
     }
+
+    cout << "---------------------------" << endl;
 
     delete this->replans;
 }

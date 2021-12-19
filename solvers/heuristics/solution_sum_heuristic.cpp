@@ -21,12 +21,6 @@ void SolutionSumHeuristic::init(MapfEnv *env_param) {
 
 
 double SolutionSumHeuristic::operator()(MultiAgentState *s) {
-    MultiAgentState *s1 = nullptr;
-    MultiAgentState *s2 = nullptr;
-    vector<Location> l1;
-    vector<Location> l2;
-    double v1 = 0;
-    double v2 = 0;
     double sum = 0;
     size_t relevant_values = 0;
     vector<vector<Location>> local_locations(this->groups.size());
