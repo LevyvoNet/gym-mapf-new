@@ -377,7 +377,7 @@ GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const 
     int bottom_row = 0;
     int left_col = grid->max_col;
     int right_col = 0;
-    for (size_t agent:group) {
+    for (size_t agent: group) {
         top_row = min(top_row, s.locations[agent].row);
         bottom_row = max(bottom_row, s.locations[agent].row);
         left_col = min(left_col, s.locations[agent].col);
@@ -433,11 +433,11 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     vector<ValueFunctionPolicy *> policies;
     vector<vector<size_t>> agents_groups;
     vector<tsl::hopscotch_set<Location>> intended_locations;
-    for (size_t agent:group) {
+    for (size_t agent: group) {
         Policy *agent_policy = this->local_policy->policies[agent];
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({group[agent]});
-        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], this->k + 1));
+        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], 2 * this->k));
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
     h->init(this->env);
@@ -447,9 +447,9 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
     AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
     AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
-    Dictionary* girth_values = new Dictionary(0);
+    Dictionary *girth_values = new Dictionary(0);
     for (; *area_iter != *area_end; ++*area_iter) {
-        for (size_t agent_idx=0;agent_idx<group.size();++agent_idx) {
+        for (size_t agent_idx = 0; agent_idx < group.size(); ++agent_idx) {
             GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
             for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
                 MultiAgentState temp_state = **area_iter;
@@ -458,7 +458,8 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
 
                 double value = (*h)(&temp_state);
 
-                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) != intended_locations[agent_idx].end()) {
+                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
+                    intended_locations[agent_idx].end()) {
                     value += BONUS_VALUE;
                 }
 
