@@ -19,7 +19,8 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_TIMEOUT = "TIMEOUT";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIME_LIMIT_SECONDS (90)
+#define EPISODE_TIMEOUT_SEC (60)
+#define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 
 class InstanceResult {
 public:
@@ -210,15 +211,15 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
                         new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
@@ -274,7 +275,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     MapfEnv *env = nullptr;
     env = (*env_creator)();
     policy = (*solver_creator)(env, 1.0);
-    double timeout = EPISODE_TIME_LIMIT_SECONDS;
+    double timeout = EPISODE_TIMEOUT_MS;
 
     /* Train and evaluate */
     policy->train(timeout);
