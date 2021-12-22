@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (60)
+#define EPISODE_TIMEOUT_SEC (90)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 
 class InstanceResult {
@@ -291,7 +291,6 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     std::cout << " total_time:" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
     std::cout << " train_time:" << train_info->time;
-    std::cout << " collision_rate:" << eval_info->collision_rate << "%";
     std::cout << " timeout_rate:" << eval_info->timeout_rate << "%";
     std::cout << " stuck_rate:" << eval_info->stuck_rate << "%";
     std::cout << " solver:" << policy->name;
