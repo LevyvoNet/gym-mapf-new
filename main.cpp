@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (75)
+#define EPISODE_TIMEOUT_SEC (120)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
@@ -288,9 +288,9 @@ vector<vector<EnvCreator *>> env_creators(
                         new MazeEnv("maze-128-128-10_scen_2_3-agents", 128, 10, 2, 3),
                         new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 6),
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 7),
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 8),
+                        new MazeEnv("maze-128-128-10_scen_2_6-agents", 128, 10, 2, 6),
+                        new MazeEnv("maze-128-128-10_scen_2_7-agents", 128, 10, 2, 7),
+                        new MazeEnv("maze-128-128-10_scen_2_8-agents", 128, 10, 2, 8),
 //                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
 //                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
 //                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
@@ -321,13 +321,11 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
-
-
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
                         new online_replan("online_replan_2", 2),
                         new online_replan("online_replan_3", 3),
                         new online_replan("online_replan_4", 4),
