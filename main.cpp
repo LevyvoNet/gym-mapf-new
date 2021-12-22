@@ -21,6 +21,8 @@ std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 /** Experiment Settings ********************************************************************************************/
 #define EPISODE_TIMEOUT_SEC (75)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
+#define MAX_STEPS (2000)
+#define EPISODE_COUNT (30)
 
 class InstanceResult {
 public:
@@ -277,13 +279,18 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
 //                        new BerlinEnv("berlin_scen_2_3-agents", 2, 3),
 //                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
-                        new MazeEnv("maze-128-128-10_scen_2_2-agents", 128, 10, 2, 2),
-                        new MazeEnv("maze-128-128-10_scen_2_3-agents", 128, 10, 2, 3),
-                        new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
+
 
                 },
                 /* lvl 4 */
                 {
+                        new MazeEnv("maze-128-128-10_scen_2_2-agents", 128, 10, 2, 2),
+                        new MazeEnv("maze-128-128-10_scen_2_3-agents", 128, 10, 2, 3),
+                        new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
+                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
+                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 6),
+                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 7),
+                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 8),
 //                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
 //                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
 //                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
@@ -340,8 +347,8 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train(timeout);
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(30,
-                                                 1000,
+    EvaluationInfo *eval_info = policy->evaluate(EPISODE_COUNT,
+                                                 MAX_STEPS,
                                                  EPISODE_TIMEOUT_MS - ELAPSED_TIME_MS);
 
     /* Print results */
