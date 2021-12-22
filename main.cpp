@@ -268,9 +268,12 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 //                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
 //                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
-                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
-                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
+//                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
+//                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
+//                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
+                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+                        new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
+                        new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
 
                 },
                 /* lvl 4 */
