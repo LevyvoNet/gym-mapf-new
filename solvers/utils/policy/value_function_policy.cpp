@@ -19,9 +19,9 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
     for (a.reach_begin(); a != action_space_end; ++a) {
         q_sa = 0;
         transitions = this->env->get_transitions(s, *a)->transitions;
-//        if (ELAPSED_TIME_MS >= timeout_ms) {
-//            return;
-//        }
+        if (ELAPSED_TIME_MS >= timeout_ms) {
+            return;
+        }
         for (Transition *t: *transitions) {
             if (t->is_collision) {
                 q_sa = -std::numeric_limits<double>::max();

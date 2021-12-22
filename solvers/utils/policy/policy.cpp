@@ -122,7 +122,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     /* aggregate the information from all episodes */
     float episodes_success_count = 0;
     float reward_sum = 0;
-    float time_sum = 0;
+    float time_sum_ms = 0;
     float timeout_count = 0;
     float collision_count = 0;
     float stuck_count = 0;
@@ -143,13 +143,13 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
         /* Episode succeed */
         ++episodes_success_count;
         reward_sum += episode.reward;
-        time_sum += episode.time;
+        time_sum_ms += episode.time;
     }
 
     if (episodes_success_count > 0) {
         eval_info->mdr = reward_sum / episodes_success_count;
-        eval_info->mean_episode_time = time_sum / episodes_success_count;
-        eval_info->success_rate = round((episodes_success_count / n_episodes ) * 100);
+        eval_info->mean_episode_time = (time_sum_ms / 1000) / episodes_success_count;
+        eval_info->success_rate = round((episodes_success_count / n_episodes) * 100);
 
         eval_info->mdr = round(eval_info->mdr * 100) / 100;
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
@@ -160,11 +160,11 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     }
 
     if (collision_count > 0) {
-        eval_info->collision_rate = round((collision_count/ n_episodes) * 100);
+        eval_info->collision_rate = round((collision_count / n_episodes) * 100);
     }
 
     if (stuck_count > 0) {
-        eval_info->stuck_rate = round((stuck_count/ n_episodes) * 100);
+        eval_info->stuck_rate = round((stuck_count / n_episodes) * 100);
     }
 
 
