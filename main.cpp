@@ -172,6 +172,18 @@ public:
 
 };
 
+class BerlinEnv : public EnvCreator {
+public:
+    size_t n_agents;
+    size_t scen_id;
+
+    BerlinEnv(string name, size_t n_agents, size_t scen_id) : EnvCreator(name), n_agents(n_agents), scen_id(scen_id) {}
+
+    virtual MapfEnv *operator()() {
+        return create_mapf_env("Berlin_1_256", this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
+    }
+};
+
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
@@ -256,16 +268,13 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 //                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
 //                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new MazeEnv("maze-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-                        new MazeEnv("maze-32-32-4_scen_1_3-agents", 32, 4, 1, 3),
+                        new BerlinEnv("berlin-2-agents", 2, 1),
+                        new BerlinEnv("berlin-3-agents", 3, 1),
+                        new BerlinEnv("berlin-4-agents", 4, 1)
 
                 },
                 /* lvl 4 */
                 {
-                        new MazeEnv("maze-32-32-4_scen_1_4-agents", 32, 4, 1, 4),
-                        new MazeEnv("maze-32-32-4_scen_1_5-agents", 32, 4, 1, 5),
-                        new MazeEnv("maze-32-32-4_scen_1_6-agents", 32, 4, 1, 6),
-                        new MazeEnv("maze-32-32-4_scen_1_7-agents", 32, 4, 1, 7),
 //                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
 //                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
 //                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
