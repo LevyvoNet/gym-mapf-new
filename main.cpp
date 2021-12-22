@@ -211,7 +211,7 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
                         new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
                         new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
@@ -223,13 +223,13 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
                 },
                 /* lvl 2 */
                 {
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 },
                 /* lvl 3 */
                 {
@@ -271,6 +271,7 @@ vector<vector<SolverCreator *>> solver_creators(
 
 std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator) {
     /* Create the policy */
+    MEASURE_TIME;
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
     env = (*env_creator)();
@@ -280,7 +281,9 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     /* Train and evaluate */
     policy->train(timeout);
     TrainInfo *train_info = policy->get_train_info();
-    EvaluationInfo *eval_info = policy->evaluate(30, 1000, 0);
+    EvaluationInfo *eval_info = policy->evaluate(30,
+                                                 1000,
+                                                 EPISODE_TIMEOUT_MS - ELAPSED_TIME_MS);
 
     /* Print results */
     std::cout << "MDR:" << eval_info->mdr;
@@ -311,7 +314,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
         return RESULT_COLLISION;
     }
 
-    if (eval_info->timeout_rate > 0){
+    if (eval_info->timeout_rate > 0) {
         return RESULT_TIMEOUT;
     }
 
@@ -339,7 +342,7 @@ int main(int argc, char **argv) {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {

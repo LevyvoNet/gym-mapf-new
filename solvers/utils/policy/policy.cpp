@@ -145,7 +145,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     if (episodes_success_count > 0) {
         eval_info->mdr = reward_sum / episodes_success_count;
         eval_info->mean_episode_time = time_sum / episodes_success_count;
-        eval_info->success_rate = n_episodes / episodes_success_count;
+        eval_info->success_rate = round((n_episodes / episodes_success_count) * 100);
 
         eval_info->mdr = round(eval_info->mdr * 100) / 100;
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
