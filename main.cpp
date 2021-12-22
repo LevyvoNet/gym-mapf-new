@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (240)
+#define EPISODE_TIMEOUT_SEC (120)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
@@ -273,12 +273,16 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
 //                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
 //                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
-//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
-//                        new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
-//                        new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
+                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+                        new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
+                        new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
                 },
                 /* lvl 4 */
                 {
+                        new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
+                        new RoomEnv("room-64-64-8-scen_1_6-agents", 64, 8, 1, 6),
+                        new RoomEnv("room-64-64-8-scen_1_7-agents", 64, 8, 1, 7),
+                        new RoomEnv("room-64-64-8-scen_1_8-agents", 64, 8, 1, 8),
 //                        new MazeEnv("maze-128-128-10_scen_2_2-agents", 128, 10, 2, 2),
 //                        new MazeEnv("maze-128-128-10_scen_2_3-agents", 128, 10, 2, 3),
 //                        new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
@@ -290,12 +294,12 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
 //                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
 //                        new RoomEnv("room-64-64-16_scen_1_7-agents", 64, 16, 1, 7),
-                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
-                        new BerlinEnv("berlin_scen_2_3-agents", 2, 3),
-                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
-                        new BerlinEnv("berlin_scen_2_5-agents", 2, 5),
-                        new BerlinEnv("berlin_scen_2_6-agents", 2, 6),
-                        new BerlinEnv("berlin_scen_2_7-agents", 2, 7),
+//                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
+//                        new BerlinEnv("berlin_scen_2_3-agents", 2, 3),
+//                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
+//                        new BerlinEnv("berlin_scen_2_5-agents", 2, 5),
+//                        new BerlinEnv("berlin_scen_2_6-agents", 2, 6),
+//                        new BerlinEnv("berlin_scen_2_7-agents", 2, 7),
 //                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
 //                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
 //                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
