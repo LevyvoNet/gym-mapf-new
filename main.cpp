@@ -235,15 +235,18 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
 
                 },
                 /* lvl 4 */
                 {
-//                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
-//                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
-//                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-//                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
+                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
+                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
+                        new RoomEnv("room-64-64-16_scen_1_7-agents", 64, 16, 1, 7),
+                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
+                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
+                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
+                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
                 }
         }
 );
