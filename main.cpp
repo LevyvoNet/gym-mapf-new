@@ -262,9 +262,9 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
-                        new online_replan("online_replan_2", 2),
-                        new online_replan("online_replan_3", 3),
-                        new online_replan("online_replan_4", 4),
+//                        new online_replan("online_replan_2", 2),
+//                        new online_replan("online_replan_3", 3),
+//                        new online_replan("online_replan_4", 4),
                 }
         }
 );
