@@ -399,12 +399,16 @@ GridArea pad_area(Grid *grid, GridArea area, int k) {
     return GridArea(top_row, bottom_row, left_col, right_col);
 }
 
-tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k) {
+tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k, double timeout_ms) {
+    MEASURE_TIME;
     tsl::hopscotch_set<Location> res;
     Location curr_location = start;
     for (size_t i = 1; i <= k; ++i) {
         MultiAgentState *curr_state = p->env->locations_to_state({curr_location});
-        MultiAgentAction *a = p->act(*curr_state);
+        MultiAgentAction *a = p->act(*curr_state, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return res;
+        }
         curr_location = p->env->grid->execute(curr_location, a->actions[0]);
         delete a;
         res.insert(curr_location);
@@ -414,8 +418,10 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
-Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgentState &s) {
-    cout << "replanning for a group of size " << group.size() << endl;
+Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
+                                   const MultiAgentState &s,
+                                   double timeout_ms) {
+    MEASURE_TIME;
     /* Calculate the conflict area */
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
 
@@ -438,10 +444,13 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
         Policy *agent_policy = this->local_policy->policies[agent];
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
-        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], 2 * this->k));
+        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return nullptr;
+        }
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
-    h->init(this->env);
+    h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
 
     /* Only a single one outside the area */
     GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, conflict_area, 1);
@@ -473,7 +482,7 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
 
     /* Solve the env by value iteration */
     ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "", girth_values);
-    policy->train();
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
     delete girth_values;
 
     /* Save the new policy in replans cache */
@@ -484,16 +493,16 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group, const MultiAgent
     ++this->replans_count;
     this->replans_max_size = max(group.size(), this->replans_max_size);
 
-    /* debug print */
-    cout << "replanned for group [";
-    for (size_t agent: group){
-        cout << agent << ", ";
-    }
-    cout << "]";
-    cout  << " and conflict starts at " << conflict_area.top_row << ","
-         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
-
-    cout << "full state is " << s << endl;
+//    /* debug print */
+//    cout << "replanned for group [";
+//    for (size_t agent: group) {
+//        cout << agent << ", ";
+//    }
+//    cout << "]";
+//    cout << " and conflict starts at " << conflict_area.top_row << ","
+//         << conflict_area.left_col << " ends at " << conflict_area.bottom_row << "," << conflict_area.right_col << ". ";
+//
+//    cout << "full state is " << s << endl;
 
     return policy;
 }
@@ -515,7 +524,10 @@ Policy *OnlineReplanPolicy::search_replan(const vector<size_t> &group, const Mul
     return nullptr;
 }
 
-MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> group, const MultiAgentState &s) {
+MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> group,
+                                                              const MultiAgentState &s,
+                                                              double timeout_ms) {
+    MEASURE_TIME;
     Policy *policy = nullptr;
     vector<Location> casted_locations;
     MultiAgentState *group_state = nullptr;
@@ -530,7 +542,10 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
         policy = this->search_replan(group, s);
         if (nullptr == policy) {
             /* Replan for this group */
-            policy = this->replan(group, s);
+            policy = this->replan(group, s, timeout_ms - ELAPSED_TIME_MS);
+            if (ELAPSED_TIME_MS >= timeout_ms){
+                return nullptr;
+            }
         }
 
     }
@@ -540,7 +555,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
         casted_locations.push_back(s.locations[agent]);
     }
     group_state = policy->env->locations_to_state(casted_locations);
-    a = policy->act(*group_state);
+    a = policy->act(*group_state, timeout_ms - ELAPSED_TIME_MS);
 
 
 l_cleanup:
@@ -568,19 +583,20 @@ OnlineReplanPolicy::~OnlineReplanPolicy() {
     this->delete_replans();
 }
 
-void OnlineReplanPolicy::train() {
+void OnlineReplanPolicy::train(double timeout_ms) {
+    MEASURE_TIME;
     vector<vector<size_t>> groups(env->n_agents);
-    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
         groups[i] = {i};
     }
-    this->local_policy = solve_local_and_cross(this->env, this->gamma, this->low_level_planner_creator, &groups);
+    this->local_policy = solve_local_and_cross(this->env,
+                                               this->gamma,
+                                               timeout_ms - ELAPSED_TIME_MS,
+                                               this->low_level_planner_creator, &groups);
 
-    auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-            std::chrono::steady_clock::now() - begin).count();
-    float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
+    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
 }
 
@@ -595,13 +611,17 @@ void OnlineReplanPolicy::reset() {
 
 }
 
-MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state) {
+MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
     vector<vector<size_t>> groups = this->divide_to_groups(state);
     vector<Action> selected_actions(this->env->n_agents);
     MultiAgentAction *group_action = nullptr;
 
     for (vector<size_t> group: groups) {
-        group_action = this->select_action_for_group(group, state);
+        group_action = this->select_action_for_group(group, state, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms) {
+            return nullptr;
+        }
         for (size_t i = 0; i < group.size(); ++i) {
             selected_actions[group[i]] = group_action->actions[i];
         }
@@ -617,7 +637,7 @@ void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
-void OnlineReplanPolicy::eval_episode_info_update() {
+void OnlineReplanPolicy::eval_episode_info_update(EpisodeInfo episode_info) {
     this->replans_sum += this->replans_count;
     ++this->episodes_count;
 }
@@ -634,7 +654,7 @@ void OnlineReplanPolicy::delete_replans() {
         delete item.second;
     }
 
-    cout << "---------------------------" << endl;
+//    cout << "---------------------------" << endl;
 
     delete this->replans;
 }

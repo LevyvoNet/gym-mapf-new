@@ -6,6 +6,7 @@
 #define GYM_MAPF_RTDP_H
 
 #include <gym_mapf/gym_mapf.h>
+#include "solvers/utils/policy/policy.h"
 #include <solvers/utils/policy/value_function_policy.h>
 #include "solvers/heuristics/heuristic.h"
 #include "solvers/heuristics/solution_sum_heuristic.h"
@@ -19,7 +20,7 @@ private:
     MultiAgentStateStorage<MultiAgentAction *> *cache;
     bool in_train;
 
-    void single_iteration();
+    void single_iteration(double timeout_ms);
 
     void clear_cache();
 
@@ -29,9 +30,9 @@ public:
 
     virtual ~RtdpPolicy();
 
-    virtual void train() override;
+    virtual void train(double timeout_ms) override;
 
-    virtual MultiAgentAction *act(const MultiAgentState &state) override;
+    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) override;
 
     virtual double get_value(MultiAgentState *s) override;
 
@@ -42,6 +43,7 @@ class RtdpMerger : public PolicyMerger {
 public:
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
+                               double timeout_ms,
                                size_t group1,
                                size_t group2,
                                CrossedPolicy *joint_policy);

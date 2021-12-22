@@ -102,13 +102,13 @@ public:
 
 class OnlineReplanPolicy : public Policy {
 private:
-    MultiAgentAction *select_action_for_group(vector<size_t> group, const MultiAgentState &s);
+    MultiAgentAction *select_action_for_group(vector<size_t> group, const MultiAgentState &s, double timeout_ms);
 
     vector<vector<size_t>> divide_to_groups(const MultiAgentState &s);
 
     Policy *search_replan(const vector<size_t> &group, const MultiAgentState &s);
 
-    Policy *replan(const vector<size_t> &group, const MultiAgentState &s);
+    Policy *replan(const vector<size_t> &group, const MultiAgentState &s, double timeout_ms);
 
     int calc_distance(const Location &l1, const Location &l2);
 
@@ -133,15 +133,15 @@ public:
 
     virtual ~OnlineReplanPolicy();
 
-    virtual void train() override;
+    virtual void train(double timeout_ms) override;
 
     void reset() override;
 
-    virtual MultiAgentAction *act(const MultiAgentState &state) override;
+    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) override;
 
     virtual void eval_episodes_info_process(EvaluationInfo* eval_info) override;
 
-    virtual void eval_episode_info_update() override;
+    virtual void eval_episode_info_update(EpisodeInfo episode_info) override;
 };
 
 

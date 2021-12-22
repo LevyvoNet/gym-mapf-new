@@ -20,7 +20,7 @@ public:
 
     ~SolutionSumHeuristic();
 
-    virtual void init(MapfEnv *env_param);
+    virtual void init(MapfEnv *env_param, double timeout_milliseconds);
 
 
     virtual double operator()(MultiAgentState *s);

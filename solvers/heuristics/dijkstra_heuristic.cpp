@@ -61,7 +61,7 @@ l_cleanup:
 
 
 /** Public *******************************************************************************/
-void DijkstraHeuristic::init(MapfEnv *env_param) {
+void DijkstraHeuristic::init(MapfEnv *env_param, double timeout_milliseconds) {
     this->env = env_param;
     this->n_agents = this->env->n_agents;
     this->distance = new int *[env->n_agents];

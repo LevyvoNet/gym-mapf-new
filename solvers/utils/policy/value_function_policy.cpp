@@ -4,8 +4,11 @@
 
 #include "value_function_policy.h"
 
-void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, double *value,
-                                                  MultiAgentAction *ret) {
+void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
+                                                  double *value,
+                                                  MultiAgentAction *ret,
+                                                  double timeout_ms) {
+    MEASURE_TIME;
     double q_sa = 0;
     list<Transition *> *transitions = NULL;
     MultiAgentAction best_action = MultiAgentAction(this->env->n_agents);
@@ -17,6 +20,9 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, doub
         q_sa = 0;
         transitions = this->env->get_transitions(s, *a)->transitions;
         for (Transition *t: *transitions) {
+            if (ELAPSED_TIME_MS >= timeout_ms) {
+                return;
+            }
             if (t->is_collision) {
                 q_sa = -std::numeric_limits<double>::max();
                 break;
@@ -41,10 +47,16 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s, doub
     }
 }
 
-MultiAgentAction *ValueFunctionPolicy::act(const MultiAgentState &state) {
+MultiAgentAction *ValueFunctionPolicy::act(const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
     double d = 0;
     MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
-    this->select_max_value_action(state, &d, a);
+    this->select_max_value_action(state, &d, a, timeout_ms);
+    if (ELAPSED_TIME_MS > timeout_ms) {
+        delete a;
+        return nullptr;
+    }
+
     return a;
 }
 

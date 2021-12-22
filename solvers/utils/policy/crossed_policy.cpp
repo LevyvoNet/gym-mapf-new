@@ -9,9 +9,10 @@ CrossedPolicy::CrossedPolicy(MapfEnv *env, float gamma, const string &name, vect
                              vector<Policy *> policies) : Policy(env, gamma, name), groups(groups),
                                                           policies(policies) {}
 
-void CrossedPolicy::train() {}
+void CrossedPolicy::train(double timeout_milliseconds) {}
 
-MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
+MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
     vector<Action> actions(this->env->n_agents);
     MultiAgentAction *group_action = nullptr;
     vector<Location> group_locations;
@@ -24,7 +25,10 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
             group_locations.push_back(state.locations[a]);
         }
         group_state = this->policies[i]->env->locations_to_state(group_locations);
-        group_action = this->policies[i]->act(*group_state);
+        group_action = this->policies[i]->act(*group_state, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return nullptr;
+        }
         for (size_t j = 0; j < this->groups[i].size(); ++j) {
             actions[this->groups[i][j]] = group_action->actions[j];
         }
@@ -45,7 +49,7 @@ MultiAgentAction *CrossedPolicy::act(const MultiAgentState &state) {
 }
 
 CrossedPolicy::~CrossedPolicy() {
-    for (Policy* p:this->policies){
+    for (Policy *p: this->policies) {
         delete p->env;
         delete p;
     }
@@ -54,15 +58,21 @@ CrossedPolicy::~CrossedPolicy() {
 
 /** Utility Functions ********************************************************************************************/
 
-CrossedPolicy *solve_local_and_cross(MapfEnv *env, float gamma, SolverCreator *low_level_planner_creator, vector<vector<size_t>> *groups) {
+CrossedPolicy *solve_local_and_cross(MapfEnv *env,
+                                     float gamma,
+                                     double timeout_milliseconds,
+                                     SolverCreator *low_level_planner_creator,
+                                     vector<vector<size_t>> *groups) {
+    MEASURE_TIME;
     vector<Policy *> policies;
     MapfEnv *local_env = nullptr;
     Policy *group_policy = nullptr;
+    double elapsed_time = 0;
 
     for (vector<size_t> group: *groups) {
         local_env = get_local_view(env, group);
         group_policy = (*low_level_planner_creator)(local_env, gamma);
-        group_policy->train();
+        group_policy->train((timeout_milliseconds - ELAPSED_TIME_MS));
         policies.push_back(group_policy);
     }
 

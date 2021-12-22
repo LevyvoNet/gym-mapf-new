@@ -12,8 +12,8 @@ class ValueFunctionPolicy : public Policy {
 public:
     ValueFunctionPolicy(MapfEnv *env, float gamma, const std::string &name = "");
 
-    void select_max_value_action(const MultiAgentState &s, double *value, MultiAgentAction *ret);
-    virtual MultiAgentAction *act(const MultiAgentState &state) override;
+    void select_max_value_action(const MultiAgentState &s, double *value, MultiAgentAction *ret, double timeout_ms);
+    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) override;
     virtual double get_value(MultiAgentState *s)=0;
 };
 

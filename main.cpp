@@ -16,6 +16,7 @@ std::string RESULT_OK = "OK";
 std::string RESULT_COLLISION = "COLLISION";
 std::string RESULT_ERROR = "ERROR";
 std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
+std::string RESULT_TIMEOUT = "TIMEOUT";
 
 /** Experiment Settings ********************************************************************************************/
 #define EPISODE_TIME_LIMIT_SECONDS (90)
@@ -209,25 +210,25 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
                         new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 },
                 /* lvl 3 */
                 {
@@ -260,9 +261,9 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
-//                        new online_replan("online_replan_2", 2),
-//                        new online_replan("online_replan_3", 3),
-//                        new online_replan("online_replan_4", 4),
+                        new online_replan("online_replan_2", 2),
+                        new online_replan("online_replan_3", 3),
+                        new online_replan("online_replan_4", 4),
                 }
         }
 );
@@ -273,9 +274,10 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     MapfEnv *env = nullptr;
     env = (*env_creator)();
     policy = (*solver_creator)(env, 1.0);
+    double timeout = EPISODE_TIME_LIMIT_SECONDS;
 
     /* Train and evaluate */
-    policy->train();
+    policy->train(timeout);
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(30, 1000, 0);
 
@@ -285,6 +287,8 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     std::cout << " total_time:" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
     std::cout << " train_time:" << train_info->time;
+    std::cout << " collision_rate:" << eval_info->collision_rate;
+    std::cout << " timeout_rate:" << eval_info->timeout_rate;
     std::cout << " solver:" << policy->name;
 
     /* Additional data */
@@ -302,8 +306,12 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 //    delete env;
 //    delete policy;
 
-    if (eval_info->collision_happened) {
+    if (eval_info->collision_rate > 0) {
         return RESULT_COLLISION;
+    }
+
+    if (eval_info->timeout_rate > 0){
+        return RESULT_TIMEOUT;
     }
 
     return RESULT_OK;

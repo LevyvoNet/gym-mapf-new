@@ -15,7 +15,7 @@ SolutionSumHeuristic::~SolutionSumHeuristic() {
     }
 }
 
-void SolutionSumHeuristic::init(MapfEnv *env_param) {
+void SolutionSumHeuristic::init(MapfEnv *env_param, double timeout_milliseconds) {
     this->env = env_param;
 }
 

@@ -20,7 +20,7 @@ public:
 
     virtual ~RtdpDijkstraHeuristic() override;
 
-    virtual void init(MapfEnv *env) override;
+    virtual void init(MapfEnv *env, double timeout_milliseconds) override;
 
     virtual double operator()(MultiAgentState *s);
 };

@@ -27,7 +27,7 @@ public:
 
     virtual double get_value(MultiAgentState *s) override;
 
-    virtual void train() override;
+    virtual void train(double timeout_milliseconds) override;
 };
 
 #endif //GYM_MAPF_VALUE_ITERATION_H

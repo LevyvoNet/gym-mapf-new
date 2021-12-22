@@ -8,9 +8,11 @@ RtdpDijkstraHeuristic::RtdpDijkstraHeuristic(float gamma) : gamma(gamma) {
     this->env = nullptr;
 }
 
-void RtdpDijkstraHeuristic::init(MapfEnv *env_param) {
+void RtdpDijkstraHeuristic::init(MapfEnv *env_param, double timeout_milliseconds) {
     MapfEnv *local_env = nullptr;
     RtdpPolicy *local_policy = nullptr;
+    double elapsed_time = 0;
+    const auto begin = std::chrono::system_clock::now();
 
     this->env = env_param;
 
@@ -18,7 +20,8 @@ void RtdpDijkstraHeuristic::init(MapfEnv *env_param) {
     for (size_t agent = 0; agent < this->env->n_agents; ++agent) {
         local_env = get_local_view(this->env, {agent});
         local_policy = new RtdpPolicy(local_env, this->gamma, "", new DijkstraHeuristic());
-        local_policy->train();
+        elapsed_time = (begin - std::chrono::system_clock::now()).count();
+        local_policy->train(timeout_milliseconds - elapsed_time);
         this->local_policies.push_back(local_policy);
     }
 

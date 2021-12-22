@@ -14,14 +14,14 @@
 #define MIN_SUCCESS_RATE (90)
 
 /** Private ****************************************************************************************************/
-void RtdpPolicy::single_iteration() {
+void RtdpPolicy::single_iteration(double timeout_ms) {
+    MEASURE_TIME;
     bool done = false;
     bool is_collision = false;
     int reward = 0;
     int total_reward = 0;
     vector<MultiAgentState> path;
     int steps = 0;
-    std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
     MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
     int diff = 0;
     double new_value = 0;
@@ -34,7 +34,10 @@ void RtdpPolicy::single_iteration() {
         ++steps;
 
         /* Select action */
-        this->select_max_value_action(*s, &new_value, a);
+        this->select_max_value_action(*s, &new_value, a, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return;
+        }
 
         /* Bellman update the current state */
         new_value_ptr = new double;
@@ -51,7 +54,10 @@ void RtdpPolicy::single_iteration() {
 
     /* Backward update */
     for (int i = path.size() - 1; i >= 0; --i) {
-        this->select_max_value_action(path[i], &new_value, nullptr);
+        this->select_max_value_action(path[i], &new_value, nullptr, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return;
+        }
         new_value_ptr = new double;
         *new_value_ptr = new_value;
         this->v->set(path[i], new_value_ptr);
@@ -97,28 +103,29 @@ RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
 }
 
 
-void RtdpPolicy::train() {
+void RtdpPolicy::train(double timeout_ms) {
     /* Initialize the heuristic and measure the time for it */
-    std::chrono::steady_clock::time_point train_begin = std::chrono::steady_clock::now();
-    std::chrono::steady_clock::time_point init_begin = std::chrono::steady_clock::now();
-    this->h->init(this->env);
-    cout.flush();
-    std::cout.flush();
-    std::chrono::steady_clock::time_point init_end = std::chrono::steady_clock::now();
-    auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(
-            init_end - init_begin).count();
-    float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
-    (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(elapsed_time_seconds * 100) / 100);
+    MEASURE_TIME;
+    this->h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
+    double init_time_sec = ELAPSED_TIME_MS / 1000;
+    (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(init_time_sec * 100) / 100);
+    if (ELAPSED_TIME_MS >= timeout_ms){
+        return;
+    }
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
     EvaluationInfo *eval_info = NULL;
     float total_eval_time = 0;
 
+
     /* Run RTDP iterations until convergence */
     while (iters_count < MAX_ITERATIONS) {
         for (size_t i = 0; i < BATCH_SIZE; ++i) {
-            this->single_iteration();
+            this->single_iteration(timeout_ms - ELAPSED_TIME_MS);
+            if (ELAPSED_TIME_MS >= timeout_ms){
+                return;
+            }
             iters_count++;
         }
 
@@ -127,24 +134,22 @@ void RtdpPolicy::train() {
             delete prev_eval_info;
         }
         prev_eval_info = eval_info;
-        std::chrono::steady_clock::time_point eval_begin = std::chrono::steady_clock::now();
+        const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        eval_info = this->evaluate(100, 1000, 0);
+        eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 100);
         this->in_train = true;
-        std::chrono::steady_clock::time_point eval_end = std::chrono::steady_clock::now();
-        total_eval_time += std::chrono::duration_cast<std::chrono::milliseconds>(eval_end - eval_begin).count();
+        const auto eval_end = clk::now();
+        total_eval_time += ((ms)(eval_end - eval_begin)).count();
 
         /* Check if there is no improvement since the last batch */
         if (should_stop(prev_eval_info, eval_info)) {
             break;
         }
     }
-    std::chrono::steady_clock::time_point train_end = std::chrono::steady_clock::now();
 
     /* Set the train info */
-    elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(train_end - train_begin).count();
-    elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
+    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
     total_eval_time = float(total_eval_time) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
     (*(this->train_info->additional_data))["eval_time"] = std::to_string((int) round(total_eval_time * 100) / 100);
@@ -185,7 +190,8 @@ RtdpPolicy::~RtdpPolicy() {
     delete this->cache;
 }
 
-MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
+MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
     MultiAgentAction *a = nullptr;
 
     a = this->cache->get(state);
@@ -199,7 +205,10 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
         return new MultiAgentAction(a_iter->actions, a_iter->id);
     }
 
-    a = ValueFunctionPolicy::act(state);
+    a = ValueFunctionPolicy::act(state, timeout_ms);
+    if (ELAPSED_TIME_MS >= timeout_ms){
+        return nullptr;
+    }
     this->cache->set(state, new MultiAgentAction(a->actions, a->id));
 
     return a;
@@ -208,6 +217,7 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state) {
 /** RTDP merger ************************************************************************************************/
 Policy *RtdpMerger::operator()(MapfEnv *env,
                                float gamma,
+                               double timeout_ms,
                                size_t group1,
                                size_t group2,
                                CrossedPolicy *joint_policy) {
@@ -224,7 +234,7 @@ Policy *RtdpMerger::operator()(MapfEnv *env,
                     joint_policy->groups[group2]});
 
     RtdpPolicy *policy = new RtdpPolicy(merged_env, gamma, "", solution_sum);
-    policy->train();
+    policy->train(timeout_ms);
 
     return policy;
 }

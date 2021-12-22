@@ -16,6 +16,7 @@ class PolicyMerger {
 public:
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
+                               double timeout_ms,
                                size_t group1,
                                size_t group2,
                                CrossedPolicy *joint_policy) = 0;
@@ -29,6 +30,7 @@ public:
 
     virtual Policy *operator()(MapfEnv *env,
                                float gamma,
+                               double timeout_ms,
                                size_t group1,
                                size_t group2,
                                CrossedPolicy *joint_policy);
@@ -45,9 +47,9 @@ public:
 
     ~IdPolicy();
 
-    virtual MultiAgentAction *act(const MultiAgentState &state);
+    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms);
 
-    virtual void train();
+    virtual void train(double timeout_milliseconds);
 
 };
 

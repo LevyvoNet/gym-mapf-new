@@ -7,13 +7,14 @@
 /** Default Policy Merger***************************************************************************************/
 Policy *DefaultPolicyMerger::operator()(MapfEnv *env,
                                         float gamma,
+                                        double timeout_ms,
                                         size_t group1,
                                         size_t group2,
                                         CrossedPolicy *joint_policy) {
     MapfEnv *merged_env = merge_groups_envs(joint_policy, group1, group2);
 
     Policy *policy = (*this->low_level_planner_creator)(merged_env, gamma);
-    policy->train();
+    policy->train(timeout_ms);
 
     return policy;
 }
@@ -37,6 +38,7 @@ IdPolicy::IdPolicy(MapfEnv *env, float gamma, const string &name,
 
 CrossedPolicy *merge_groups(MapfEnv *env,
                             float gamma,
+                            double timeout_ms,
                             PolicyMerger *low_level_merger,
                             CrossedPolicy *joint_policy,
                             Conflict *conflict) {
@@ -52,6 +54,7 @@ CrossedPolicy *merge_groups(MapfEnv *env,
     /* Merge the policies of both groups to a single one */
     new_joint_policy = (*low_level_merger)(env,
                                            gamma,
+                                           timeout_ms,
                                            a1_group,
                                            a2_group,
                                            joint_policy);
@@ -81,7 +84,7 @@ CrossedPolicy *merge_groups(MapfEnv *env,
 }
 
 
-void IdPolicy::train() {
+void IdPolicy::train(double timeout_ms) {
     Conflict *conflict = nullptr;
     CrossedPolicy *curr_joint_policy = nullptr;
     CrossedPolicy *prev_joint_policy = nullptr;
@@ -90,46 +93,61 @@ void IdPolicy::train() {
     std::chrono::steady_clock::time_point end;
     size_t conflicts_count = 0;
     std::chrono::steady_clock::time_point conflict_begin;
-    float conflict_detection_time_milliseconds = 0;
+    float conflict_detection_ms = 0;
+    const auto start_time = clk::now();
+
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
         groups[i] = {i};
     }
-    curr_joint_policy = solve_local_and_cross(this->env, this->gamma, this->low_level_planner_creator, &groups);
+    curr_joint_policy = solve_local_and_cross(this->env,
+                                              this->gamma,
+                                              timeout_ms,
+                                              this->low_level_planner_creator,
+                                              &groups);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return;
+    }
 
     /* Search for conflicts and merge iteratively */
     do {
         /* Check for conflict */
-        conflict_begin = std::chrono::steady_clock::now();
-        conflict = detect_conflict(curr_joint_policy);
-        conflict_detection_time_milliseconds += std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::steady_clock::now() - conflict_begin).count();
+        conflict_begin = clk::now();
+        conflict = detect_conflict(curr_joint_policy, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms){
+            return;
+        }
+        conflict_detection_ms += ((ms) (clk::now() - conflict_begin)).count();
 
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */
             prev_joint_policy = curr_joint_policy;
-            curr_joint_policy = merge_groups(env, gamma, low_level_merger, prev_joint_policy, conflict);
+            curr_joint_policy = merge_groups(env,
+                                             gamma,
+                                             timeout_ms - ELAPSED_TIME_MS,
+                                             low_level_merger,
+                                             prev_joint_policy,
+                                             conflict);
             ++conflicts_count;
         }
     } while (groups.size() != 1 && nullptr != conflict);
 
     /* Update train time measurement */
-    end = std::chrono::steady_clock::now();
-    auto elapsed_time_milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(end - begin).count();
-    float elapsed_time_seconds = float(elapsed_time_milliseconds) / 1000;
+    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
     this->train_info->time = round(elapsed_time_seconds * 100) / 100;
 
     /* Set additional training info */
     (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflicts_count);
-    float conflict_time = conflict_detection_time_milliseconds / 1000;
-    (*(this->train_info->additional_data))["conflicts_time"] = std::to_string((int) round(conflict_time * 100) / 100);
+    float conflict_time_sec = conflict_detection_ms / 1000;
+    (*(this->train_info->additional_data))["conflicts_time"] = std::to_string(
+            (int) round(conflict_time_sec * 100) / 100);
 
     this->joint_policy = curr_joint_policy;
 }
 
-MultiAgentAction *IdPolicy::act(const MultiAgentState &state) {
-    return this->joint_policy->act(state);
+MultiAgentAction *IdPolicy::act(const MultiAgentState &state, double timeout_ms) {
+    return this->joint_policy->act(state, timeout_ms);
 }
 
 IdPolicy::~IdPolicy() {

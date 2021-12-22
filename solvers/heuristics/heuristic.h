@@ -9,7 +9,7 @@
 
 class Heuristic {
 public:
-    virtual void init(MapfEnv *env)=0;
+    virtual void init(MapfEnv *env, double timeout_milliseconds)=0;
 
     virtual ~Heuristic();
 

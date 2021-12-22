@@ -21,14 +21,15 @@ public:
 
     ~CrossedPolicy();
 
-    virtual MultiAgentAction *act(const MultiAgentState &state);
+    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms);
 
-    virtual void train();
+    virtual void train(double timeout_milliseconds);
 
 };
 
 CrossedPolicy *solve_local_and_cross(MapfEnv *env,
                                      float gamma,
+                                     double timeout_milliseconds,
                                      SolverCreator *low_level_planner_creator,
                                      vector<vector<size_t>> *groups);
 
