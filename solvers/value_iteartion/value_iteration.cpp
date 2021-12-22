@@ -55,12 +55,11 @@ void ValueIterationPolicy::train(double timeout_milliseconds) {
             for (a.reach_begin(); a != action_end; ++a) {
                 q_sa = 0;
                 transitions = this->env->get_transitions(**s, *a)->transitions;
+                if (ELAPSED_TIME_MS >= timeout_milliseconds) {
+                    /* timeout */
+                    return;
+                }
                 for (Transition *t: *transitions) {
-                    if (ELAPSED_TIME_MS >= timeout_milliseconds){
-                        /* timeout */
-                        return;
-                    }
-
                     if (t->is_collision) {
                         q_sa = -std::numeric_limits<double>::max();
                         break;

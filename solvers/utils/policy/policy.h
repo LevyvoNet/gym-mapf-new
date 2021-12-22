@@ -25,8 +25,9 @@ public:
     double time;
     bool collision;
     bool timeout;
+    bool stuck;
 
-    EpisodeInfo(int reward, double time, bool collision, bool timeout);
+    EpisodeInfo(int reward, double time, bool collision, bool timeout, bool stuck);
 };
 
 class EvaluationInfo {
@@ -36,6 +37,7 @@ public:
     float mean_episode_time;
     float collision_rate;
     float timeout_rate;
+    float stuck_rate;
     vector<EpisodeInfo> episodes_info;
 
     std::unordered_map<std::string, std::string> *additional_data;

@@ -31,8 +31,8 @@ void Policy::reset() {
 }
 
 /** Evaluation ************************************************************************************************/
-EpisodeInfo::EpisodeInfo(int reward, double time, bool collision, bool timeout) :
-        reward(reward), time(time), collision(collision), timeout(timeout) {}
+EpisodeInfo::EpisodeInfo(int reward, double time, bool collision, bool timeout, bool stuck) :
+        reward(reward), time(time), collision(collision), timeout(timeout), stuck(stuck) {}
 
 EvaluationInfo::EvaluationInfo() {
     this->mdr = 0;
@@ -73,11 +73,11 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
         /* Select the best action */
         selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
         if (nullptr == selected_action) {
-            return EpisodeInfo(-999, ELAPSED_TIME_MS, false, true);
+            return EpisodeInfo(-999, ELAPSED_TIME_MS, false, true, false);
         }
         /* Check if we are stuck */
         if (*selected_action == all_stay) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, true);
+            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, true);
         }
 
         /* Step */
@@ -87,17 +87,17 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
 
         /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
         if (is_collision) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, true, false);
+            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, true, false, false);
         }
 
         /* The goal was reached, the episode is solved. Update its stats. */
         if (done) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false);
+            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, false);
         }
 
     } while (steps < max_steps);
 
-    return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, true);
+    return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, true);
 }
 
 EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
@@ -106,8 +106,8 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
                                  double min_success_rate) {
     EvaluationInfo *eval_info = new EvaluationInfo();
 
-    if (episode_timeout_ms<=0){
-        eval_info->timeout_rate = 1;
+    if (episode_timeout_ms <= 0) {
+        eval_info->timeout_rate = 100;
         return eval_info;
     }
 
@@ -125,14 +125,18 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     float time_sum = 0;
     float timeout_count = 0;
     float collision_count = 0;
+    float stuck_count = 0;
     for (EpisodeInfo episode: eval_info->episodes_info) {
         if (episode.collision) {
             ++collision_count;
             continue;
         }
-
         if (episode.timeout) {
             ++timeout_count;
+            continue;
+        }
+        if (episode.stuck) {
+            ++stuck_count;
             continue;
         }
 
@@ -145,19 +149,24 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     if (episodes_success_count > 0) {
         eval_info->mdr = reward_sum / episodes_success_count;
         eval_info->mean_episode_time = time_sum / episodes_success_count;
-        eval_info->success_rate = round((n_episodes / episodes_success_count) * 100);
+        eval_info->success_rate = round((episodes_success_count / n_episodes ) * 100);
 
         eval_info->mdr = round(eval_info->mdr * 100) / 100;
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
     }
 
-    if (timeout_count > 0){
-        eval_info->timeout_rate = n_episodes / timeout_count;
+    if (timeout_count > 0) {
+        eval_info->timeout_rate = round((timeout_count / n_episodes) * 100);
     }
 
     if (collision_count > 0) {
-        eval_info->collision_rate = n_episodes / collision_count;
+        eval_info->collision_rate = round((collision_count/ n_episodes) * 100);
     }
+
+    if (stuck_count > 0) {
+        eval_info->stuck_rate = round((stuck_count/ n_episodes) * 100);
+    }
+
 
     /* Give the inheriting policy a change to process data collected from all of the episodes */
     this->eval_episodes_info_process(eval_info);
