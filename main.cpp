@@ -229,16 +229,20 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 2 */
                 {
                         new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 },
                 /* lvl 3 */
+                {
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2);
+
+                },
+                /* lvl 4 */
                 {
 //                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
 //                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
 //                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
 //                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
                 }
-
         }
 );
 
@@ -257,14 +261,19 @@ vector<vector<SolverCreator *>> solver_creators(
                 /* lvl 2 */
                 {
                         new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 3 */
                 {
-//                        new online_replan("online_replan_2", 2),
-//                        new online_replan("online_replan_3", 3),
-//                        new online_replan("online_replan_4", 4),
+
+
+                },
+                /* lvl 4 */
+                {
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
+                        new online_replan("online_replan_2", 2),
+                        new online_replan("online_replan_3", 3),
+                        new online_replan("online_replan_4", 4),
                 }
         }
 );
