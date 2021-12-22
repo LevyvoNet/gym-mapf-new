@@ -151,6 +151,27 @@ public:
     }
 };
 
+class MazeEnv : public EnvCreator {
+public:
+    size_t maze_size;
+    size_t scen_id;
+    size_t n_rooms;
+    size_t n_agents;
+
+    MazeEnv(string name, size_t maze_size, size_t n_rooms, size_t scen_id, size_t n_agents) : EnvCreator(name),
+                                                                                              maze_size(maze_size),
+                                                                                              scen_id(scen_id),
+                                                                                              n_agents(n_agents),
+                                                                                              n_rooms(n_rooms) {}
+
+    virtual MapfEnv *operator()() {
+        std::ostringstream map_name;
+        map_name << "maze-" << this->maze_size << "-" << this->maze_size << "-" << this->n_rooms;
+        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
+    }
+
+};
+
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
@@ -233,20 +254,26 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 3 */
                 {
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
+                        new MazeEnv("maze-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new MazeEnv("maze-32-32-4_scen_1_3-agents", 32, 4, 1, 3),
 
                 },
                 /* lvl 4 */
                 {
-                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
-                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
-                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
-                        new RoomEnv("room-64-64-16_scen_1_7-agents", 64, 16, 1, 7),
-                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
-                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
-                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new MazeEnv("maze-32-32-4_scen_1_4-agents", 32, 4, 1, 4),
+                        new MazeEnv("maze-32-32-4_scen_1_5-agents", 32, 4, 1, 5),
+                        new MazeEnv("maze-32-32-4_scen_1_6-agents", 32, 4, 1, 6),
+                        new MazeEnv("maze-32-32-4_scen_1_7-agents", 32, 4, 1, 7),
+//                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
+//                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
+//                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
+//                        new RoomEnv("room-64-64-16_scen_1_7-agents", 64, 16, 1, 7),
+//                        new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
+//                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
+//                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
+//                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
                 }
         }
 );
