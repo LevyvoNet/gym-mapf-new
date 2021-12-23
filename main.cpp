@@ -307,7 +307,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                     new RoomEnv("room-64-64-16_scen_1_12-agents", 64, 16, 1, 12),
 //                     new RoomEnv("room-64-64-16_scen_1_13-agents", 64, 16, 1, 13),
 //                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
-                        new BerlinEnv("berlin_scen_2_3-agents", 2, 3),
+                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
 //                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
 //                        new BerlinEnv("berlin_scen_2_5-agents", 2, 5),
 //                        new BerlinEnv("berlin_scen_2_6-agents", 2, 6),
