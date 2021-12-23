@@ -117,6 +117,17 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
 
         /* Give the inheriting policy a chance to collect inner data about the last episode */
         this->eval_episode_info_update(episode_info);
+
+        /* If we don't have a chance, give up */
+        if (eval_info->episodes_info.size() >= EPISODES_TIMEOUT_LIMIT){
+            bool all_timeouts = true;
+            for (size_t i=0;i<EPISODES_TIMEOUT_LIMIT;++i){
+                all_timeouts = all_timeouts && eval_info->episodes_info[i].timeout;
+            }
+            if (all_timeouts){
+                break;
+            }
+        }
     }
 
     /* aggregate the information from all episodes */

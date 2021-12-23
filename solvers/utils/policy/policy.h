@@ -16,8 +16,7 @@ using clk = std::chrono::steady_clock;
 
 #define ELAPSED_TIME_MS (((ms)(clk::now() - start_time)).count())
 #define MEASURE_TIME const auto start_time = clk::now()
-#define EPISODE_SUCCEED(episode_info) (!episode_info.collision && !episode_info.timeout)
-
+#define EPISODES_TIMEOUT_LIMIT (3)
 
 class EpisodeInfo{
 public:
