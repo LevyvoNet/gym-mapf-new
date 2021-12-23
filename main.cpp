@@ -281,9 +281,6 @@ vector<vector<EnvCreator *>> env_creators(
                         new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
-                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
-                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
                          new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                          new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
                          new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
@@ -337,27 +334,27 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi("vi"),
+//                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-                        new dijkstra_baseline("dijkstra_baseline"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
+                        new dijkstra_baseline("dijkstra_baseline"),
                         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
                         new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
                         new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
