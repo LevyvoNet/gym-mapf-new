@@ -40,6 +40,8 @@ add_library(gym_mapf_solvers SHARED
         utils/conflict/conflict.h
         utils/conflict/conflict.cpp
         utils/utils.h
+        dijkstra_baseline/dijkstra_baseline.h
+        dijkstra_baseline/dijkstra_baseline.cpp
         )
 target_include_directories(gym_mapf_solvers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
