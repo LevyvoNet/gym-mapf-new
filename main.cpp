@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (240)
+#define EPISODE_TIMEOUT_SEC (300)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
@@ -242,19 +242,28 @@ public:
     }
 };
 
+class dijkstra_baseline: public SolverCreator {
+public:
+    dijkstra_baseline(string name):SolverCreator(name){}
+
+    virtual Policy* operator()(MapfEnv* env, float gamma){
+     return new DijkstraBaselinePolicy(env, gamma, this->name);
+    }
+};
+
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
@@ -307,7 +316,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                     new RoomEnv("room-64-64-16_scen_1_12-agents", 64, 16, 1, 12),
 //                     new RoomEnv("room-64-64-16_scen_1_13-agents", 64, 16, 1, 13),
 //                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
-                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
+//                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
 //                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
 //                        new BerlinEnv("berlin_scen_2_5-agents", 2, 5),
 //                        new BerlinEnv("berlin_scen_2_6-agents", 2, 6),
@@ -332,21 +341,22 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new dijkstra_baseline("dijkstra_baseline"),
                 },
                 /* lvl 3 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-                        new online_replan("online_replan_2", 2),
+//                        new online_replan("online_replan_2", 2),
 //                        new online_replan("online_replan_3", 3),
 //                        new online_replan("online_replan_4", 4),
                 }
