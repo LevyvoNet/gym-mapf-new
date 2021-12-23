@@ -267,12 +267,12 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
                 },
                 /* lvl 2 */
                 {
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
@@ -335,7 +335,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi("vi"),
+//                        new vi("vi"),
 
                 },
 
@@ -346,7 +346,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                         new dijkstra_baseline("dijkstra_baseline"),
                 },
                 /* lvl 3 */
