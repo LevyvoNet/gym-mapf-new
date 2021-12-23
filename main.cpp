@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (10)
+#define EPISODE_TIMEOUT_SEC (240)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)

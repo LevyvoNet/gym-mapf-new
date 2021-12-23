@@ -8,12 +8,12 @@
 #include <gym_mapf/gym_mapf.h>
 #include "solvers/utils/policy/policy.h"
 #include <solvers/utils/policy/value_function_policy.h>
-#include "solvers/heuristics/heuristic.h"
+#include "solvers/heuristics/dijkstra_heuristic.h"
 #include "solvers/rtdp/rtdp.h"
 
 class DijkstraBaselinePolicy : public ValueFunctionPolicy {
 private:
-    RtdpPolicy* rtdp_policy;
+    DijkstraHeuristic* h;
 
 public:
 
@@ -22,8 +22,6 @@ public:
     virtual ~DijkstraBaselinePolicy();
 
     virtual void train(double timeout_ms) override;
-
-    virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) override;
 
     virtual double get_value(MultiAgentState *s) override;
 

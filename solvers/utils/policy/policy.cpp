@@ -119,7 +119,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
         this->eval_episode_info_update(episode_info);
 
         /* If we don't have a chance, give up */
-        if (eval_info->episodes_info.size() >= EPISODES_TIMEOUT_LIMIT){
+        if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT){
             bool all_timeouts = true;
             for (size_t i=0;i<EPISODES_TIMEOUT_LIMIT;++i){
                 all_timeouts = all_timeouts && eval_info->episodes_info[i].timeout;
