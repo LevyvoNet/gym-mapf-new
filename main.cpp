@@ -19,7 +19,7 @@ std::string RESULT_CHILD_ERROR = "CHILD_ERROR";
 std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (300)
+#define EPISODE_TIMEOUT_SEC (180)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
@@ -276,15 +276,15 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 3 */
                 {
-//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-//                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-//                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
-//                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
-//                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
-//                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
-//                         new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
-//                         new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
+                        new MazeEnv("maze-32-32-4_scen_2_2-agents", 32, 4, 2, 2),
+                        new MazeEnv("maze-32-32-4_scen_2_3-agents", 32, 4, 2, 3),
+                        new MazeEnv("maze-32-32-4_scen_2_4-agents", 32, 4, 2, 4),
+                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+                         new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
+                         new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
                 },
                 /* lvl 4 */
                 {
@@ -351,12 +351,12 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 3 */
                 {
-//                        new id_rtdp_default("id_rtdp_default"),
-//                        new id_rtdp("id_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-//                        new online_replan("online_replan_2", 2),
+                        new online_replan("online_replan_2", 2),
 //                        new online_replan("online_replan_3", 3),
 //                        new online_replan("online_replan_4", 4),
                 }
