@@ -264,6 +264,7 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 2 */
                 {
 //                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                    new BerlinEnv("berlin_scen_2_1-agents", 2, 1)
                 },
                 /* lvl 3 */
                 {
@@ -300,12 +301,12 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new RoomEnv("room-64-64-16_scen_1_5-agents", 64, 16, 1, 5),
 //                        new RoomEnv("room-64-64-16_scen_1_6-agents", 64, 16, 1, 6),
 //                        new RoomEnv("room-64-64-16_scen_1_7-agents", 64, 16, 1, 7),
-                          new RoomEnv("room-64-64-16_scen_1_8-agents", 64, 16, 1, 8),
-                    new RoomEnv("room-64-64-16_scen_1_9-agents", 64, 16, 1, 9),
-                    new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
-                    new RoomEnv("room-64-64-16_scen_1_11-agents", 64, 16, 1, 11),
-                    new RoomEnv("room-64-64-16_scen_1_12-agents", 64, 16, 1, 12),
-                    new RoomEnv("room-64-64-16_scen_1_13-agents", 64, 16, 1, 13),
+//                           new RoomEnv("room-64-64-16_scen_1_8-agents", 64, 16, 1, 8),
+//                     new RoomEnv("room-64-64-16_scen_1_9-agents", 64, 16, 1, 9),
+//                     new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
+//                     new RoomEnv("room-64-64-16_scen_1_11-agents", 64, 16, 1, 11),
+//                     new RoomEnv("room-64-64-16_scen_1_12-agents", 64, 16, 1, 12),
+//                     new RoomEnv("room-64-64-16_scen_1_13-agents", 64, 16, 1, 13),
 //                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
 //                        new BerlinEnv("berlin_scen_2_3-agents", 2, 3),
 //                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
