@@ -234,20 +234,22 @@ public:
 
 class online_replan : public SolverCreator {
     int k;
+    SolverCreator *low_level_planner;
 public:
-    online_replan(string name, int k) : SolverCreator(name), k(k) {}
+    online_replan(string name, int k, SolverCreator *low_level_planner) : SolverCreator(name),
+                                                                          k(k), low_level_planner(low_level_planner) {}
 
     virtual Policy *operator()(MapfEnv *env, float gamma) {
-        return new OnlineReplanPolicy(env, gamma, this->name, new rtdp_dijkstra_rtdp(""), this->k);
+        return new OnlineReplanPolicy(env, gamma, this->name, this->low_level_planner, this->k);
     }
 };
 
-class dijkstra_baseline: public SolverCreator {
+class dijkstra_baseline : public SolverCreator {
 public:
-    dijkstra_baseline(string name):SolverCreator(name){}
+    dijkstra_baseline(string name) : SolverCreator(name) {}
 
-    virtual Policy* operator()(MapfEnv* env, float gamma){
-     return new DijkstraBaselinePolicy(env, gamma, this->name);
+    virtual Policy *operator()(MapfEnv *env, float gamma) {
+        return new DijkstraBaselinePolicy(env, gamma, this->name);
     }
 };
 
@@ -335,13 +337,13 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
@@ -356,8 +358,10 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-                        new online_replan("online_replan_2", 2),
-//                        new online_replan("online_replan_3", 3),
+                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
 //                        new online_replan("online_replan_4", 4),
                 }
         }
