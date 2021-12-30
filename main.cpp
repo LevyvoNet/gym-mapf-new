@@ -314,12 +314,6 @@ vector<vector<EnvCreator *>> env_creators(
                         new RoomEnv("room-64-64-16_scen_1_11-agents", 64, 16, 1, 11),
                         new RoomEnv("room-64-64-16_scen_1_12-agents", 64, 16, 1, 12),
                         new RoomEnv("room-64-64-16_scen_1_13-agents", 64, 16, 1, 13),
-                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
-                        new BerlinEnv("berlin_scen_2_2-agents", 2, 2),
-                        new BerlinEnv("berlin_scen_2_4-agents", 2, 4),
-                        new BerlinEnv("berlin_scen_2_5-agents", 2, 5),
-                        new BerlinEnv("berlin_scen_2_6-agents", 2, 6),
-                        new BerlinEnv("berlin_scen_2_7-agents", 2, 7),
                         new EmptyGrid("empty_32X32_4_agents", 32, 4, 0),
                         new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
                         new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
@@ -334,31 +328,31 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-//                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-                        new dijkstra_baseline("dijkstra_baseline"),
-                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+//                        new dijkstra_baseline("dijkstra_baseline"),
+//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
 //                        new online_replan("online_replan_4", 4),
                 }
         }
@@ -417,7 +411,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 }
 
 
-int main(int argc, char **argv) {
+int run_benchmarks() {
     vector<InstanceResult> results;
     std::string result = RESULT_ERROR;
     InstanceResult instance_result("", "", "");
@@ -488,5 +482,15 @@ int main(int argc, char **argv) {
     }
 
     cout << "-----------------------------------------Success-----------------------------------------" << endl;
+    return 0;
+}
+
+
+
+
+
+int main(int argc, char **argv) {
+    run_benchmarks();
+
     return 0;
 }

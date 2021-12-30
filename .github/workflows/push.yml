@@ -10,7 +10,7 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
-      - run: ${{ runner.workspace }}/build/gym_mapf/gym_mapf_ut
+      - run: ${{ runner.workspace }}/build/gym_mapf/tests/gym_mapf_ut
 
   solvers_ut:
     name: solvers unit tests
@@ -21,7 +21,7 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Debug
-      - run: ${{ runner.workspace }}/build/solvers/solvers_ut
+      - run: ${{ runner.workspace }}/build/solvers/tests/solvers_ut
 
   benchmark:
     name: benchmark

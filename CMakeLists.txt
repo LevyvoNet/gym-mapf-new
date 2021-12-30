@@ -3,10 +3,12 @@ project(gym_mapf)
 
 set(CMAKE_CXX_STANDARD 20)
 
-
+# Mine
 add_subdirectory(gym_mapf)
 add_subdirectory(solvers)
+#add_subdirectory(visualization)
 
+# Third Party
 add_subdirectory(third-party/hopscotch-map)
 
 
@@ -16,6 +18,7 @@ add_executable(
         main
         main.cpp
 )
+
 
 target_link_libraries(
         main
