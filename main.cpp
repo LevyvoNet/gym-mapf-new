@@ -282,11 +282,11 @@ vector<vector<EnvCreator *>> env_creators(
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
-                        new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
-                        new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
                 },
                 /* lvl 4 */
                 {
+                        new RoomEnv("room-64-64-8-scen_1_3-agents", 64, 8, 1, 3),
+                        new RoomEnv("room-64-64-8-scen_1_4-agents", 64, 8, 1, 4),
                         new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
                         new RoomEnv("room-64-64-8-scen_1_6-agents", 64, 8, 1, 6),
                         new RoomEnv("room-64-64-8-scen_1_7-agents", 64, 8, 1, 7),
@@ -489,7 +489,5 @@ int run_benchmarks() {
 
 
 int main(int argc, char **argv) {
-    run_benchmarks();
-
-    return 0;
+    return run_benchmarks();
 }
