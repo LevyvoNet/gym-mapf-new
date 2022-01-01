@@ -285,13 +285,12 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 4 */
                 {
-                        new RoomEnv("room-64-64-8-scen_1_10-agents", 64, 8, 1, 10),
+                        new RoomEnv("room-64-64-8-scen_1_9-agents", 64, 8, 1, 9),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
                         new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
                         new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
                         new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
                         new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
-                        new EmptyGrid("empty_8X8_4_agents", 8, 4, 0),
                 }
         }
 );
@@ -319,7 +318,6 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-                        new dijkstra_baseline("dijkstra_baseline"),
                         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
                         new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
                         new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
