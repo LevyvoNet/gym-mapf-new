@@ -12,6 +12,8 @@ Cell::Cell(bool is_obstacle) {
 }
 
 
+
+
 /** GridIterator************************************************************/
 GridIterator::GridIterator(const Grid *grid) {
     this->grid = grid;
@@ -229,5 +231,28 @@ std::ostream &operator<<(std::ostream &os, const Location &l) {
 }
 
 
+size_t hash<GridArea>::operator()(const GridArea &area) const {
+    size_t h = 0;
+    h += pow(2, area.top_row);
+    h += pow(3, area.bottom_row);
+    h += pow(5, area.left_col);
+    h += pow(7, area.right_col);
+    return h;
+}
 
+bool GridArea::contains(const Location &l) {
+    return ((l.row <= this->bottom_row) &&
+            (l.row >= this->top_row) &&
+            (l.col <= this->right_col) &&
+            (l.col >= this->left_col));
+}
 
+GridArea::GridArea(int top_row, int bottom_row, int left_col, int right_col) :
+        top_row(top_row), bottom_row(bottom_row), left_col(left_col), right_col(right_col) {}
+
+bool GridArea::operator==(const GridArea &other) const {
+    return ((this->top_row == other.top_row) &&
+            (this->bottom_row == other.bottom_row) &&
+            (this->left_col == other.left_col) &&
+            (this->right_col == other.right_col));
+}

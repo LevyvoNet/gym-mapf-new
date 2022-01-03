@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <cmath>
 
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
@@ -253,6 +254,60 @@ public:
     }
 };
 
+/** Utilities ********************************************************************************************************/
+void add_mountains_to_env(MapfEnv *env) {
+    int grid_area = (env->grid->max_row + 1) * ((env->grid->max_col + 1));
+    int mountain_count = env->n_agents * 2;
+    int mountain_area = grid_area / mountain_count;
+    int mountain_dim = sqrt(mountain_area);
+    vector<Location> mountain_centers;
+
+
+
+    vector<vector<size_t>> groups(env->n_agents);
+    for (size_t i = 0; i < env->n_agents; ++i) {
+        groups[i] = {i};
+    }
+    CrossedPolicy *p = solve_local_and_cross(env,
+                                             1.0,
+                                             EPISODE_TIMEOUT_MS,
+                                             new dijkstra_baseline(""),
+                                             &groups);
+    p->train(EPISODE_TIMEOUT_MS);
+
+    for (size_t agent_idx = 0; agent_idx < env->n_agents; ++agent_idx) {
+        MultiAgentState *s = p->env->locations_to_state({p->env->start_state->locations[agent_idx]});
+        size_t path_length = ((DijkstraBaselinePolicy *) (p->policies[agent_idx]))->get_value(s);
+        Location l = s->locations[0];
+
+        /* Add a mountain in 1/4 of path */
+        for (size_t i = 1; i <= path_length / 4; ++i) {
+            MultiAgentAction* a = p->policies[agent_idx]->act(MultiAgentState({l}, l.id), EPISODE_TIMEOUT_MS);
+            l = p->env->grid->execute(l, a->actions[0]);
+            delete a;
+        }
+        mountain_centers.push_back(l);
+
+        /* Add a mountain in 3/4 of path */
+        for (size_t i = 1; i <= path_length / 2; ++i) {
+            MultiAgentAction* a = p->policies[agent_idx]->act(MultiAgentState({l}, l.id), EPISODE_TIMEOUT_MS);
+            l = p->env->grid->execute(l, a->actions[0]);
+            delete a;
+        }
+        mountain_centers.push_back(l);
+    }
+
+
+    /* Add the mountains */
+    for (Location center: mountain_centers) {
+        int mountain_top = max(0, center.row - mountain_dim / 2);
+        int mountain_bottom = min((int) env->grid->max_row, center.row + mountain_dim / 2);
+        int mountain_left = max(0, center.col - mountain_dim / 2);
+        int mountain_right = min((int) env->grid->max_col, center.col + mountain_dim / 2);
+        env->add_mountain(GridArea(mountain_top, mountain_bottom, mountain_left, mountain_right));
+    }
+}
+
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
@@ -318,22 +373,27 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+                        new dijkstra_baseline("dijkstra_baseline"),
+//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }
 );
 
 std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator) {
     /* Create the policy */
-    MEASURE_TIME;
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
     env = (*env_creator)();
     policy = (*solver_creator)(env, 1.0);
     double timeout = EPISODE_TIMEOUT_MS;
+
+    /* Add the mountains to env */
+    add_mountains_to_env(env);
+
+    MEASURE_TIME;
 
     /* Train and evaluate */
     policy->train(timeout);
@@ -452,9 +512,6 @@ int run_benchmarks() {
     cout << "-----------------------------------------Success-----------------------------------------" << endl;
     return 0;
 }
-
-
-
 
 
 int main(int argc, char **argv) {

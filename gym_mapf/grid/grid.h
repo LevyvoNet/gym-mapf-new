@@ -112,4 +112,25 @@ public:
     bool operator!=(const GridIterator &other) const;
 };
 
+
+class GridArea {
+public:
+    int top_row;
+    int bottom_row;
+    int left_col;
+    int right_col;
+
+    GridArea(int top_row, int bottom_row, int left_col, int right_col);
+
+    bool contains(const Location &l);
+
+    bool operator==(const GridArea &other) const;
+};
+
+template<>
+class std::hash<GridArea> {
+public:
+    size_t operator()(const GridArea &area) const;
+};
+
 #endif //GYM_MAPF_GRID_H

@@ -588,3 +588,839 @@ TEST(MafpEnvTests, ActionSpaceIteration) {
 
 }
 
+
+TEST(MapfEnvTests, GirthStatesNormalIteration) {
+    std::vector<std::string> lines{{'.', '.', '.', '.'},
+                                   {'.', '.', '.', '.'},
+                                   {'.', '.', '.', '.'},
+                                   {'.', '.', '.', '.'},
+                                   {'.', '.', '.', '.'}};
+    Grid grid(lines);
+    MapfEnv aux_env = MapfEnv(&grid,
+                              2,
+                              {grid.get_location(1, 1), grid.get_location(3, 2)},
+                              {grid.get_location(4, 4), grid.get_location(0, 0)},
+                              0.2,
+                              -1000,
+                              0,
+                              -1);
+
+    GridArea area = GridArea(1, 3, 1, 2);
+
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&grid, area, 2);
+
+    list<MultiAgentState *> states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        states.
+                push_back(s);
+    }
+
+    list<MultiAgentState *> expected_states{
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(0, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 0)}),
+
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(0, 1)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 1)}),
+
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(0, 2)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 2)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(0, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(0, 3)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(1, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(1, 3)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(2, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(2, 3)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(3, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(3, 3)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(4, 3)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(4, 3)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(4, 2)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(4, 2)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(4, 1)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(4, 1)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(4, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(4, 0)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(3, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(3, 0)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(2, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(2, 0)}),
+
+            aux_env.locations_to_state({grid.get_location(0, 0), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 1), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 2), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(0, 3), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 3), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 3), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 3), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 3), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 2), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 1), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(4, 0), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(3, 0), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(2, 0), grid.get_location(1, 0)}),
+            aux_env.locations_to_state({grid.get_location(1, 0), grid.get_location(1, 0)}),
+
+
+    };
+
+    ASSERT_TRUE(list_equal_no_order(states, expected_states));
+
+}
+
+TEST(MapfEnvTests, SymmetricalBottleneckAreaGirth) {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@..."
+                                  });
+
+    Grid g = Grid(map_lines);
+
+    MapfEnv env = MapfEnv(&g,
+                          2,
+                          {g.get_location(2, 0), g.get_location(2, 5)},
+                          {g.get_location(2, 5), g.get_location(2, 0)},
+                          0.21,
+                          -1000,
+                          100,
+                          -1);
+
+    GridArea conflict_area = GridArea(2, 2, 1, 4);
+
+    /* Calculate girth states */
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&g, conflict_area, 2);
+    list<MultiAgentState *> girth_states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        girth_states.
+                push_back(s);
+    }
+
+    list<MultiAgentState *> expected_girth_states{
+            env.locations_to_state({g.get_location(1, 0), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(1, 0)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(1, 0)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(1, 1)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(1, 3)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(1, 4)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(1, 5)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(2, 5)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(3, 5)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(3, 4)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(3, 3)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(3, 1)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(3, 0)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(3, 0)}),
+
+            env.locations_to_state({g.get_location(1, 0), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(1, 1), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(3, 0), g.get_location(2, 0)}),
+            env.locations_to_state({g.get_location(2, 0), g.get_location(2, 0)}),
+    };
+
+
+    ASSERT_TRUE(list_equal_no_order(girth_states, expected_girth_states)
+    );
+
+/* Calculate area states */
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_area_states{
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 1)}),
+
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 2)}),
+
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3)}),
+
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 4)}),
+
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, expected_area_states)
+    );
+}
+
+TEST(MapfEnvTests, SymmetricalBottleneckAreaGirthDifferentRows) {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@..."
+                                  });
+
+    Grid g = Grid(map_lines);
+
+    MapfEnv env = MapfEnv(&g,
+                          2,
+                          {g.get_location(2, 0), g.get_location(2, 5)},
+                          {g.get_location(2, 5), g.get_location(2, 0)},
+                          0.21,
+                          -1000,
+                          100,
+                          -1);
+
+    GridArea conflict_area = GridArea(2, 3, 2, 4);
+
+/* Calculate girth states */
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&g, conflict_area, 2);
+    list<MultiAgentState *> girth_states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        girth_states.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_girth_states{
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 1)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(1, 1)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 3)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(1, 3)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 4)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(1, 4)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(1, 5)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(1, 5)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(2, 5)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 5)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 5)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(3, 5)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(4, 5)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(4, 5)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(4, 4)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(4, 4)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(4, 3)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(4, 3)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(4, 1)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(4, 1)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(3, 1)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(3, 1)}),
+
+            env.locations_to_state({g.get_location(1, 1), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(1, 3), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(1, 4), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(1, 5), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(2, 5), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(3, 5), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(4, 5), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(4, 4), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(4, 3), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(4, 1), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(3, 1), g.get_location(2, 1)}),
+            env.locations_to_state({g.get_location(2, 1), g.get_location(2, 1)}),
+
+
+    };
+
+
+    ASSERT_TRUE(list_equal_no_order(girth_states, expected_girth_states));
+
+/* Calculate area states */
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_area_states{
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 2)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 4)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 3)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(3, 4)}),
+
+
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, expected_area_states));
+}
+
+TEST(MapfEnvTests, MountainsEmptyGrid) {
+    std::vector<std::string> empty_8_8{{'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'},
+                                       {'.', '.', '.', '.', '.', '.', '.', '.'}};
+    Grid g(empty_8_8);
+    vector<Location> start_locations{g.get_location(3, 0), g.get_location(3, 7)};
+    vector<Location> goal_locations = {g.get_location(3, 0)};
+
+    MapfEnv *env = new MapfEnv(&g,
+                               2,
+                               start_locations,
+                               goal_locations,
+                               0.3,
+                               REWARD_OF_COLLISION,
+                               REWARD_OF_GOAL,
+                               REWARD_OF_LIVING);
+
+    /* Add a mountain on the path of the agents to the goal */
+    GridArea mountain_area = GridArea(3, 5, 1, 6);
+
+    env->add_mountain(mountain_area);
+
+    /* Get the transitions */
+    MultiAgentAction *action = actions_to_action({RIGHT, UP});
+    MultiAgentState *s = env->locations_to_state({g.get_location(3, 2), g.get_location(3, 7)});
+    list<Transition *> *transitions = env->get_transitions(*s, *action)->transitions;
+    /* Round the probabilities to 2 decimal points */
+    for (Transition *t: *transitions) {
+        t->p = round(t->p * 100) / 100;
+    }
+
+    /* Set the expected transitions */
+    list<Transition *> expected_transitions(
+            {
+                    // (RIGHT, UP)
+                    new Transition(0.4 * 0.7,
+                                   env->locations_to_state({g.get_location(3, 3), g.get_location(2, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (RIGHT, RIGHT)
+                    new Transition(0.4 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 3), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (RIGHT, LEFT)
+                    new Transition(0.4 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 3), g.get_location(3, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (RIGHT, STAY)
+                    new Transition(0.4 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 3), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+
+                    // (UP, UP)
+                    new Transition(0.2 * 0.7,
+                                   env->locations_to_state({g.get_location(2, 2), g.get_location(2, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (UP, RIGHT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(2, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (UP, LEFT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(2, 2), g.get_location(3, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (UP, STAY)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(2, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+
+                    // (DOWN, UP)
+                    new Transition(0.2 * 0.7,
+                                   env->locations_to_state({g.get_location(4, 2), g.get_location(2, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (DOWN, RIGHT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(4, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (DOWN, LEFT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(4, 2), g.get_location(3, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (DOWN, STAY)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(4, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+
+                    // (STAY, UP)
+                    new Transition(0.2 * 0.7,
+                                   env->locations_to_state({g.get_location(3, 2), g.get_location(2, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (STAY, RIGHT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (STAY, LEFT)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 2), g.get_location(3, 6)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+                    // (STAY, STAY)
+                    new Transition(0.2 * 0.1,
+                                   env->locations_to_state({g.get_location(3, 2), g.get_location(3, 7)}),
+                                   2 * REWARD_OF_LIVING, false, false),
+            });
+
+    for (Transition *t: expected_transitions) {
+        t->p = round(t->p * 100) / 100;
+    }
+
+
+    ASSERT_TRUE(list_equal_no_order(*transitions, expected_transitions));
+
+
+}

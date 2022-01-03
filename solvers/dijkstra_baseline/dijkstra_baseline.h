@@ -12,10 +12,8 @@
 #include "solvers/rtdp/rtdp.h"
 
 class DijkstraBaselinePolicy : public ValueFunctionPolicy {
-private:
-    DijkstraHeuristic* h;
-
 public:
+    DijkstraHeuristic* h;
 
     DijkstraBaselinePolicy(MapfEnv *env, float gamma, const string &name);
 

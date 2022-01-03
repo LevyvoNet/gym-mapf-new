@@ -90,6 +90,7 @@ MapfEnv::MapfEnv(Grid *grid,
 
     /* State */
     this->s = new MultiAgentState(start_state->locations, start_state->id);
+    this->mountains = new vector<GridArea>;
 
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
@@ -252,8 +253,10 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
     size_t curr_agent_idx = 0;
     double curr_prob = 0;
     unsigned long n_disruptions = (unsigned long) pow((double) INVALID_DISRUPTION, this->n_agents);
-    double disrupt_ratio = (this->fail_prob / (1 - this->fail_prob)) / 3;
-    double normal_ratio = 3 * (1 - this->fail_prob) / this->fail_prob;
+//    double disrupt_ratio = (this->fail_prob / (1 - this->fail_prob)) / 3;
+//    double normal_ratio = 3 * (1 - this->fail_prob) / this->fail_prob;
+    vector<double> disrupt_ratio(this->n_agents);
+    vector<double> normal_ratio(this->n_agents);
     /* TODO: make sure that this the default copy c'tor copies the underlying vector */
     MultiAgentAction t_action = MultiAgentAction(action);
     MultiAgentState *t_state = NULL;
@@ -289,28 +292,50 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
         return transitions;
     }
 
-    /* Initialize disruptions */
+    /* Initialize disruptions and ratios */
     for (i = 0; i < n_agents; ++i) {
         disruptions[i] = 0;
+
+        disrupt_ratio[i] = (this->fail_prob / (1 - this->fail_prob)) / 3;
+        normal_ratio[i] = 3 * (1 - this->fail_prob) / this->fail_prob;
+
+        for (GridArea mountain: *(this->mountains)) {
+            if (mountain.contains(state.locations[i])) {
+                /* TODO: add a dependency on the direction of movement - into the mountain or out from it */
+                double fail_prob_in_mountain = this->fail_prob * MOUNTAIN_NOISE_FACTOR;
+                disrupt_ratio[i] = (fail_prob_in_mountain / (1 - fail_prob_in_mountain)) / 3;
+                normal_ratio[i] = 3 * (1 - fail_prob_in_mountain) / fail_prob_in_mountain;
+                break;
+            }
+
+        }
     }
     disruptions[0] = -1;
-    curr_prob = pow((1 - this->fail_prob), this->n_agents);
+    curr_prob = 1;
+    double regular_disrupt_ratio = (this->fail_prob / (1 - this->fail_prob)) / 3;
+    for (size_t k = 0; k < this->n_agents; ++k) {
+        if (disrupt_ratio[k] == regular_disrupt_ratio) {
+            curr_prob *= 1 - this->fail_prob;
+        } else {
+            curr_prob *= 1 - (this->fail_prob * MOUNTAIN_NOISE_FACTOR);
+        }
+    }
 
     /* Iterate over all possible disruptions and compute the matching transition */
     for (i = 1; i <= n_disruptions; ++i) {
         /* Increment and handle the "carry" */
         curr_agent_idx = 0;
         if (disruptions[curr_agent_idx] == NO_DISRUPTION) {
-            curr_prob *= disrupt_ratio;
+            curr_prob *= disrupt_ratio[curr_agent_idx];
         }
         disruptions[curr_agent_idx]++;
         while (disruptions[curr_agent_idx] == INVALID_DISRUPTION) {
             disruptions[curr_agent_idx] = 0;
             t_action.actions[curr_agent_idx] = g_action_noise_to_action[action.actions[curr_agent_idx]][disruptions[curr_agent_idx]];
-            curr_prob *= normal_ratio;
+            curr_prob *= normal_ratio[curr_agent_idx];
             curr_agent_idx++;
             if (disruptions[curr_agent_idx] == 0) {
-                curr_prob *= disrupt_ratio;
+                curr_prob *= disrupt_ratio[curr_agent_idx];
             }
             disruptions[curr_agent_idx]++;
         }
@@ -353,10 +378,7 @@ void MapfEnv::step(const MultiAgentAction &action,
                    bool cache) {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::discrete_distribution<> d({1 - this->fail_prob,
-                                    this->fail_prob / 3,
-                                    this->fail_prob / 3,
-                                    this->fail_prob / 3});
+
     int noise_idx = 0;
     Action noised_action = STAY;
     size_t agent_idx = 0;
@@ -371,6 +393,17 @@ void MapfEnv::step(const MultiAgentAction &action,
 
     /* Set the next state locations - for each agent sample an action and set its next location properly */
     for (agent_idx = 0; agent_idx < this->n_agents; ++agent_idx) {
+        double agent_fail_prob = this->fail_prob;
+        /* TODO: add dependency on direction */
+        for (GridArea mountain: (*this->mountains)) {
+            if (mountain.contains(this->s->locations[agent_idx])) {
+                agent_fail_prob *= MOUNTAIN_NOISE_FACTOR;
+            }
+        }
+        std::discrete_distribution<> d({1 - agent_fail_prob,
+                                        agent_fail_prob / 3,
+                                        agent_fail_prob / 3,
+                                        agent_fail_prob / 3});
         noise_idx = d(gen);
         noised_action = g_action_noise_to_action[action.actions[agent_idx]][noise_idx];
         next_state->locations[agent_idx] = this->grid->execute(this->s->locations[agent_idx], noised_action);
@@ -433,6 +466,10 @@ MapfEnv::~MapfEnv() {
     delete this->observation_space;
 //    delete this->grid;
     delete this->s;
+}
+
+void MapfEnv::add_mountain(GridArea mountain_area) {
+    this->mountains->push_back(mountain_area);
 }
 
 

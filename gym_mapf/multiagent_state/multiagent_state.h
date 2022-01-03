@@ -69,4 +69,56 @@ public:
     virtual MultiAgentStateIterator* end();
 };
 
+
+class AreaMultiAgentStateIterator : public MultiAgentStateIterator {
+public:
+    GridArea area;
+
+    void _reach_begin();
+
+    AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual void reach_begin() override;
+
+    virtual MultiAgentStateIterator &operator++() override;
+};
+
+class AreaMultiAgentStateSpace : public MultiAgentStateSpace {
+protected:
+    GridArea area;
+public:
+    AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual AreaMultiAgentStateIterator *begin() override;
+
+    virtual AreaMultiAgentStateIterator *end() override;
+};
+
+
+class GirthMultiAgentStateIterator : public MultiAgentStateIterator {
+
+public:
+    GridArea area;
+
+    GirthMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual MultiAgentStateIterator &operator++() override;
+
+    void _reach_begin();
+
+    virtual void reach_begin() override;
+};
+
+class GirthMultiAgentStateSpace : public MultiAgentStateSpace {
+protected:
+    GridArea area;
+
+public:
+    GirthMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents);
+
+    virtual GirthMultiAgentStateIterator *begin() override;
+
+    virtual GirthMultiAgentStateIterator *end() override;
+};
+
 #endif //GYM_MAPF_MULTIAGENT_STATE_H
