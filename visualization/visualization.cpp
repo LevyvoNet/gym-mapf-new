@@ -80,6 +80,7 @@ void GridDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates render
 
             if (this->g->map[i][j].is_obstacle) {
                 t.fill_color = sf::Color(192, 192, 192);
+                t.tile_image.setFillColor(t.fill_color);
             }
 
             render_target.draw(t);
@@ -131,10 +132,13 @@ void MapfEnvDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates ren
         AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(env->grid, mountain, 1);
         AreaMultiAgentStateIterator *area_iter = area_space.begin();
         for (; *area_iter != *area_space.end(); ++*area_iter) {
-            TileDrawable t = TileDrawable(this->tile_size,
-                                          (*area_iter)->locations[0],
-                                          sf::Color(245,222,179, 128));
-            render_target.draw(t);
+            Location l = (*area_iter)->locations[0];
+            if (!env->grid->map[l.row][l.col].is_obstacle) {
+                TileDrawable t = TileDrawable(this->tile_size,
+                                              l,
+                                              sf::Color(245, 222, 179, 128));
+                render_target.draw(t);
+            }
         }
     }
 }

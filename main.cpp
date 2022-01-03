@@ -92,7 +92,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                         new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
@@ -102,9 +102,9 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
 //                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
 //                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }

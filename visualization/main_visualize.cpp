@@ -10,6 +10,7 @@
 
 #define LONG_TIME_SEC (60)
 #define LONG_TIME_MS (LONG_TIME_SEC * 1000)
+#define SLEEP_TIME_nS (200000)
 
 void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator) {
     MapfEnv *env = (*env_creator)();
@@ -35,12 +36,15 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
                 window.close();
         }
 
+        done = false;
+        policy->reset();
+
         do {
             /* Render */
             window.clear();
             render(policy->env, &window);
             window.display();
-            sleep(1);
+            usleep(SLEEP_TIME_nS);
 
             /* Execute new action */
             selected_action = policy->act(*(policy->env->s), LONG_TIME_MS);
@@ -52,13 +56,14 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
         render(env, &window);
         window.display();
 
+        sleep(2);
     }
 
 }
 
 
 int main(int argc, char **argv) {
-    render_solver_on_env(new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+    render_solver_on_env(new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
                          new vi("vi"));
 
     return 0;

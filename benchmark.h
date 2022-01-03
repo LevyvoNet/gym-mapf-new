@@ -10,7 +10,7 @@
 
 #define BENCHMARK_LONG_TIME_SEC (60)
 #define BENCHMARK_LONG_TIME_MS (BENCHMARK_LONG_TIME_SEC * 1000)
-#define MOUNT_FACTOR (0.7)
+#define MOUNT_FACTOR (0.3)
 
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
@@ -27,7 +27,7 @@ public:
         std::ostringstream map_name;
         map_name << "empty-" << this->grid_size << "-" << this->grid_size;
 
-        return create_mapf_env(map_name.str(), 1, this->n_agents, 0.21, -1000, this->goal_reward, -1);
+        return create_mapf_env(map_name.str(), 3, this->n_agents, 0.21, -1000, this->goal_reward, -1);
     }
 };
 
@@ -234,10 +234,6 @@ public:
 /** Utilities ********************************************************************************************************/
 void add_mountains_to_env(MapfEnv *env) {
     int grid_area = (env->grid->max_row + 1) * ((env->grid->max_col + 1));
-    int mountain_count = env->n_agents * 2;
-    int total_mount_area = grid_area * MOUNT_FACTOR;
-    int mountain_area = total_mount_area / mountain_count;
-    int mountain_dim = sqrt(mountain_area);
     vector<Location> mountain_centers;
 
 
@@ -254,38 +250,21 @@ void add_mountains_to_env(MapfEnv *env) {
     for (size_t agent_idx = 0; agent_idx < env->n_agents; ++agent_idx) {
         MultiAgentState *s = p->env->locations_to_state({p->env->start_state->locations[agent_idx]});
         Location l = s->locations[0];
-        size_t path_length = ((DijkstraBaselinePolicy *) (p->policies[agent_idx]))->h->distance[0][l.id];
+        int path_length = ((DijkstraBaselinePolicy *) (p->policies[agent_idx]))->h->distance[0][l.id];
 
-        /* Add a mountain in 1/4 of path */
-        size_t i = 0;
-        for (size_t i = 0; i < path_length / 4; ++i) {
-            MultiAgentAction *a = p->policies[agent_idx]->act(MultiAgentState({l}, l.id), BENCHMARK_LONG_TIME_MS);
-            l = p->env->grid->execute(l, a->actions[0]);
-            delete a;
-        }
-        if (i > 0) {
-            mountain_centers.push_back(l);
-        }
+        /* Add a mountain in middle of path */
         /* Add a mountain in 3/4 of path */
         size_t j = 0;
-        for (j = 1; j <= path_length / 2; ++j) {
+        for (j = 0; j < path_length / 2; ++j) {
             MultiAgentAction *a = p->policies[agent_idx]->act(MultiAgentState({l}, l.id), BENCHMARK_LONG_TIME_MS);
             l = p->env->grid->execute(l, a->actions[0]);
             delete a;
         }
-        if (j > i) {
 
-            mountain_centers.push_back(l);
-        }
-    }
-
-
-    /* Add the mountains */
-    for (Location center: mountain_centers) {
-        int mountain_top = max(0, center.row - mountain_dim / 2);
-        int mountain_bottom = min((int) env->grid->max_row, center.row + mountain_dim / 2);
-        int mountain_left = max(0, center.col - mountain_dim / 2);
-        int mountain_right = min((int) env->grid->max_col, center.col + mountain_dim / 2);
+        int mountain_top = max(0, l.row - path_length / 8);
+        int mountain_bottom = min((int) env->grid->max_row, l.row + path_length / 8);
+        int mountain_left = max(0, l.col - path_length / 8);
+        int mountain_right = min((int) env->grid->max_col, l.col + path_length / 8);
         env->add_mountain(GridArea(mountain_top, mountain_bottom, mountain_left, mountain_right));
     }
 }
