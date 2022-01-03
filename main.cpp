@@ -98,14 +98,14 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
                         new id_rtdp_default("id_rtdp_default"),
                         new id_rtdp("id_rtdp"),
+                        new dijkstra_baseline("dijkstra_baseline"),
                 },
                 /* lvl 4 */
                 {
-                        new dijkstra_baseline("dijkstra_baseline"),
-                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }
 );
@@ -119,7 +119,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     double timeout = EPISODE_TIMEOUT_MS;
 
     /* Add the mountains to env */
-//    add_mountains_to_env(env);
+    add_mountains_to_env(env);
 
     MEASURE_TIME;
 

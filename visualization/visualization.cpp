@@ -16,13 +16,14 @@ vector<sf::Color> AGENT_COLORS{
         sf::Color::Cyan,
 };
 
-TileDrawable::TileDrawable(float tile_size, Location l) : tile_size(tile_size) {
+TileDrawable::TileDrawable(float tile_size, Location l, sf::Color fill_color) : tile_size(tile_size),
+                                                                                fill_color(fill_color) {
     this->position = sf::Vector2i(l.col * tile_size, l.row * tile_size);
     this->tile_image = sf::RectangleShape(sf::Vector2f(this->tile_size, this->tile_size));
     this->tile_image.setPosition(sf::Vector2f(this->position));
     this->tile_image.setOutlineColor(sf::Color::Black);
     this->tile_image.setOutlineThickness(OUTLINE_THICKNESS);
-    this->tile_image.setFillColor(sf::Color::White);
+    this->tile_image.setFillColor(this->fill_color);
 }
 
 void TileDrawable::draw(sf::RenderTarget &renderTarget, sf::RenderStates renderStates) const {
@@ -61,18 +62,26 @@ void GoalDrawable::draw(sf::RenderTarget &renderTarget, sf::RenderStates renderS
 }
 
 
-GridDrawable::GridDrawable(int row_count, int col_count, int tile_size) :
-        row_count(row_count), col_count(col_count), tile_size(tile_size) {}
+GridDrawable::GridDrawable(Grid *g, int tile_size) :
+        g(g), tile_size(tile_size) {}
 
 void GridDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates render_states) const {
     vector<TileDrawable> tiles;
 
+    int row_count = this->g->max_row + 1;
+    int col_count = this->g->max_col + 1;
 
     /* Draw the blank tiles */
-    for (int i = 0; i < this->row_count; ++i) {
-        for (int j = 0; j < this->col_count; ++j) {
+    for (int i = 0; i < row_count; ++i) {
+        for (int j = 0; j < col_count; ++j) {
             TileDrawable t = TileDrawable(this->tile_size,
-                                          Location(i, j, 0));
+                                          Location(i, j, 0),
+                                          sf::Color::White);
+
+            if (this->g->map[i][j].is_obstacle) {
+                t.fill_color = sf::Color(192, 192, 192);
+            }
+
             render_target.draw(t);
         }
     }
@@ -83,8 +92,7 @@ void GridDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates render
 
 
 MapfEnvDrawable::MapfEnvDrawable(MapfEnv *env) : env(env),
-                                                 grid_drawable(env->grid->max_row + 1,
-                                                               env->grid->max_col + 1,
+                                                 grid_drawable(env->grid,
                                                                min(sf::VideoMode::getDesktopMode().height *
                                                                    WINDOW_BUFFER_FACTOR / (env->grid->max_row + 1),
                                                                    sf::VideoMode::getDesktopMode().width *
@@ -95,9 +103,9 @@ MapfEnvDrawable::MapfEnvDrawable(MapfEnv *env) : env(env),
     float tile_height = sf::VideoMode::getDesktopMode().height * WINDOW_BUFFER_FACTOR / row_count;
     float tile_width = sf::VideoMode::getDesktopMode().width * WINDOW_BUFFER_FACTOR / col_count;
 
-    float tile_size = min(tile_height, tile_width);
+    this->tile_size = min(tile_height, tile_width);
 
-    this->grid_drawable = GridDrawable(row_count, col_count, tile_size);
+    this->grid_drawable = GridDrawable(this->env->grid, tile_size);
 }
 
 void MapfEnvDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates render_states) const {
@@ -105,7 +113,7 @@ void MapfEnvDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates ren
     /* Draw the grid */
     this->grid_drawable.draw(render_target, render_states);
 
-    /* Draw the agents */
+    /* Draw the agents locations and their goals */
     for (size_t i = 0; i < this->env->n_agents; ++i) {
         AgentDrawable agent = AgentDrawable(this->grid_drawable.tile_size,
                                             this->env->s->locations[i],
@@ -116,6 +124,18 @@ void MapfEnvDrawable::draw(sf::RenderTarget &render_target, sf::RenderStates ren
 
         agent.draw(render_target, render_states);
         goal.draw(render_target, render_states);
+    }
+
+    /* Draw mountains */
+    for (GridArea mountain: *(env->mountains)) {
+        AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(env->grid, mountain, 1);
+        AreaMultiAgentStateIterator *area_iter = area_space.begin();
+        for (; *area_iter != *area_space.end(); ++*area_iter) {
+            TileDrawable t = TileDrawable(this->tile_size,
+                                          (*area_iter)->locations[0],
+                                          sf::Color(245,222,179, 128));
+            render_target.draw(t);
+        }
     }
 }
 

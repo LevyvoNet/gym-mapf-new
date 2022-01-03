@@ -10,6 +10,7 @@
 
 #define BENCHMARK_LONG_TIME_SEC (60)
 #define BENCHMARK_LONG_TIME_MS (BENCHMARK_LONG_TIME_SEC * 1000)
+#define MOUNT_FACTOR (0.7)
 
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
@@ -234,7 +235,8 @@ public:
 void add_mountains_to_env(MapfEnv *env) {
     int grid_area = (env->grid->max_row + 1) * ((env->grid->max_col + 1));
     int mountain_count = env->n_agents * 2;
-    int mountain_area = grid_area / mountain_count;
+    int total_mount_area = grid_area * MOUNT_FACTOR;
+    int mountain_area = total_mount_area / mountain_count;
     int mountain_dim = sqrt(mountain_area);
     vector<Location> mountain_centers;
 

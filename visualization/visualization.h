@@ -16,14 +16,15 @@ public:
     float tile_size;
     sf::RectangleShape tile_image;
     sf::Vector2i position;
+    sf::Color fill_color;
 
-    TileDrawable(float tile_size, Location l);
+    TileDrawable(float tile_size, Location l, sf::Color fill_color);
 
     void draw(sf::RenderTarget &renderTarget, sf::RenderStates renderStates) const override;
 };
 
 
-class AgentDrawable: public sf::Drawable {
+class AgentDrawable : public sf::Drawable {
 public:
     float tile_size;
     sf::CircleShape agent_image;
@@ -36,7 +37,7 @@ public:
 
 };
 
-class GoalDrawable: public sf::Drawable{
+class GoalDrawable : public sf::Drawable {
 public:
     float tile_size;
     sf::CircleShape goal_image;
@@ -48,30 +49,30 @@ public:
     void draw(sf::RenderTarget &renderTarget, sf::RenderStates renderStates) const override;
 };
 
-class GridDrawable: public sf::Drawable {
+class GridDrawable : public sf::Drawable {
 public:
-    int row_count;
-    int col_count;
+    Grid* g;
     int tile_size;
 
-    GridDrawable(int row_count, int col_count, int tile_size);
+    GridDrawable(Grid* g, int tile_size);
 
     void draw(sf::RenderTarget &render_target, sf::RenderStates render_states) const override;
 };
 
 
-class MapfEnvDrawable: public sf::Drawable {
+class MapfEnvDrawable : public sf::Drawable {
 public:
-    MapfEnv* env;
+    MapfEnv *env;
+    int tile_size;
 
     GridDrawable grid_drawable;
 
-    MapfEnvDrawable(MapfEnv* env);
+    MapfEnvDrawable(MapfEnv *env);
 
     void draw(sf::RenderTarget &render_target, sf::RenderStates render_states) const override;
 
 };
 
-void render(MapfEnv* env, sf::RenderWindow* window);
+void render(MapfEnv *env, sf::RenderWindow *window);
 
 #endif //GYM_MAPF_VISUALIZATION_H
