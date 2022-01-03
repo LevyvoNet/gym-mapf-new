@@ -11,14 +11,12 @@
 #include "solvers/heuristics/heuristic.h"
 
 class DijkstraHeuristic : public Heuristic {
-private:
+public:
     int **distance;
     size_t n_agents;
     MapfEnv *env;
 
     void dijkstra_single_agent(size_t agent_idx);
-
-public:
 
     virtual ~DijkstraHeuristic() override;
 

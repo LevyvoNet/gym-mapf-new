@@ -542,3 +542,4 @@ MultiAgentAction *actions_to_action(const vector<Action> &actions) {
 
     return new MultiAgentAction(actions, sum);
 }
+

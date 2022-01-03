@@ -5,6 +5,7 @@ add_executable(
         main_visualize
         main_visualize.cpp
         visualization.cpp
+        ../benchmark.h
 )
 
 

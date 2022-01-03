@@ -17,6 +17,7 @@ include_directories(. gym_mapf solvers third-party/hopscotch-map/include)
 add_executable(
         main
         main.cpp
+        benchmark.h
 )
 
 
