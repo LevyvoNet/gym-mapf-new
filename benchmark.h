@@ -261,10 +261,10 @@ void add_mountains_to_env(MapfEnv *env) {
             delete a;
         }
 
-        int mountain_top = max(0, l.row - path_length / 8);
-        int mountain_bottom = min((int) env->grid->max_row, l.row + path_length / 8);
-        int mountain_left = max(0, l.col - path_length / 8);
-        int mountain_right = min((int) env->grid->max_col, l.col + path_length / 8);
+        int mountain_top = max(0, l.row - path_length  / 4);
+        int mountain_bottom = min((int) env->grid->max_row, l.row + path_length / 4);
+        int mountain_left = max(0, l.col - path_length / 4);
+        int mountain_right = min((int) env->grid->max_col, l.col + path_length / 4);
         env->add_mountain(GridArea(mountain_top, mountain_bottom, mountain_left, mountain_right));
     }
 }
