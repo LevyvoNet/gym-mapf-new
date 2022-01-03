@@ -599,7 +599,7 @@ TEST(MapfEnvTests, GirthStatesNormalIteration) {
     MapfEnv aux_env = MapfEnv(&grid,
                               2,
                               {grid.get_location(1, 1), grid.get_location(3, 2)},
-                              {grid.get_location(4, 4), grid.get_location(0, 0)},
+                              {grid.get_location(4, 3), grid.get_location(0, 0)},
                               0.2,
                               -1000,
                               0,
