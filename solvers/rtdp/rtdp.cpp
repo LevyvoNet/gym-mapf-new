@@ -200,10 +200,10 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
     }
 
     /* If this is an unfamiliar state, return all stay action */
-    if (nullptr == this->v->get(state)) {
-        MultiAgentActionIterator a_iter = this->env->action_space->begin();
-        return new MultiAgentAction(a_iter->actions, a_iter->id);
-    }
+//    if (nullptr == this->v->get(state)) {
+//        MultiAgentActionIterator a_iter = this->env->action_space->begin();
+//        return new MultiAgentAction(a_iter->actions, a_iter->id);
+//    }
 
     a = ValueFunctionPolicy::act(state, timeout_ms);
     if (ELAPSED_TIME_MS >= timeout_ms){
