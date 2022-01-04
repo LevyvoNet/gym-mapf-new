@@ -73,7 +73,7 @@ public:
 
 };
 
-#define MOUNTAIN_NOISE_FACTOR (2)
+#define MOUNTAIN_NOISE_FACTOR (3)
 
 class MapfEnv {
 private:
