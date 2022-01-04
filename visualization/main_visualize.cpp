@@ -64,8 +64,8 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
 
 int main(int argc, char **argv) {
     render_solver_on_env(
-            new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-            new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""))
+            new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+            new vi("vi")
     );
 
     return 0;

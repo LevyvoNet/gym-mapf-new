@@ -52,28 +52,28 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
+//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
-                        new RoomEnv("room-64-64-8-scen_1_9-agents", 64, 8, 1, 9),
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
-                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
-                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
-                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+//                        new RoomEnv("room-64-64-8-scen_1_9-agents", 64, 8, 1, 9),
+//                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
+//                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
+//                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
+//                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
+//                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
                 }
         }
 );
