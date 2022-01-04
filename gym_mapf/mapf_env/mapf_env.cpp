@@ -397,10 +397,11 @@ void MapfEnv::step(const MultiAgentAction &action,
         /* TODO: add dependency on direction */
         for (GridArea mountain: (*this->mountains)) {
             if (mountain.contains(this->s->locations[agent_idx])) {
-                agent_fail_prob = this->fail_prob * 2;
+                agent_fail_prob = this->fail_prob * MOUNTAIN_NOISE_FACTOR;
                 break;
             }
         }
+
         std::discrete_distribution<> d({1 - agent_fail_prob,
                                         agent_fail_prob / 3,
                                         agent_fail_prob / 3,

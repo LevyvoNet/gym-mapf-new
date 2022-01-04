@@ -10,7 +10,7 @@
 
 #define BENCHMARK_LONG_TIME_SEC (60)
 #define BENCHMARK_LONG_TIME_MS (BENCHMARK_LONG_TIME_SEC * 1000)
-#define MOUNT_FACTOR (0.3)
+#define FAIL_PROB (0.3)
 
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
@@ -27,7 +27,7 @@ public:
         std::ostringstream map_name;
         map_name << "empty-" << this->grid_size << "-" << this->grid_size;
 
-        return create_mapf_env(map_name.str(), 3, this->n_agents, 0.21, -1000, this->goal_reward, -1);
+        return create_mapf_env(map_name.str(), 3, this->n_agents, FAIL_PROB, -1000, this->goal_reward, -1);
     }
 };
 
@@ -53,7 +53,7 @@ public:
                            2,
                            {g->get_location(2, 0), g->get_location(2, 5)},
                            {g->get_location(2, 5), g->get_location(2, 0)},
-                           0.21,
+                           FAIL_PROB,
                            -1000,
                            goal_reward,
                            -1);
@@ -84,7 +84,7 @@ public:
                            2,
                            {g->get_location(2, 0), g->get_location(2, 4)},
                            {g->get_location(2, 4), g->get_location(2, 0)},
-                           0.21,
+                           FAIL_PROB,
                            -1000,
                            goal_reward,
                            -1);
@@ -110,7 +110,7 @@ public:
     virtual MapfEnv *operator()() {
         std::ostringstream map_name;
         map_name << "room-" << this->room_size << "-" << this->room_size << "-" << this->n_rooms;
-        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
+        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
     }
 };
 
@@ -127,7 +127,7 @@ public:
                                                                                 n_rooms(n_rooms) {}
 
     virtual MapfEnv *operator()() {
-        return create_sanity_mapf_env(this->n_rooms, this->room_size, this->n_agents, 0.21, -1000, 0, -1);
+        return create_sanity_mapf_env(this->n_rooms, this->room_size, this->n_agents, FAIL_PROB, -1000, 0, -1);
     }
 };
 
@@ -147,7 +147,7 @@ public:
     virtual MapfEnv *operator()() {
         std::ostringstream map_name;
         map_name << "maze-" << this->maze_size << "-" << this->maze_size << "-" << this->n_rooms;
-        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
+        return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
     }
 
 };
@@ -160,7 +160,7 @@ public:
     BerlinEnv(string name, size_t scen_id, size_t n_agents) : EnvCreator(name), n_agents(n_agents), scen_id(scen_id) {}
 
     virtual MapfEnv *operator()() {
-        return create_mapf_env("Berlin_1_256", this->scen_id, this->n_agents, 0.21, -1000, 0, -1);
+        return create_mapf_env("Berlin_1_256", this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
     }
 };
 
@@ -253,18 +253,18 @@ void add_mountains_to_env(MapfEnv *env) {
         int path_length = ((DijkstraBaselinePolicy *) (p->policies[agent_idx]))->h->distance[0][l.id];
 
         /* Add a mountain in middle of path */
-        /* Add a mountain in 3/4 of path */
         size_t j = 0;
-        for (j = 0; j < path_length / 2; ++j) {
+        for (; j < path_length / 2; ++j) {
             MultiAgentAction *a = p->policies[agent_idx]->act(MultiAgentState({l}, l.id), BENCHMARK_LONG_TIME_MS);
             l = p->env->grid->execute(l, a->actions[0]);
             delete a;
         }
+        int mountain_dim = min(5, path_length / 4);
 
-        int mountain_top = max(0, l.row - path_length  / 4);
-        int mountain_bottom = min((int) env->grid->max_row, l.row + path_length / 4);
-        int mountain_left = max(0, l.col - path_length / 4);
-        int mountain_right = min((int) env->grid->max_col, l.col + path_length / 4);
+        int mountain_top = max(0, l.row - mountain_dim);
+        int mountain_bottom = min((int) env->grid->max_row, l.row +mountain_dim);
+        int mountain_left = max(0, l.col - mountain_dim);
+        int mountain_right = min((int) env->grid->max_col, l.col + mountain_dim);
         env->add_mountain(GridArea(mountain_top, mountain_bottom, mountain_left, mountain_right));
     }
 }
