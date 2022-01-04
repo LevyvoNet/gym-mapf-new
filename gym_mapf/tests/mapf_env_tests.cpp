@@ -186,19 +186,19 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
     /* Set the expected transitions */
     list<Transition *> expected_transitions_from_wish_state(
             {
-                    new Transition(0.64,
+                    new Transition(0.49,
                                    env->locations_to_state({g.get_location(0, 2), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING + REWARD_OF_GOAL, true, false),
-                    new Transition(0.08,
+                    new Transition(0.07,
                                    env->locations_to_state({g.get_location(1, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
-                    new Transition(0.08,
+                    new Transition(0.07,
                                    env->locations_to_state({g.get_location(0, 1), g.get_location(5, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
-                    new Transition(0.08,
+                    new Transition(0.07,
                                    env->locations_to_state({g.get_location(0, 2), g.get_location(6, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
-                    new Transition(0.08,
+                    new Transition(0.07,
                                    env->locations_to_state({g.get_location(0, 2), g.get_location(6, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     new Transition(0.01,
@@ -220,7 +220,7 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
         t->p = round(t->p * 100) / 100;
     }
 
-
+    /* TODO: expected_transitions_from_wish_state does not contain stay failures, its old and should be updated */
 //    ASSERT_TRUE(list_equal_no_order(*transitions, expected_transitions_from_wish_state));
 }
 
@@ -1344,73 +1344,75 @@ TEST(MapfEnvTests, MountainsEmptyGrid) {
     }
 
     /* Set the expected transitions */
+    double agent_in_mountain_success_prob = 1.0- (2+MOUNTAIN_NOISE_FACTOR)*(env->fail_prob/3);
+    double agent_in_mountain_stay_prob = MOUNTAIN_NOISE_FACTOR * (env->fail_prob/3);
     list<Transition *> expected_transitions(
             {
                     // (RIGHT, UP)
-                    new Transition(0.4 * 0.7,
+                    new Transition(agent_in_mountain_success_prob * 0.7,
                                    env->locations_to_state({g.get_location(3, 3), g.get_location(2, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (RIGHT, RIGHT)
-                    new Transition(0.4 * 0.1,
+                    new Transition(agent_in_mountain_success_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 3), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (RIGHT, LEFT)
-                    new Transition(0.4 * 0.1,
+                    new Transition(agent_in_mountain_success_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 3), g.get_location(3, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (RIGHT, STAY)
-                    new Transition(0.4 * 0.1,
+                    new Transition(agent_in_mountain_success_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 3), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
 
                     // (UP, UP)
-                    new Transition(0.2 * 0.7,
+                    new Transition(0.1 * 0.7,
                                    env->locations_to_state({g.get_location(2, 2), g.get_location(2, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (UP, RIGHT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(2, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (UP, LEFT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(2, 2), g.get_location(3, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (UP, STAY)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(2, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
 
                     // (DOWN, UP)
-                    new Transition(0.2 * 0.7,
+                    new Transition(0.1 * 0.7,
                                    env->locations_to_state({g.get_location(4, 2), g.get_location(2, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (DOWN, RIGHT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(4, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (DOWN, LEFT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(4, 2), g.get_location(3, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (DOWN, STAY)
-                    new Transition(0.2 * 0.1,
+                    new Transition(0.1 * 0.1,
                                    env->locations_to_state({g.get_location(4, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
 
                     // (STAY, UP)
-                    new Transition(0.2 * 0.7,
+                    new Transition(agent_in_mountain_stay_prob * 0.7,
                                    env->locations_to_state({g.get_location(3, 2), g.get_location(2, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (STAY, RIGHT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(agent_in_mountain_stay_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (STAY, LEFT)
-                    new Transition(0.2 * 0.1,
+                    new Transition(agent_in_mountain_stay_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 2), g.get_location(3, 6)}),
                                    2 * REWARD_OF_LIVING, false, false),
                     // (STAY, STAY)
-                    new Transition(0.2 * 0.1,
+                    new Transition(agent_in_mountain_stay_prob * 0.1,
                                    env->locations_to_state({g.get_location(3, 2), g.get_location(3, 7)}),
                                    2 * REWARD_OF_LIVING, false, false),
             });

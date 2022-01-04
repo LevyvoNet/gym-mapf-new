@@ -63,8 +63,10 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
 
 
 int main(int argc, char **argv) {
-    render_solver_on_env( new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
-                         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")));
+    render_solver_on_env(
+            new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+            new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""))
+    );
 
     return 0;
 }

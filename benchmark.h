@@ -259,7 +259,7 @@ void add_mountains_to_env(MapfEnv *env) {
             l = p->env->grid->execute(l, a->actions[0]);
             delete a;
         }
-        int mountain_dim = min(5, path_length / 4);
+        int mountain_dim = min(3, path_length / 8);
 
         int mountain_top = max(0, l.row - mountain_dim);
         int mountain_bottom = min((int) env->grid->max_row, l.row +mountain_dim);

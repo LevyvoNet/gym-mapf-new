@@ -73,7 +73,7 @@ public:
 
 };
 
-#define MOUNTAIN_NOISE_FACTOR (2)
+#define MOUNTAIN_NOISE_FACTOR (5)
 
 class MapfEnv {
 private:
@@ -140,6 +140,8 @@ public:
     MultiAgentAction *id_to_action(int64_t id);
 
     void add_mountain(GridArea mountain_area);
+
+    bool is_in_mountain(const Location& l);
 };
 
 MapfEnv *get_local_view(MapfEnv *, vector<size_t> agents);
