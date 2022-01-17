@@ -2,8 +2,8 @@
 // Created by levyvonet on 19/11/2021.
 //
 
-#ifndef GYM_MAPF_UTILS_H
-#define GYM_MAPF_UTILS_H
+#ifndef GYM_MAPF_SOLVERS_UTILS_H
+#define GYM_MAPF_SOLVERS_UTILS_H
 
 using namespace std;
 
@@ -27,4 +27,4 @@ public:
 
 
 
-#endif //GYM_MAPF_UTILS_H
+#endif //GYM_MAPF_SOLVERS_UTILS_H

@@ -17,12 +17,37 @@ include_directories(. gym_mapf solvers third-party/hopscotch-map/include)
 add_executable(
         main
         main.cpp
-        benchmark.h
+        benchmark/available_solvers_envs.h
+        benchmark/available_solvers_envs.cpp
+        benchmark/utils.h
+        benchmark/utils.cpp
+        benchmark/infra.h
+        benchmark/infra.cpp
+)
+
+add_executable(
+        sanity_benchmark
+        sanity_benchmark.cpp
+        benchmark/available_solvers_envs.h
+        benchmark/available_solvers_envs.cpp
+        benchmark/utils.h
+        benchmark/utils.cpp
+        benchmark/infra.h
+        benchmark/infra.cpp
 )
 
 
 target_link_libraries(
         main
+
+        $<TARGET_OBJECTS:gym_mapf>
+        $<TARGET_OBJECTS:gym_mapf_solvers>
+
+        tsl::hopscotch_map
+)
+
+target_link_libraries(
+        sanity_benchmark
 
         $<TARGET_OBJECTS:gym_mapf>
         $<TARGET_OBJECTS:gym_mapf_solvers>

@@ -11,7 +11,8 @@
 
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
-#include <benchmark.h>
+#include "benchmark/available_solvers_envs.h"
+#include "benchmark/utils.h"
 
 /** Results ********************************************************************************************************/
 std::string RESULT_OK = "OK";
@@ -26,13 +27,13 @@ std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
 
-class InstanceResult {
+class TestResult {
 public:
     std::string env;
     std::string solver;
     std::string result;
 
-    InstanceResult(std::string env, std::string solver, std::string result) :
+    TestResult(std::string env, std::string solver, std::string result) :
             solver(solver), env(env), result(result) {}
 };
 
@@ -61,19 +62,16 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 3 */
                 {
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
-                        new RoomEnv("room-64-64-8-scen_1_9-agents", 64, 8, 1, 9),
+                        new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
                         new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
-                        new EmptyGrid("empty_32X32_6_agents", 32, 6, 0),
-                        new EmptyGrid("empty_48X48_4_agents", 48, 4, 0),
-                        new EmptyGrid("empty_48X48_6_agents", 48, 6, 0),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 }
         }
 );
@@ -92,19 +90,19 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-                         new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }
 );
@@ -130,7 +128,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
                                                  EPISODE_TIMEOUT_MS - ELAPSED_TIME_MS);
 
     /* Print results */
-    std::cout << "MDR:" << eval_info->mdr;
+    std::cout << "ADR:" << eval_info->mdr;
     std::cout << " rate:" << eval_info->success_rate << "%";
     std::cout << " total_time:" << eval_info->mean_episode_time + train_info->time;
     std::cout << " exec_time:" << eval_info->mean_episode_time;
@@ -166,10 +164,13 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 }
 
 
+
+
+
 int run_benchmarks() {
-    vector<InstanceResult> results;
+    vector<TestResult> results;
     std::string result = RESULT_ERROR;
-    InstanceResult instance_result("", "", "");
+    TestResult instance_result("", "", "");
     int fds[2] = {0};
     pid_t pid = 0;
     ssize_t written_bytes = 0;
@@ -205,13 +206,13 @@ int run_benchmarks() {
                         close(fds[1]);
                         waitpid_result = waitpid(pid, &child_status, 0);
                         if (child_status != 0) {
-                            instance_result = InstanceResult(env_creator->name,
-                                                             solver_creator->name,
-                                                             RESULT_CHILD_ERROR);
+                            instance_result = TestResult(env_creator->name,
+                                                         solver_creator->name,
+                                                         RESULT_CHILD_ERROR);
                         } else {
                             read_result = read(fds[0], c_result, 20);
-                            instance_result = InstanceResult(env_creator->name, solver_creator->name,
-                                                             std::string(c_result));
+                            instance_result = TestResult(env_creator->name, solver_creator->name,
+                                                         std::string(c_result));
                         }
                         results.push_back(instance_result);
                     }
@@ -224,7 +225,7 @@ int run_benchmarks() {
     cout << endl;
 
     bool error_occurred = false;
-    for (InstanceResult r: results) {
+    for (TestResult r: results) {
         if (r.result != RESULT_OK) {
             cout << r.env << ", " << r.solver << ": " << r.result << endl;
             error_occurred = true;
