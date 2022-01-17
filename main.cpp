@@ -48,8 +48,8 @@ vector<vector<EnvCreator *>> env_creators(
                         new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
