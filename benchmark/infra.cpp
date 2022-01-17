@@ -43,6 +43,7 @@ struct problem_instance_result solve(struct problem_instance problem,
                                                  timeout_ms - ELAPSED_TIME_MS);
 
     /* Set res fields */
+    res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
     strncpy(res.env_name, problem.env_creator->name.c_str(), MAX_ENV_NAME);
     strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
@@ -108,6 +109,7 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
         read_result = read(worker_data.fd, &result, sizeof(result));
         if (0 > read_result) {
             result.status = PROBLEM_FAIL;
+            result.id = worker_data.problem_id;
             return result;
         }
 
