@@ -100,7 +100,6 @@ list<problem_instance> *generate_problems() {
 
     for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
         for (EnvCreator *env_creator: env_creators[env_lvl]) {
-            cout << endl << env_creator->name << endl;
             for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
                 for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
                     struct problem_instance problem;
@@ -134,6 +133,7 @@ public:
 int main(int argc, char **argv) {
     list<problem_instance> *problems = nullptr;
     bool sanity_test_failed = false;
+    std::string last_name = "";
 
     /* Generate the problmes to solve */
     problems = generate_problems();
@@ -147,6 +147,10 @@ int main(int argc, char **argv) {
     for (problem_instance_result result: db.results) {
         if (PROBLEM_STATUS_FAILED(result)) {
             sanity_test_failed = true;
+        }
+        if (std::string(result.env_name) != last_name) {
+            cout << endl << std::string(result.env_name) << endl;
+            last_name = std::string(result.env_name);
         }
 
         std::cout << "ADR:" << result.adr;
