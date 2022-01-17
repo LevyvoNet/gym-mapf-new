@@ -135,7 +135,7 @@ int main(int argc, char **argv) {
     bool sanity_test_failed = false;
     std::string last_name = "";
 
-    /* Generate the problmes to solve */
+    /* Generate the problems to solve */
     problems = generate_problems();
 
     /* Create the sanity benchmark db */
@@ -145,7 +145,7 @@ int main(int argc, char **argv) {
 
     /* Print every result */
     for (problem_instance_result result: db.results) {
-        if (PROBLEM_STATUS_FAILED(result)) {
+        if (PROBLEM_STATUS_FAILED(result) || result.timeout_rate > 0) {
             sanity_test_failed = true;
         }
         if (std::string(result.env_name) != last_name) {
