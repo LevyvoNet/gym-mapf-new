@@ -14,10 +14,14 @@
 #include "benchmark/utils.h"
 
 /** Constants *******************************************************************************************************/
+#define MAX_ENV_NAME (100)
+#define MAX_SOLVER_NAME (50)
+
 #define BGU_CLUSTER_WORKER_LIMIT (20)
 #define POLL_SLEEP_TIME_nS (200000)
 
 #define ANY_CHILD (-1)
+
 
 
 /** Structs *********************************************************************************************************/
@@ -45,8 +49,8 @@ struct problem_instance_result {
     int id;
 
     problem_status_code status;
-    char env_name[30];
-    char solver_name[30];
+    char env_name[MAX_ENV_NAME];
+    char solver_name[MAX_SOLVER_NAME];
     double adr;
     int rate;
     double total_time;

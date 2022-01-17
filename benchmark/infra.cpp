@@ -44,8 +44,8 @@ struct problem_instance_result solve(struct problem_instance problem,
 
     /* Set res fields */
     res.id = problem.id;
-    strncpy(res.env_name, problem.env_creator->name.c_str(), 30);
-    strncpy(res.solver_name, policy->name.c_str(), 30);
+    strncpy(res.env_name, problem.env_creator->name.c_str(), MAX_ENV_NAME);
+    strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
     res.adr = eval_info->mdr;
     res.rate = eval_info->success_rate;
     res.total_time = eval_info->mean_episode_time + train_info->time;
