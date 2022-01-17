@@ -21,7 +21,7 @@
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
-#define WORKERS_LIMIT (4)
+#define WORKERS_LIMIT (2)
 
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
