@@ -89,10 +89,12 @@ void IdPolicy::train(double timeout_ms) {
     CrossedPolicy *curr_joint_policy = nullptr;
     CrossedPolicy *prev_joint_policy = nullptr;
     vector<vector<size_t>> groups(env->n_agents);
+    std::chrono::steady_clock::time_point begin = std::chrono::steady_clock::now();
+    std::chrono::steady_clock::time_point end;
     size_t conflicts_count = 0;
+    std::chrono::steady_clock::time_point conflict_begin;
     float conflict_detection_ms = 0;
-    clock_t conflict_begin = 0;
-    MEASURE_TIME;
+    const auto start_time = clk::now();
 
 
     /* Solve Independently for each agent */
@@ -111,12 +113,12 @@ void IdPolicy::train(double timeout_ms) {
     /* Search for conflicts and merge iteratively */
     do {
         /* Check for conflict */
-        conflict_begin = clock();
+        conflict_begin = clk::now();
         conflict = detect_conflict(curr_joint_policy, timeout_ms - ELAPSED_TIME_MS);
-        if (ELAPSED_TIME_MS >= timeout_ms) {
+        if (ELAPSED_TIME_MS >= timeout_ms){
             return;
         }
-        conflict_detection_ms += (((double) (clock() - conflict_begin)) / CLOCKS_PER_SEC) * 1000;
+        conflict_detection_ms += ((ms) (clk::now() - conflict_begin)).count();
 
         if (nullptr != conflict) {
             /* Merge the groups of the agents in the conflict */

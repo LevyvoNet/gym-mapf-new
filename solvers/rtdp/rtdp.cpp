@@ -134,13 +134,13 @@ void RtdpPolicy::train(double timeout_ms) {
             delete prev_eval_info;
         }
         prev_eval_info = eval_info;
-        const clock_t eval_begin = clock();
+        const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
         eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 100);
         this->in_train = true;
-        const clock_t eval_end = clock();
-        total_eval_time += (((double) (eval_end - eval_begin)) / CLOCKS_PER_SEC) * 1000;
+        const auto eval_end = clk::now();
+        total_eval_time += ((ms)(eval_end - eval_begin)).count();
 
         /* Check if there is no improvement since the last batch */
         if (should_stop(prev_eval_info, eval_info)) {

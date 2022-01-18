@@ -17,7 +17,7 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (180)
+#define EPISODE_TIMEOUT_SEC (300)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
