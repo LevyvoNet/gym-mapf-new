@@ -34,13 +34,14 @@ vector<vector<EnvCreator *>> env_creators(
                         new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+
                 },
                 /* lvl 1 */
                 {
                         new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
                         new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
@@ -51,13 +52,14 @@ vector<vector<EnvCreator *>> env_creators(
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 },
                 /* lvl 4 */
                 {
                         new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
                         new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+
                 }
         }
 );
@@ -71,24 +73,24 @@ vector<vector<SolverCreator *>> solver_creators(
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-//                        new id_rtdp_default("id_rtdp_default"),
-//                        new id_rtdp("id_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
-//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }
 );
