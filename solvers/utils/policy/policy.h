@@ -13,7 +13,7 @@
 #include <gym_mapf/gym_mapf.h>
 
 using ms = std::chrono::duration<double, std::milli>;
-using clk = std::chrono::steady_clock;
+using clk = std::chrono::system_clock;
 
 #define ELAPSED_TIME_MS (((ms)(clk::now() - start_time)).count())
 #define MEASURE_TIME const auto start_time = clk::now()
