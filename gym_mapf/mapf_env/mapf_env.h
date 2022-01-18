@@ -121,7 +121,7 @@ public:
 
     ~MapfEnv();
 
-    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache = true);
+    TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache = false);
 
     void step(const MultiAgentAction &action,
               MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
