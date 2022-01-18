@@ -21,21 +21,21 @@
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
-#define WORKERS_LIMIT (1)
+#define WORKERS_LIMIT (2)
 
 /** Constants *******************************************************************************************************/
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
                         new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 1 */
                 {
@@ -161,6 +161,7 @@ int main(int argc, char **argv) {
         std::cout << " timeout_rate:" << result.timeout_rate << "%";
         std::cout << " stuck_rate:" << result.stuck_rate << "%";
         std::cout << " solver:" << std::string(result.solver_name);
+        cout << endl;
     }
 
     if (sanity_test_failed) {
