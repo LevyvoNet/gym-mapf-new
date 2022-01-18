@@ -37,12 +37,10 @@ struct problem_instance_result solve(struct problem_instance problem,
 
     /* Train and evaluate */
     policy->train(timeout_ms);
-    cout << "*********done train " << problem.env_creator->name << endl;
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(episode_count,
                                                  max_steps,
                                                  timeout_ms - ELAPSED_TIME_MS);
-    cout << "******** done eval " << problem.env_creator->name << " timeout_rate="<<eval_info->timeout_rate << endl;
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
@@ -135,7 +133,6 @@ void solve_problems(list<struct problem_instance> *problems,
             /* Add another worker */
             workers.push_back(spawn_worker(workers, *problems->begin(), episode_timeout_ms, eval_episodes_count, max_steps));
             problems->erase(problems->begin());
-            ++finished_count;
         }
 
         /* Iterate over all workers, if one of them finished, clear it */
@@ -149,6 +146,7 @@ void solve_problems(list<struct problem_instance> *problems,
                 worker_to_delete = worker_iter;
                 struct problem_instance_result problem_result = read_result(*worker_iter);
                 db->insert(problem_result);
+                ++finished_count;
                 cout << "finished " << finished_count << "/" << problems_count << endl;
                 worker_to_delete = worker_iter;
             }
