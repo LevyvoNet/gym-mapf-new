@@ -6,19 +6,23 @@
 #define GYM_MAPF_POLICY_H
 
 #include <unordered_map>
-//#include <chrono>
+#include <chrono>
 #include <cmath>
-#include <time.h>
+//#include <time.h>
 
 #include <gym_mapf/gym_mapf.h>
 
-//using ms = std::chrono::duration<double, std::milli>;
-//using clk = std::chrono::steady_clock;
+using ms = std::chrono::duration<double, std::milli>;
+using clk = std::chrono::system_clock;
 
-#define ELAPSED_TIME_SEC (((double) (clock() - start_time)) / CLOCKS_PER_SEC)
-#define ELAPSED_TIME_MS (ELAPSED_TIME_SEC * 1000)
-#define MEASURE_TIME const clock_t start_time = clock()
+#define ELAPSED_TIME_MS (((ms)(clk::now() - start_time)).count())
+#define MEASURE_TIME const auto start_time = clk::now()
 #define EPISODES_TIMEOUT_LIMIT (3)
+
+//#define ELAPSED_TIME_SEC (((double) (clock() - start_time)) / CLOCKS_PER_SEC)
+//#define ELAPSED_TIME_MS (ELAPSED_TIME_SEC * 1000)
+//#define MEASURE_TIME const clock_t start_time = clock()
+//#define EPISODES_TIMEOUT_LIMIT (3)
 
 class EpisodeInfo{
 public:
