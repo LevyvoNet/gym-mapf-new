@@ -37,11 +37,12 @@ struct problem_instance_result solve(struct problem_instance problem,
 
     /* Train and evaluate */
     policy->train(timeout_ms);
+    cout << "*********done train " << problem.env_creator->name << endl;
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(episode_count,
                                                  max_steps,
                                                  timeout_ms - ELAPSED_TIME_MS);
-
+    cout << "******** done eval " << problem.env_creator->name << endl;
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
