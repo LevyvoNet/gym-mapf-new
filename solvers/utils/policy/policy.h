@@ -15,8 +15,9 @@
 //using ms = std::chrono::duration<double, std::milli>;
 //using clk = std::chrono::steady_clock;
 
-#define ELAPSED_TIME_MS ((clock()/ CLOCKS_PER_SEC) * 1000)
-#define MEASURE_TIME (1) //const auto start_time = clk::now()
+#define ELAPSED_TIME_SEC (((double) (clock() - start_time)) / CLOCKS_PER_SEC)
+#define ELAPSED_TIME_MS (ELAPSED_TIME_SEC * 1000)
+#define MEASURE_TIME const clock_t start_time = clock()
 #define EPISODES_TIMEOUT_LIMIT (3)
 
 class EpisodeInfo{

@@ -24,7 +24,6 @@ ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const stri
 
 
 void ValueIterationPolicy::train(double timeout_milliseconds) {
-    const auto start_time = clk::now();
     size_t i = 0;
     MultiAgentStateIterator *s = this->env->observation_space->begin();
     MultiAgentActionIterator a = this->env->action_space->begin();
@@ -37,6 +36,8 @@ void ValueIterationPolicy::train(double timeout_milliseconds) {
     MultiAgentStateIterator *state_end = this->env->observation_space->end();
     int states_count = 0;
     double value = 0;
+
+    MEASURE_TIME;
 
     for (i = 0; i < MAX_ITERATIONS; i++) {
         /* Perform a full iteration */
