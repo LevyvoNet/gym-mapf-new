@@ -42,7 +42,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     EvaluationInfo *eval_info = policy->evaluate(episode_count,
                                                  max_steps,
                                                  timeout_ms - ELAPSED_TIME_MS);
-    cout << "******** done eval " << problem.env_creator->name << endl;
+    cout << "******** done eval " << problem.env_creator->name << " timeout_rate="<<eval_info->timeout_rate << endl;
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
