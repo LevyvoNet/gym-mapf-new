@@ -26,6 +26,8 @@ struct problem_instance_result solve(struct problem_instance problem,
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
 
+    kill(getpid(), 9);
+
     /* Create the policy */
     env = (*problem.env_creator)();
     policy = (*problem.solver_creator)(env, 1.0);
@@ -90,6 +92,8 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
     else {
         close(fds[1]);
         struct worker_data new_worker;
+        strncpy(new_worker.env_name, problem.env_creator->name.c_str(), MAX_ENV_NAME);
+        strncpy(new_worker.solver_name, problem.solver_creator->name.c_str(), MAX_SOLVER_NAME);
         new_worker.problem_id = problem.id;
         new_worker.pid = pid;
         new_worker.fd = fds[0];
@@ -106,11 +110,14 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
 
     do {
         read_result = read(worker_data.fd, &result, sizeof(result));
-        if (0 > read_result) {
+        if (0 >= read_result) {
             result.status = PROBLEM_FAIL;
             result.id = worker_data.problem_id;
+            strncpy(result.env_name, worker_data.env_name, MAX_ENV_NAME);
+            strncpy(result.solver_name, worker_data.solver_name, MAX_SOLVER_NAME);
             return result;
         }
+
 
         read_bytes += read_result;
     } while (read_bytes < sizeof(result));
@@ -131,7 +138,8 @@ void solve_problems(list<struct problem_instance> *problems,
     while (problems->size() > 0 || workers.size() > 0) {
         while (problems->size() > 0 && workers.size() < workers_limit) {
             /* Add another worker */
-            workers.push_back(spawn_worker(workers, *problems->begin(), episode_timeout_ms, eval_episodes_count, max_steps));
+            workers.push_back(
+                    spawn_worker(workers, *problems->begin(), episode_timeout_ms, eval_episodes_count, max_steps));
             problems->erase(problems->begin());
         }
 

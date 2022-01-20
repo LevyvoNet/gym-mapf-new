@@ -30,6 +30,9 @@ struct worker_data {
     int problem_id;
     pid_t pid;
     int fd;
+
+    char env_name[MAX_ENV_NAME];
+    char solver_name[MAX_SOLVER_NAME];
 };
 
 struct problem_instance {
