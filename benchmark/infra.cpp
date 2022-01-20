@@ -26,8 +26,6 @@ struct problem_instance_result solve(struct problem_instance problem,
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
 
-    kill(getpid(), 9);
-
     /* Create the policy */
     env = (*problem.env_creator)();
     policy = (*problem.solver_creator)(env, 1.0);

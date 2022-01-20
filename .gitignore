@@ -24,3 +24,4 @@ solvers/tests/solvers_ut
 .cmake/*
 CMakeCache.txt
 sanity_benchmark
+real_benchmark

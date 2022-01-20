@@ -1,4 +1,8 @@
 //
+// Created by levyvonet on 20/01/2022.
+//
+
+//
 // Created by levyvonet on 17/01/2022.
 //
 
@@ -119,16 +123,44 @@ list<problem_instance> *generate_problems() {
 }
 
 
-class SanityBenchmarksResultDatabase : public ResultDatabase {
+class CsvResultDataBase : public ResultDatabase {
 public:
-    vector<struct problem_instance_result> results;
+    string file_name;
+    ofstream csv_file;
 
-    SanityBenchmarksResultDatabase(int problems_count) {
-        this->results = vector<struct problem_instance_result>(problems_count);
+    CsvResultDataBase(string name) {
+        std::ostringstream file_name;
+        file_name << name << ".csv";
+        this->file_name = file_name.str();
+
+        /* Open the file */
+        this->csv_file.open(this->file_name, ios::ate);
+
+        /* Write the columns name row */
+        this->csv_file << "col1" << "col2";
+
+        this->csv_file.close();
     }
 
     virtual void insert(struct problem_instance_result result) {
-        this->results[result.id] = result;
+
+        /* Open the file */
+        this->csv_file.open(this->file_name, ios::ate);
+
+        this->csv_file << result.env_name;
+        this->csv_file << "," << result.solver_name;
+        this->csv_file << "," << result.adr;
+        this->csv_file << "," << result.rate;
+        this->csv_file << "," << result.total_time;
+        this->csv_file << "," << result.exec_time;
+        this->csv_file << "," << result.train_time;
+        this->csv_file << "," << result.timeout_rate;
+        this->csv_file << "," << result.stuck_rate;
+        this->csv_file << "," << result.collision_rate;
+
+        this->csv_file << endl;
+
+        this->csv_file.close();
     }
 };
 
@@ -141,35 +173,10 @@ int main(int argc, char **argv) {
     problems = generate_problems();
 
     /* Create the sanity benchmark db */
-    SanityBenchmarksResultDatabase db(problems->size());
+    CsvResultDataBase db("test");
 
     solve_problems(problems, WORKERS_LIMIT, &db, EPISODE_TIMEOUT_MS, EPISODE_COUNT, MAX_STEPS);
 
-    /* Print every result */
-    for (problem_instance_result result: db.results) {
-        if (PROBLEM_STATUS_FAILED(result) || result.timeout_rate > 0) {
-            sanity_test_failed = true;
-        }
-        if (std::string(result.env_name) != last_name) {
-            cout << endl << std::string(result.env_name) << endl;
-            last_name = std::string(result.env_name);
-        }
-
-        std::cout << "ADR:" << result.adr;
-        std::cout << " rate:" << result.rate << "%";
-        std::cout << " total_time:" << result.total_time;
-        std::cout << " exec_time:" << result.exec_time;
-        std::cout << " train_time:" << result.train_time;
-        std::cout << " timeout_rate:" << result.timeout_rate << "%";
-        std::cout << " stuck_rate:" << result.stuck_rate << "%";
-        std::cout << " collision_rate:" << result.collision_rate << "%";
-        std::cout << " solver:" << std::string(result.solver_name);
-        cout << endl;
-    }
-
-    if (sanity_test_failed) {
-        return 1;
-    }
     return 0;
 
 }
