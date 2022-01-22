@@ -25,98 +25,68 @@
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
-#define WORKERS_LIMIT (1)
+#define WORKERS_LIMIT (20)
 
 /** Constants *******************************************************************************************************/
-vector<vector<EnvCreator *>> env_creators(
-        {   /* lvl 0 */
-                {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+#define MIN_SCEN_ID (1)
+#define MAX_SCEN_ID (25)
+#define MIN_AGENTS (1)
+#define MAX_AGENTS (2)
+vector<string> MAPS{
+        "empty-8-8",
+//        "empty-16-16",
+//        "empty-32-32",
+//        "empty-48-48",
 
-                },
-                /* lvl 1 */
-                {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
-                },
-                /* lvl 2 */
-                {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
-                },
-                /* lvl 3 */
-                {
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-                },
-                /* lvl 4 */
-                {
-                        new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
-                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
+//        "room-32-32-4",
+//        "room-64-64-8",
+//        "room-64-64-16",
 
-                }
+//    "maze-128-128-10",
+
+};
+
+vector<SolverCreator *> SOLVERS{
+        new vi("vi"),
+        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+        new id_rtdp("id_rtdp"),
+        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
+        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+};
+
+vector<EnvCreator *> generate_env_creators() {
+    vector<EnvCreator *> res;
+    for (string map: MAPS) {
+        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; ++n_agents) {
+            for (size_t scen_id = MIN_SCEN_ID; scen_id <= MAX_SCEN_ID; ++scen_id) {
+                std::ostringstream env_name;
+                env_name << map << "_scen" << "-" << scen_id << "_agents=" << n_agents;
+                res.push_back(new GeneralEnv(env_name.str(), map, scen_id, n_agents));
+            }
         }
-);
 
-vector<vector<SolverCreator *>> solver_creators(
-        {   /* lvl 0 */
-                {
-                        new vi("vi"),
+    }
 
-                },
-
-                /* lvl 1 */
-                {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
-
-                },
-                /* lvl 2 */
-                {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-                },
-                /* lvl 3 */
-                {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
-                },
-                /* lvl 4 */
-                {
-                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
-                }
-        }
-);
+    return res;
+}
 
 
 list<problem_instance> *generate_problems() {
     list<problem_instance> *res = new list<problem_instance>();
     int id_iter = 0;
-
-    for (size_t env_lvl = 0; env_lvl < env_creators.size(); ++env_lvl) {
-        for (EnvCreator *env_creator: env_creators[env_lvl]) {
-            for (size_t solver_lvl = env_lvl; solver_lvl < solver_creators.size(); ++solver_lvl) {
-                for (SolverCreator *solver_creator: solver_creators[solver_lvl]) {
-                    struct problem_instance problem;
-                    problem.solver_creator = solver_creator;
-                    problem.env_creator = env_creator;
-                    problem.id = id_iter;
-                    ++id_iter;
-                    res->push_back(problem);
-                }
-            }
+    vector<EnvCreator *> env_creators = generate_env_creators();
+    for (EnvCreator *env_creator: env_creators) {
+        for (SolverCreator *solver_creator: SOLVERS) {
+            struct problem_instance problem;
+            problem.solver_creator = solver_creator;
+            problem.env_creator = env_creator;
+            problem.id = id_iter;
+            ++id_iter;
+            res->push_back(problem);
         }
+
     }
 
     return res;
@@ -134,7 +104,18 @@ public:
         this->file_name = file_name.str();
 
         /* Open the file */
-        this->csv_file.open(this->file_name, ios::ate);
+        this->csv_file.open(this->file_name, ios::out);
+
+        this->csv_file << "env_name";
+        this->csv_file << "," << "solver_name";
+        this->csv_file << "," << "adr";
+        this->csv_file << "," << "rate";
+        this->csv_file << "," << "total_time";
+        this->csv_file << "," << "exec_time";
+        this->csv_file << "," << "train_time";
+        this->csv_file << "," << "timeout_rate";
+        this->csv_file << "," << "stuck_rate";
+        this->csv_file << "," << "collision_rate";
 
         /* Write the columns name row */
         this->csv_file << "col1" << "col2";
@@ -145,7 +126,7 @@ public:
     virtual void insert(struct problem_instance_result result) {
 
         /* Open the file */
-        this->csv_file.open(this->file_name, ios::ate);
+        this->csv_file.open(this->file_name, ios::app);
 
         this->csv_file << result.env_name;
         this->csv_file << "," << result.solver_name;
@@ -165,17 +146,18 @@ public:
 };
 
 int main(int argc, char **argv) {
-    list<problem_instance> *problems = nullptr;
-    bool sanity_test_failed = false;
-    std::string last_name = "";
+    list<problem_instance> *problems = generate_problems();
 
-    /* Generate the problems to solve */
-    problems = generate_problems();
 
     /* Create the sanity benchmark db */
-    CsvResultDataBase db("test");
+    CsvResultDataBase db(argv[1]);
 
-    solve_problems(problems, WORKERS_LIMIT, &db, EPISODE_TIMEOUT_MS, EPISODE_COUNT, MAX_STEPS);
+    solve_problems(problems,
+                   WORKERS_LIMIT,
+                   &db,
+                   EPISODE_TIMEOUT_MS,
+                   EPISODE_COUNT,
+                   MAX_STEPS);
 
     return 0;
 

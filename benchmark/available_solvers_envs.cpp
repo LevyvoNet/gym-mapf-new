@@ -108,6 +108,15 @@ MapfEnv *BerlinEnv::operator()() {
     return create_mapf_env("Berlin_1_256", this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
+MapfEnv *GeneralEnv::operator()() {
+    return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, 1);
+}
+
+GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name),
+                                                                                        n_agents(n_agents),
+                                                                                        scen_id(scen_id) {}
+
+
 /** Policies *******************************************************************************************************/
 vi::vi(string name) : SolverCreator(name) {}
 
@@ -152,3 +161,4 @@ dijkstra_baseline::dijkstra_baseline(string name) : SolverCreator(name) {}
 Policy *dijkstra_baseline::operator()(MapfEnv *env, float gamma) {
     return new DijkstraBaselinePolicy(env, gamma, this->name);
 }
+

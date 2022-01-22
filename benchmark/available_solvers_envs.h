@@ -92,6 +92,19 @@ public:
     virtual MapfEnv *operator()();
 };
 
+
+class GeneralEnv: public EnvCreator{
+public:
+    string map_name;
+    size_t scen_id;
+    size_t n_agents;
+
+    GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents);
+
+    virtual MapfEnv *operator()();
+
+
+};
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
