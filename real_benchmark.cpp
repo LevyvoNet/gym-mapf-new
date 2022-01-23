@@ -25,11 +25,11 @@
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define EPISODE_COUNT (30)
-#define WORKERS_LIMIT (20)
+#define WORKERS_LIMIT (2)
 
 /** Constants *******************************************************************************************************/
-#define MIN_SCEN_ID (1)
-#define MAX_SCEN_ID (25)
+#define MIN_SCEN_ID (3)
+#define MAX_SCEN_ID (3)
 #define MIN_AGENTS (1)
 #define MAX_AGENTS (2)
 vector<string> MAPS{

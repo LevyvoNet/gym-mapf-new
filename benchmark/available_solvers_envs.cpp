@@ -113,6 +113,7 @@ MapfEnv *GeneralEnv::operator()() {
 }
 
 GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name),
+                                                                                        map_name(map_name),
                                                                                         n_agents(n_agents),
                                                                                         scen_id(scen_id) {}
 
