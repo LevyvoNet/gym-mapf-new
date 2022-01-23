@@ -109,7 +109,7 @@ MapfEnv *BerlinEnv::operator()() {
 }
 
 MapfEnv *GeneralEnv::operator()() {
-    return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, 1);
+    return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
 GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name),
