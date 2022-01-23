@@ -118,7 +118,6 @@ public:
         this->csv_file << "," << "collision_rate";
 
         /* Write the columns name row */
-        this->csv_file << "col1" << "col2";
 
         this->csv_file.close();
     }
@@ -128,6 +127,8 @@ public:
         /* Open the file */
         this->csv_file.open(this->file_name, ios::app);
 
+        
+        /* Write the column names row */
         this->csv_file << result.env_name;
         this->csv_file << "," << result.solver_name;
         this->csv_file << "," << result.adr;
