@@ -55,6 +55,52 @@ struct problem_instance_result solve(struct problem_instance problem,
     res.stuck_rate = eval_info->stuck_rate;
     res.collision_rate = eval_info->collision_rate;
 
+    string field_value;
+    /* Set solvers train additional data */
+    field_value = "-";
+    if (train_info->additional_data->find("n_iterations") != train_info->additional_data->end()) {
+        field_value = (*(train_info->additional_data))["n_iterations"];
+    }
+    strncpy(res.n_iterations, field_value.c_str(), 8);
+
+    field_value = "-";
+    if (train_info->additional_data->find("conflicts_time") != train_info->additional_data->end()) {
+        field_value = (*(train_info->additional_data))["conflicts_time"];
+    }
+    strncpy(res.conflicts_time, field_value.c_str(), 8);
+
+    field_value = "-";
+    if (train_info->additional_data->find("n_conflicts") != train_info->additional_data->end()) {
+        field_value = (*(train_info->additional_data))["n_conflicts"];
+    }
+    strncpy(res.n_conflicts, field_value.c_str(), 8);
+
+    field_value = "-";
+    if (train_info->additional_data->find("eval_time") != train_info->additional_data->end()) {
+        field_value = (*(train_info->additional_data))["eval_time"];
+    }
+    strncpy(res.eval_time, field_value.c_str(), 8);
+
+    field_value = "-";
+    if (train_info->additional_data->find("init_time") != train_info->additional_data->end()) {
+        field_value = (*(train_info->additional_data))["init_time"];
+    }
+    strncpy(res.init_time, field_value.c_str(), 8);
+
+
+    /* Set solvers evaluation additional data */
+    field_value = "-";
+    if (eval_info->additional_data->find("replans_mean") != eval_info->additional_data->end()) {
+        field_value = (*(eval_info->additional_data))["replans_mean"];
+    }
+    strncpy(res.replans_mean, field_value.c_str(), 8);
+
+    field_value = "-";
+    if (eval_info->additional_data->find("replans_max_size") != eval_info->additional_data->end()) {
+        field_value = (*(eval_info->additional_data))["replans_max_size"];
+    }
+    strncpy(res.replans_max_size, field_value.c_str(), 8);
+
     return res;
 
 }

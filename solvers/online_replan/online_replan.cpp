@@ -142,6 +142,10 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
                                    const MultiAgentState &s,
                                    double timeout_ms) {
     MEASURE_TIME;
+    /* Update information */
+    ++this->replans_count;
+    this->replans_max_size = max(group.size(), this->replans_max_size);
+
     /* Calculate the conflict area */
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
 
@@ -211,8 +215,6 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
         (*this->replans)[group] = new tsl::hopscotch_map<GridArea, Policy *>();
     }
     (*(*this->replans)[group])[conflict_area] = policy;
-    ++this->replans_count;
-    this->replans_max_size = max(group.size(), this->replans_max_size);
 
 //    /* debug print */
 //    cout << "replanned for group [";

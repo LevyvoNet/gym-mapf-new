@@ -52,13 +52,13 @@ vector<vector<EnvCreator *>> env_creators(
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
                         new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 },
                 /* lvl 4 */
                 {
                         new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
                         new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
+                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 
                 }
         }
@@ -164,6 +164,28 @@ int main(int argc, char **argv) {
         std::cout << " stuck_rate:" << result.stuck_rate << "%";
         std::cout << " collision_rate:" << result.collision_rate << "%";
         std::cout << " solver:" << std::string(result.solver_name);
+
+        if (strcmp(result.init_time, "-")) {
+            std::cout << "init_time: " << result.init_time;
+        }
+        if (strcmp(result.eval_time, "-")) {
+            std::cout << "eval_time: " << result.eval_time;
+        }
+        if (strcmp(result.replans_max_size, "-")) {
+            std::cout << "replans_max_size: " << result.replans_max_size;
+        }
+        if (strcmp(result.replans_mean, "-")) {
+            std::cout << "replans_mean: " << result.replans_mean;
+        }
+        if (strcmp(result.n_conflicts, "-")) {
+            std::cout << "n_conflicts: " << result.n_conflicts;
+        }
+        if (strcmp(result.conflicts_time, "-")) {
+            std::cout << "conflicts_time: " << result.conflicts_time;
+        }
+        if (strcmp(result.n_iterations, "-")) {
+            std::cout << "n_iterations: " << result.n_iterations;
+        }
         cout << endl;
     }
 

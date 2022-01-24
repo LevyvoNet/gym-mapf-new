@@ -23,7 +23,6 @@
 #define ANY_CHILD (-1)
 
 
-
 /** Structs *********************************************************************************************************/
 
 struct worker_data {
@@ -62,6 +61,16 @@ struct problem_instance_result {
     float timeout_rate;
     float stuck_rate;
     float collision_rate;
+
+    /* Solver proprietary information */
+    char replans_max_size[8];
+    char replans_mean[8];
+    char n_conflicts[8];
+    char eval_time[8];
+    char init_time[8];
+    char conflicts_time[8];
+    char n_iterations[8];
+
 
 };
 
