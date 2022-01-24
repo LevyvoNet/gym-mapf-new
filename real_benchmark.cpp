@@ -28,28 +28,28 @@
 #define WORKERS_LIMIT (2)
 
 /** Constants *******************************************************************************************************/
-#define MIN_SCEN_ID (3)
-#define MAX_SCEN_ID (3)
-#define MIN_AGENTS (1)
-#define MAX_AGENTS (2)
+#define MIN_SCEN_ID (1)
+#define MAX_SCEN_ID (25)
+#define MIN_AGENTS (3)
+#define MAX_AGENTS (5)
 vector<string> MAPS{
         "empty-8-8",
-//        "empty-16-16",
-//        "empty-32-32",
-//        "empty-48-48",
+        "empty-16-16",
+        "empty-32-32",
+        "empty-48-48",
 
-//        "room-32-32-4",
-//        "room-64-64-8",
-//        "room-64-64-16",
+        "room-32-32-4",
+        "room-64-64-8",
+        "room-64-64-16",
 
-//    "maze-128-128-10",
+        "maze-128-128-10",
 
 };
 
 vector<SolverCreator *> SOLVERS{
-        new vi("vi"),
-        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-        new id_rtdp("id_rtdp"),
+//        new vi("vi"),
+//        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//        new id_rtdp("id_rtdp"),
         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
         new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
         new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
