@@ -166,25 +166,25 @@ int main(int argc, char **argv) {
         std::cout << " solver:" << std::string(result.solver_name);
 
         if (strcmp(result.init_time, "-")) {
-            std::cout << "init_time: " << result.init_time;
+            std::cout << " init_time: " << result.init_time;
         }
         if (strcmp(result.eval_time, "-")) {
-            std::cout << "eval_time: " << result.eval_time;
+            std::cout << " eval_time: " << result.eval_time;
         }
         if (strcmp(result.replans_max_size, "-")) {
-            std::cout << "replans_max_size: " << result.replans_max_size;
+            std::cout << " replans_max_size: " << result.replans_max_size;
         }
         if (strcmp(result.replans_mean, "-")) {
-            std::cout << "replans_mean: " << result.replans_mean;
+            std::cout << " replans_mean: " << result.replans_mean;
         }
         if (strcmp(result.n_conflicts, "-")) {
-            std::cout << "n_conflicts: " << result.n_conflicts;
+            std::cout << " n_conflicts: " << result.n_conflicts;
         }
         if (strcmp(result.conflicts_time, "-")) {
-            std::cout << "conflicts_time: " << result.conflicts_time;
+            std::cout << " conflicts_time: " << result.conflicts_time;
         }
         if (strcmp(result.n_iterations, "-")) {
-            std::cout << "n_iterations: " << result.n_iterations;
+            std::cout << " n_iterations: " << result.n_iterations;
         }
         cout << endl;
     }

@@ -356,7 +356,7 @@ MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state, double t
 
 void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     float replans_mean = float(this->replans_sum) / this->episodes_count;
-    (*eval_info->additional_data)["replans_mean"] = std::to_string(replans_mean);
+    (*eval_info->additional_data)["replans_mean"] = std::to_string((int) round(replans_mean * 100) / 100);
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
