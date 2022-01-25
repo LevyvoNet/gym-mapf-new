@@ -54,7 +54,6 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 4 */
                 {
-                        new RoomEnv("room-64-64-8-scen_1_5-agents", 64, 8, 1, 5),
                         new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
                         new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
                         new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
