@@ -63,7 +63,6 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 3 */
                 {
                         new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-16_scen_1_3-agents", 64, 16, 1, 3),
                         new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
 
                 },
