@@ -10,10 +10,7 @@ vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
 size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
     size_t h = 0;
-    for (
-            size_t i = 0;
-            i < v.
-
+    for (size_t i = 0;i < v.
                     size();
 
             ++i) {
@@ -350,6 +347,8 @@ MultiAgentAction *OnlineReplanPolicy::act(const MultiAgentState &state, double t
         }
         delete group_action;
     }
+
+    this->prev_groups = groups;
 
     return actions_to_action(selected_actions);
 }

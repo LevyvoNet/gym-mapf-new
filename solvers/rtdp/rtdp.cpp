@@ -137,7 +137,7 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 100);
+        eval_info = this->evaluate(30, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30);
         this->in_train = true;
         const auto eval_end = clk::now();
         total_eval_time += ((ms)(eval_end - eval_begin)).count();
@@ -172,11 +172,11 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
     double h_value = 0;
     if (nullptr == value) {
         h_value = (*(this->h))(s);
-        if (this->in_train) {
-            value = new double;
-            *value = h_value;
-            this->v->set(*s, value);
-        }
+//        if (this->in_train) {
+//            value = new double;
+//            *value = h_value;
+//            this->v->set(*s, value);
+//        }
 
         return h_value;
     }

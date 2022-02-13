@@ -6,6 +6,9 @@ add_executable(
         main_visualize.cpp
         visualization.cpp
         ../benchmark/available_solvers_envs.h
+        ../benchmark/available_solvers_envs.cpp
+        ../benchmark/utils.h
+        ../benchmark/utils.cpp
 )
 
 

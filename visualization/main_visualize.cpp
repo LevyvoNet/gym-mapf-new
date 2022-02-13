@@ -5,7 +5,8 @@
 #include <gym_mapf/gym_mapf.h>
 #include <solvers/solvers.h>
 #include <visualization/visualization.h>
-#include <benchmark.h>
+#include <benchmark/utils.h>
+#include <benchmark/available_solvers_envs.h>
 #include <unistd.h>
 
 #define LONG_TIME_SEC (60)
@@ -65,7 +66,7 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
 int main(int argc, char **argv) {
     render_solver_on_env(
             new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-            new vi("vi")
+            new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""))
     );
 
     return 0;

@@ -29,9 +29,16 @@ public:
     size_t operator()(const vector<size_t> &v) const;
 };
 
+class Window {
+    vector<size_t> agents;
+    GridArea area;
+};
+
 
 class OnlineReplanPolicy : public Policy {
 private:
+    vector<vector<size_t>> prev_groups;
+
     MultiAgentAction *select_action_for_group(vector<size_t> group, const MultiAgentState &s, double timeout_ms);
 
     vector<vector<size_t>> divide_to_groups(const MultiAgentState &s);
