@@ -65,7 +65,7 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
 
 int main(int argc, char **argv) {
     render_solver_on_env(
-            new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+            new MazeEnv("maze-128-128-10_scen_2_10-agents", 128, 10, 2, 10),
             new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""))
     );
 
