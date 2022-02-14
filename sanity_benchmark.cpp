@@ -58,7 +58,8 @@ vector<vector<EnvCreator *>> env_creators(
                         new MazeEnv("maze-128-128-10_scen_2_8-agents", 128, 10, 2, 8),
                         new RoomEnv("room-64-64-16_scen_1_8-agents", 64, 16, 1, 8),
                         new MazeEnv("maze-32-32-4-scen_2_8-agents", 32, 4, 2, 8),
-                        new GeneralEnv("den312d_scen_5_8-agents", "den312d", 5 , 8),
+                        new GeneralEnv("den312d_scen_2_8-agents", "den312d", 2, 8),
+                        new GeneralEnv("ost003d_scen_2_8-agents", "ost003d", 2, 8),
                         new GeneralEnv("random-64-64-20_scen_5_8-agents", "random-64-64-20", 5, 8),
                 }
         }
