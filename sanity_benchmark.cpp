@@ -61,6 +61,20 @@ vector<vector<EnvCreator *>> env_creators(
                         new GeneralEnv("den312d_scen_2_8-agents", "den312d", 2, 8),
                         new GeneralEnv("ost003d_scen_2_8-agents", "ost003d", 2, 8),
                         new GeneralEnv("random-64-64-20_scen_5_8-agents", "random-64-64-20", 5, 8),
+
+                        new MazeEnv("maze-128-128-10_scen_10_8-agents", 128, 10, 10, 8),
+                        new RoomEnv("room-64-64-16_scen_10_8-agents", 64, 16, 10, 8),
+                        new MazeEnv("maze-32-32-4-scen_2_8-agents", 32, 4, 2, 8),
+                        new GeneralEnv("den312d_scen_10_8-agents", "den312d", 10, 8),
+                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
+                        new GeneralEnv("random-64-64-20_scen_5_8-agents", "random-64-64-20", 10, 8),
+
+                        new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
+                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
+                        new MazeEnv("maze-32-32-4-scen_2_4-agents", 32, 4, 2, 4),
+                        new GeneralEnv("den312d_scen_2_4-agents", "den312d", 2, 4),
+                        new GeneralEnv("ost003d_scen_2_4-agents", "ost003d", 2, 4),
+                        new GeneralEnv("random-64-64-20_scen_5_4-agents", "random-64-64-20", 5, 4),
                 }
         }
 );
