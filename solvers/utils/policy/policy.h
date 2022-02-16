@@ -38,8 +38,10 @@ public:
 class EvaluationInfo {
 public:
     float mdr;
+    float mdr_stderr;
     float success_rate;
     float mean_episode_time;
+    float mean_episode_time_stderr;
     float collision_rate;
     float timeout_rate;
     float stuck_rate;

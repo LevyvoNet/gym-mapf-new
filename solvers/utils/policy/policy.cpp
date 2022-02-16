@@ -100,6 +100,50 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
     return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, true);
 }
 
+float calc_mdr_std(vector<EpisodeInfo> episodes, float adr) {
+    float squared_distance_sum = 0;
+    int count = 0;
+    for (EpisodeInfo episode: episodes) {
+        if (episode.collision) {
+            continue;
+        }
+        if (episode.timeout) {
+            continue;
+        }
+        if (episode.stuck) {
+            continue;
+        }
+
+        ++count;
+
+        squared_distance_sum += pow(episode.reward - adr, 2);
+    }
+
+    return sqrt(squared_distance_sum / count);
+}
+
+float calc_time_std(vector<EpisodeInfo> episodes, float mean_time) {
+    float squared_distance_sum = 0;
+    int count = 0;
+    for (EpisodeInfo episode: episodes) {
+        if (episode.collision) {
+            continue;
+        }
+        if (episode.timeout) {
+            continue;
+        }
+        if (episode.stuck) {
+            continue;
+        }
+
+        ++count;
+
+        squared_distance_sum += pow(episode.time - mean_time, 2);
+    }
+
+    return sqrt(squared_distance_sum / count);
+}
+
 EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
                                  std::size_t max_steps,
                                  double episode_timeout_ms,
@@ -119,12 +163,12 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
         this->eval_episode_info_update(episode_info);
 
         /* If we don't have a chance, give up */
-        if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT){
+        if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT) {
             bool all_timeouts = true;
-            for (size_t i=0;i<EPISODES_TIMEOUT_LIMIT;++i){
+            for (size_t i = 0; i < EPISODES_TIMEOUT_LIMIT; ++i) {
                 all_timeouts = all_timeouts && eval_info->episodes_info[i].timeout;
             }
-            if (all_timeouts){
+            if (all_timeouts) {
                 break;
             }
         }
@@ -162,8 +206,16 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
         eval_info->mean_episode_time = (time_sum_ms / 1000) / episodes_success_count;
         eval_info->success_rate = round((episodes_success_count / n_episodes) * 100);
 
+        eval_info->mdr_stderr = calc_mdr_std(eval_info->episodes_info,
+                                             eval_info->mdr) / sqrt(episodes_success_count);
+        eval_info->mean_episode_time_stderr = calc_time_std(eval_info->episodes_info,
+                                                            eval_info->mean_episode_time) /
+                                              sqrt(episodes_success_count);
+
         eval_info->mdr = round(eval_info->mdr * 100) / 100;
         eval_info->mean_episode_time = round(eval_info->mean_episode_time * 100) / 100;
+        eval_info->mdr_stderr = round(eval_info->mdr_stderr * 100) / 100;
+        eval_info->mean_episode_time_stderr = round(eval_info->mean_episode_time_stderr * 100) / 100;
     }
 
     if (timeout_count > 0) {
@@ -179,7 +231,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     }
 
 
-    /* Give the inheriting policy a change to process data collected from all of the episodes */
+    /* Give the inheriting policy a change to process data collected from all episodes */
     this->eval_episodes_info_process(eval_info);
 
     this->reset();

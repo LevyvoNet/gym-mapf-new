@@ -61,6 +61,8 @@ struct problem_instance_result {
     float timeout_rate;
     float stuck_rate;
     float collision_rate;
+    float adr_stderr;
+    float exec_time_stderr;
 
     /* Solver proprietary information */
     char replans_max_size[8];

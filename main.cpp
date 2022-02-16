@@ -134,6 +134,8 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     std::cout << " train_time:" << train_info->time;
     std::cout << " timeout_rate:" << eval_info->timeout_rate << "%";
     std::cout << " stuck_rate:" << eval_info->stuck_rate << "%";
+    std::cout << "ADR_STDERR:" << eval_info->mdr_stderr << "%";
+    std::cout << "exec_time_STDERR:" << eval_info->mean_episode_time_stderr << "%";
     std::cout << " solver:" << policy->name;
 
     /* Additional data */
@@ -161,9 +163,6 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
 
     return RESULT_OK;
 }
-
-
-
 
 
 int run_benchmarks() {
