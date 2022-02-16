@@ -55,26 +55,37 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 4 */
                 {
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-                        new MazeEnv("maze-128-128-10_scen_2_8-agents", 128, 10, 2, 8),
-                        new RoomEnv("room-64-64-16_scen_1_8-agents", 64, 16, 1, 8),
-                        new MazeEnv("maze-32-32-4-scen_2_8-agents", 32, 4, 2, 8),
-                        new GeneralEnv("den312d_scen_2_8-agents", "den312d", 2, 8),
-                        new GeneralEnv("ost003d_scen_2_8-agents", "ost003d", 2, 8),
-                        new GeneralEnv("random-64-64-20_scen_5_8-agents", "random-64-64-20", 5, 8),
 
-                        new MazeEnv("maze-128-128-10_scen_10_8-agents", 128, 10, 10, 8),
-                        new RoomEnv("room-64-64-16_scen_10_8-agents", 64, 16, 10, 8),
-                        new MazeEnv("maze-32-32-4-scen_2_8-agents", 32, 4, 2, 8),
-                        new GeneralEnv("den312d_scen_10_8-agents", "den312d", 10, 8),
+                        /* City */
+                        new BerlinEnv("berlin_1_256_scen_2_8-agents", 2, 8),
+                        new BerlinEnv("berlin_1_256_scen_2_4-agents", 2, 4),
+
+                        /* Dragon Age */
                         new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
-                        new GeneralEnv("random-64-64-20_scen_5_8-agents", "random-64-64-20", 10, 8),
+                        new GeneralEnv("ost003d_scen_10_4-agents", "ost003d", 10, 4),
 
-                        new MazeEnv("maze-128-128-10_scen_2_4-agents", 128, 10, 2, 4),
-                        new RoomEnv("room-64-64-16_scen_1_4-agents", 64, 16, 1, 4),
-                        new MazeEnv("maze-32-32-4-scen_2_4-agents", 32, 4, 2, 4),
-                        new GeneralEnv("den312d_scen_2_4-agents", "den312d", 2, 4),
-                        new GeneralEnv("ost003d_scen_2_4-agents", "ost003d", 2, 4),
-                        new GeneralEnv("random-64-64-20_scen_5_4-agents", "random-64-64-20", 5, 4),
+                        /* Open */
+                        new GeneralEnv("empty-16-16_scen_1_4-agents", "empty-16-16", 1, 4),
+                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
+                        new GeneralEnv("empty-16-16_scen_1_8-agents", "empty-16-16", 1, 8),
+                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+                        new GeneralEnv("empty-48-48_scen_1_6-agents", "empty-48-48", 1, 6),
+                        new GeneralEnv("empty-48-48_scen_1_8-agents", "empty-48-48", 1, 8),
+
+                        /* Open + obstacles */
+                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 14, 4),
+                        new GeneralEnv("random-64-64-10_scen_16_4-agents", "random-64-64-10", 16, 4),
+                        new GeneralEnv("random-64-64-10_scen_14_8-agents", "random-64-64-10", 14, 8),
+                        new GeneralEnv("random-64-64-10_scen_16_8-agents", "random-64-64-10", 16, 8),
+
+
+                        /* Maze */
+                        new MazeEnv("maze-128-128-10_scen_10_6-agents", 128, 10, 10, 6),
+                        new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 16, 8),
+                        new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 16, 4),
+
+                        /* Room */
+                        new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
                 }
         }
 );

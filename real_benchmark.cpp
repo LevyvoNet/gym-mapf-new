@@ -30,19 +30,33 @@
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
 #define MAX_SCEN_ID (25)
-#define MIN_AGENTS (3)
-#define MAX_AGENTS (5)
+#define MIN_AGENTS (2)
+#define MAX_AGENTS (8)
 vector<string> MAPS{
-        "empty-8-8",
-        "empty-16-16",
-        "empty-32-32",
+        /* City */
+        "berlin_1_256",
+
+        /* Dragon Age */
+        "ost003d"
+
+        /* Open */
+//        "empty-8-8",
+//        "empty-16-16",
+//        "empty-32-32",
         "empty-48-48",
 
-        "room-32-32-4",
-        "room-64-64-8",
+        /* Open + obstacles */
+        "random-64-64-10",
+
+        /* Maze */
+        "maze-128-128-10",
+
+        /* Room */
+//        "room-32-32-4",
+//        "room-64-64-8",
         "room-64-64-16",
 
-        "maze-128-128-10",
+
 
 };
 
@@ -59,7 +73,7 @@ vector<SolverCreator *> SOLVERS{
 vector<EnvCreator *> generate_env_creators() {
     vector<EnvCreator *> res;
     for (string map: MAPS) {
-        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; ++n_agents) {
+        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; n_agents+=2) {
             for (size_t scen_id = MIN_SCEN_ID; scen_id <= MAX_SCEN_ID; ++scen_id) {
                 std::ostringstream env_name;
                 env_name << map << "_scen" << "-" << scen_id << "_agents=" << n_agents;
