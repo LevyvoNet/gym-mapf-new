@@ -40,9 +40,9 @@ vector<string> MAPS{
         "ost003d"
 
         /* Open */
-//        "empty-8-8",
-//        "empty-16-16",
-//        "empty-32-32",
+        //        "empty-8-8",
+        //        "empty-16-16",
+        //        "empty-32-32",
         "empty-48-48",
 
         /* Open + obstacles */
@@ -55,7 +55,6 @@ vector<string> MAPS{
 //        "room-32-32-4",
 //        "room-64-64-8",
         "room-64-64-16",
-
 
 
 };
@@ -73,7 +72,7 @@ vector<SolverCreator *> SOLVERS{
 vector<EnvCreator *> generate_env_creators() {
     vector<EnvCreator *> res;
     for (string map: MAPS) {
-        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; n_agents+=2) {
+        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; n_agents += 2) {
             for (size_t scen_id = MIN_SCEN_ID; scen_id <= MAX_SCEN_ID; ++scen_id) {
                 std::ostringstream env_name;
                 env_name << map << "_scen" << "-" << scen_id << "_agents=" << n_agents;
@@ -124,9 +123,11 @@ public:
         this->csv_file << "env_name";
         this->csv_file << "," << "solver_name";
         this->csv_file << "," << "adr";
+        this->csv_file << "," << "adr_stderr";
         this->csv_file << "," << "rate";
         this->csv_file << "," << "total_time";
         this->csv_file << "," << "exec_time";
+        this->csv_file << "," << "exec_time_stderr";
         this->csv_file << "," << "train_time";
         this->csv_file << "," << "timeout_rate";
         this->csv_file << "," << "stuck_rate";
@@ -146,9 +147,11 @@ public:
         this->csv_file << result.env_name;
         this->csv_file << "," << result.solver_name;
         this->csv_file << "," << result.adr;
+        this->csv_file << "," << result.adr_stderr;
         this->csv_file << "," << result.rate;
         this->csv_file << "," << result.total_time;
         this->csv_file << "," << result.exec_time;
+        this->csv_file << "," << result.exec_time_stderr;
         this->csv_file << "," << result.train_time;
         this->csv_file << "," << result.timeout_rate;
         this->csv_file << "," << result.stuck_rate;

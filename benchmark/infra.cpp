@@ -54,6 +54,8 @@ struct problem_instance_result solve(struct problem_instance problem,
     res.timeout_rate = eval_info->timeout_rate;
     res.stuck_rate = eval_info->stuck_rate;
     res.collision_rate = eval_info->collision_rate;
+    res.adr_stderr = eval_info->mdr_stderr;
+    res.exec_time_stderr = eval_info->mean_episode_time_stderr;
 
     string field_value;
     /* Set solvers train additional data */

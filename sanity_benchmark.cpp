@@ -57,31 +57,31 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 
                         /* City */
-                        new BerlinEnv("berlin_1_256_scen_2_8-agents", 2, 8),
+//                        new BerlinEnv("berlin_1_256_scen_2_8-agents", 2, 8),
                         new BerlinEnv("berlin_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
+//                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
                         new GeneralEnv("ost003d_scen_10_4-agents", "ost003d", 10, 4),
 
                         /* Open */
                         new GeneralEnv("empty-16-16_scen_1_4-agents", "empty-16-16", 1, 4),
                         new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
-                        new GeneralEnv("empty-16-16_scen_1_8-agents", "empty-16-16", 1, 8),
-                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
-                        new GeneralEnv("empty-48-48_scen_1_6-agents", "empty-48-48", 1, 6),
-                        new GeneralEnv("empty-48-48_scen_1_8-agents", "empty-48-48", 1, 8),
+//                        new GeneralEnv("empty-16-16_scen_1_8-agents", "empty-16-16", 1, 8),
+//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+//                        new GeneralEnv("empty-48-48_scen_1_6-agents", "empty-48-48", 1, 6),
+//                        new GeneralEnv("empty-48-48_scen_1_8-agents", "empty-48-48", 1, 8),
 
                         /* Open + obstacles */
                         new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 14, 4),
                         new GeneralEnv("random-64-64-10_scen_16_4-agents", "random-64-64-10", 16, 4),
-                        new GeneralEnv("random-64-64-10_scen_14_8-agents", "random-64-64-10", 14, 8),
-                        new GeneralEnv("random-64-64-10_scen_16_8-agents", "random-64-64-10", 16, 8),
+//                        new GeneralEnv("random-64-64-10_scen_14_8-agents", "random-64-64-10", 14, 8),
+//                        new GeneralEnv("random-64-64-10_scen_16_8-agents", "random-64-64-10", 16, 8),
 
 
                         /* Maze */
-                        new MazeEnv("maze-128-128-10_scen_10_6-agents", 128, 10, 10, 6),
-                        new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 16, 8),
+//                        new MazeEnv("maze-128-128-10_scen_10_6-agents", 128, 10, 10, 6),
+//                        new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 16, 8),
                         new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 16, 4),
 
                         /* Room */
@@ -189,6 +189,8 @@ int main(int argc, char **argv) {
         std::cout << " timeout_rate:" << result.timeout_rate << "%";
         std::cout << " stuck_rate:" << result.stuck_rate << "%";
         std::cout << " collision_rate:" << result.collision_rate << "%";
+        std::cout << " ADR_STDERR:" << result.adr_stderr;
+        std::cout << " exec_time_STDERR:" << result.exec_time_stderr;
         std::cout << " solver:" << std::string(result.solver_name);
 
         if (strcmp(result.init_time, "-")) {
