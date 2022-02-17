@@ -20,7 +20,7 @@
 #define EPISODE_TIMEOUT_SEC (180)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
-#define EPISODE_COUNT (5)
+#define EPISODE_COUNT (30)
 #define WORKERS_LIMIT (1)
 
 /** Constants *******************************************************************************************************/
@@ -55,23 +55,22 @@ vector<vector<EnvCreator *>> env_creators(
                 /* lvl 4 */
                 {
                         /* City */
-                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
+//                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
                         new GeneralEnv("ost003d_scen_10_4-agents", "ost003d", 5, 8),
 
                         /* Open */
-                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
+//                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
 
                         /* Open + obstacles */
-                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 10, 8),
-
+//                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 10, 8),
 
                         /* Maze */
-                        new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 2, 8),
+//                        new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 2, 8),
 
                         /* Room */
-                        new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
+//                        new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
                 }
         }
 );
