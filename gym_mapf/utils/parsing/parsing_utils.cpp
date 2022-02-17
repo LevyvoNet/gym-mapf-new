@@ -57,24 +57,24 @@ void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<
             line.erase(0, pos + delimiter.length());
         }
 
-        /* cut start row */
-        pos = line.find(delimiter);
-        start_row = line.substr(0, pos);
-        line.erase(0, pos + delimiter.length());
-
         /* cut start col */
         pos = line.find(delimiter);
         start_col = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
-        /* cut goal row */
+        /* cut start row */
         pos = line.find(delimiter);
-        goal_row = line.substr(0, pos);
+        start_row = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
         /* cut goal col */
         pos = line.find(delimiter);
         goal_col = line.substr(0, pos);
+        line.erase(0, pos + delimiter.length());
+
+        /* cut goal row */
+        pos = line.find(delimiter);
+        goal_row = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
         Location start_loc = grid->get_location(std::stoi(start_row), std::stoi(start_col));

@@ -27,62 +27,48 @@
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
 
                 },
                 /* lvl 1 */
                 {
-//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
-//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
-//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
-
                         /* City */
-//                        new BerlinEnv("berlin_1_256_scen_2_8-agents", 2, 8),
-                        new BerlinEnv("berlin_1_256_scen_2_4-agents", 2, 4),
+                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-//                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
-                        new GeneralEnv("ost003d_scen_10_4-agents", "ost003d", 10, 4),
+                        new GeneralEnv("ost003d_scen_10_4-agents", "ost003d", 5, 8),
 
                         /* Open */
-                        new GeneralEnv("empty-16-16_scen_1_4-agents", "empty-16-16", 1, 4),
                         new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
-//                        new GeneralEnv("empty-16-16_scen_1_8-agents", "empty-16-16", 1, 8),
-//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
-//                        new GeneralEnv("empty-48-48_scen_1_6-agents", "empty-48-48", 1, 6),
-//                        new GeneralEnv("empty-48-48_scen_1_8-agents", "empty-48-48", 1, 8),
 
                         /* Open + obstacles */
-                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 14, 4),
-                        new GeneralEnv("random-64-64-10_scen_16_4-agents", "random-64-64-10", 16, 4),
-//                        new GeneralEnv("random-64-64-10_scen_14_8-agents", "random-64-64-10", 14, 8),
-//                        new GeneralEnv("random-64-64-10_scen_16_8-agents", "random-64-64-10", 16, 8),
+                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 10, 8),
 
 
                         /* Maze */
-//                        new MazeEnv("maze-128-128-10_scen_10_6-agents", 128, 10, 10, 6),
-//                        new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 16, 8),
-                        new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 16, 4),
+                        new MazeEnv("maze-32-32-4-scen_16_4-agents", 32, 4, 2, 8),
 
                         /* Room */
                         new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
@@ -93,23 +79,23 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-//                        new id_rtdp_default("id_rtdp_default"),
-//                        new id_rtdp("id_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
