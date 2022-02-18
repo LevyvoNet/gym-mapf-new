@@ -8,17 +8,24 @@
 EmptyGrid::EmptyGrid(string name, size_t grid_size, size_t n_agents, int goal_reward) : EnvCreator(name),
                                                                                         grid_size(grid_size),
                                                                                         n_agents(n_agents),
-                                                                                        goal_reward(goal_reward) {}
-
-MapfEnv *EmptyGrid::operator()() {
+                                                                                        goal_reward(goal_reward) {
     std::ostringstream map_name;
     map_name << "empty-" << this->grid_size << "-" << this->grid_size;
+    this->map_name = map_name.str();
+}
 
-    return create_mapf_env(map_name.str(), 3, this->n_agents, FAIL_PROB, -1000, this->goal_reward, -1);
+MapfEnv *EmptyGrid::operator()() {
+
+
+    return create_mapf_env(this->map_name, 3, this->n_agents, FAIL_PROB, -1000, this->goal_reward, -1);
 }
 
 SymmetricalBottleneck::SymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
-                                                                             goal_reward(goal_reward) {}
+                                                                             goal_reward(goal_reward) {
+    this->map_name="SymmetricalBottleneck";
+    this->scen_id = 0;
+    this->n_agents = 2;
+}
 
 MapfEnv *SymmetricalBottleneck::operator()() {
     vector<std::string> map_lines({
@@ -33,7 +40,7 @@ MapfEnv *SymmetricalBottleneck::operator()() {
     Grid *g = new Grid(map_lines);
 
     return new MapfEnv(g,
-                       2,
+                       this->n_agents,
                        {g->get_location(2, 0), g->get_location(2, 5)},
                        {g->get_location(2, 5), g->get_location(2, 0)},
                        FAIL_PROB,
@@ -44,7 +51,11 @@ MapfEnv *SymmetricalBottleneck::operator()() {
 }
 
 ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
-                                                                               goal_reward(goal_reward) {}
+                                                                               goal_reward(goal_reward) {
+    this->map_name="AsymmetricalBottleneck";
+    this->scen_id = 0;
+    this->n_agents = 2;
+}
 
 MapfEnv *ASymmetricalBottleneck::operator()() {
     vector<std::string> map_lines({
@@ -58,7 +69,7 @@ MapfEnv *ASymmetricalBottleneck::operator()() {
     Grid *g = new Grid(map_lines);
 
     return new MapfEnv(g,
-                       2,
+                       this->n_agents,
                        {g->get_location(2, 0), g->get_location(2, 4)},
                        {g->get_location(2, 4), g->get_location(2, 0)},
                        FAIL_PROB,
@@ -72,7 +83,11 @@ RoomEnv::RoomEnv(string name, size_t room_size, size_t n_rooms, size_t scen_id, 
                                                                                                    room_size(room_size),
                                                                                                    scen_id(scen_id),
                                                                                                    n_agents(n_agents),
-                                                                                                   n_rooms(n_rooms) {}
+                                                                                                   n_rooms(n_rooms) {
+    std::ostringstream map_name;
+    map_name << "room-" << this->room_size << "-" << this->room_size << "-" << this->n_rooms;
+    this->map_name = map_name.str();
+}
 
 MapfEnv *RoomEnv::operator()() {
     std::ostringstream map_name;
@@ -83,7 +98,10 @@ MapfEnv *RoomEnv::operator()() {
 SanityEnv::SanityEnv(string name, size_t n_rooms, size_t room_size, size_t n_agents) : EnvCreator(name),
                                                                                        room_size(room_size),
                                                                                        n_agents(n_agents),
-                                                                                       n_rooms(n_rooms) {}
+                                                                                       n_rooms(n_rooms) {
+    this->map_name = "SanityEnv";
+    this->scen_id = 0;
+}
 
 MapfEnv *SanityEnv::operator()() {
     return create_sanity_mapf_env(this->n_rooms, this->room_size, this->n_agents, FAIL_PROB, -1000, 0, -1);
@@ -93,19 +111,24 @@ MazeEnv::MazeEnv(string name, size_t maze_size, size_t n_rooms, size_t scen_id, 
                                                                                                    maze_size(maze_size),
                                                                                                    scen_id(scen_id),
                                                                                                    n_agents(n_agents),
-                                                                                                   n_rooms(n_rooms) {}
-
-MapfEnv *MazeEnv::operator()() {
+                                                                                                   n_rooms(n_rooms) {
     std::ostringstream map_name;
     map_name << "maze-" << this->maze_size << "-" << this->maze_size << "-" << this->n_rooms;
-    return create_mapf_env(map_name.str(), this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
+    this->map_name = map_name.str();
+}
+
+MapfEnv *MazeEnv::operator()() {
+
+    return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
 BerlinEnv::BerlinEnv(string name, size_t scen_id, size_t n_agents) : EnvCreator(name), n_agents(n_agents),
-                                                                     scen_id(scen_id) {}
+                                                                     scen_id(scen_id) {
+    this->map_name = "Berlin_1_256";
+}
 
 MapfEnv *BerlinEnv::operator()() {
-    return create_mapf_env("Berlin_1_256", this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
+    return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
 MapfEnv *GeneralEnv::operator()() {
