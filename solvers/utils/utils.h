@@ -9,6 +9,9 @@ using namespace std;
 
 class EnvCreator {
 public:
+    string map_name;
+    int scen_id;
+    int n_agents;
     string name;
 
     EnvCreator(string name) : name(name) {}

@@ -14,7 +14,7 @@
 #include "benchmark/utils.h"
 
 /** Constants *******************************************************************************************************/
-#define MAX_ENV_NAME (100)
+#define MAX_MAP_NAME (100)
 #define MAX_SOLVER_NAME (50)
 
 #define BGU_CLUSTER_WORKER_LIMIT (20)
@@ -30,7 +30,7 @@ struct worker_data {
     pid_t pid;
     int fd;
 
-    char env_name[MAX_ENV_NAME];
+    char env_name[MAX_MAP_NAME];
     char solver_name[MAX_SOLVER_NAME];
 };
 
@@ -51,8 +51,13 @@ struct problem_instance_result {
     int id;
 
     problem_status_code status;
-    char env_name[MAX_ENV_NAME];
+
+    char map_name[MAX_MAP_NAME];
+    int scen_id;
+    int n_agents;
+
     char solver_name[MAX_SOLVER_NAME];
+
     double adr;
     int rate;
     double total_time;

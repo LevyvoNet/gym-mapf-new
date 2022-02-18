@@ -147,6 +147,8 @@ int main(int argc, char **argv) {
     list<problem_instance> *problems = nullptr;
     bool sanity_test_failed = false;
     std::string last_name = "";
+    int last_scen_id = -1;
+    int last_n_agents = -1;
 
     /* Generate the problems to solve */
     problems = generate_problems();
@@ -161,9 +163,13 @@ int main(int argc, char **argv) {
         if (PROBLEM_STATUS_FAILED(result) || result.timeout_rate > 0) {
             sanity_test_failed = true;
         }
-        if (std::string(result.env_name) != last_name) {
-            cout << endl << std::string(result.env_name) << endl;
-            last_name = std::string(result.env_name);
+        if (std::string(result.map_name) != last_name || result.scen_id != last_scen_id ||
+            result.n_agents != last_n_agents) {
+            cout << endl << std::string(result.map_name) << " scen:" << result.scen_id << " n_agents:"
+                 << result.n_agents << endl;
+            last_name = std::string(result.map_name);
+            last_scen_id = result.scen_id;
+            last_n_agents = result.n_agents;
         }
 
         std::cout << "ADR:" << result.adr;

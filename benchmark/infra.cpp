@@ -44,7 +44,9 @@ struct problem_instance_result solve(struct problem_instance problem,
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
-    strncpy(res.env_name, problem.env_creator->name.c_str(), MAX_ENV_NAME);
+    strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
+    res.scen_id = problem.env_creator->scen_id;;
+    res.n_agents = problem.env_creator->n_agents;
     strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
     res.adr = eval_info->mdr;
     res.rate = eval_info->success_rate;
@@ -138,7 +140,7 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
     else {
         close(fds[1]);
         struct worker_data new_worker;
-        strncpy(new_worker.env_name, problem.env_creator->name.c_str(), MAX_ENV_NAME);
+        strncpy(new_worker.env_name, problem.env_creator->name.c_str(), MAX_MAP_NAME);
         strncpy(new_worker.solver_name, problem.solver_creator->name.c_str(), MAX_SOLVER_NAME);
         new_worker.problem_id = problem.id;
         new_worker.pid = pid;
@@ -159,7 +161,7 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
         if (0 >= read_result) {
             result.status = PROBLEM_FAIL;
             result.id = worker_data.problem_id;
-            strncpy(result.env_name, worker_data.env_name, MAX_ENV_NAME);
+            strncpy(result.map_name, worker_data.env_name, MAX_MAP_NAME);
             strncpy(result.solver_name, worker_data.solver_name, MAX_SOLVER_NAME);
             return result;
         }

@@ -120,7 +120,9 @@ public:
         this->csv_file.open(this->file_name, ios::out);
 
         /* Write the column names row */
-        this->csv_file << "env_name";
+        this->csv_file << "map_name";
+        this->csv_file << "scen_id";
+        this->csv_file << "n_agents";
         this->csv_file << "," << "solver_name";
         this->csv_file << "," << "adr";
         this->csv_file << "," << "adr_stderr";
@@ -144,7 +146,9 @@ public:
         this->csv_file.open(this->file_name, ios::app);
 
         /* Write the result data */
-        this->csv_file << result.env_name;
+        this->csv_file << result.map_name;
+        this->csv_file << "," << result.scen_id;
+        this->csv_file << "," << result.n_agents;
         this->csv_file << "," << result.solver_name;
         this->csv_file << "," << result.adr;
         this->csv_file << "," << result.adr_stderr;
