@@ -58,7 +58,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
+//                        new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
 
                         /* Open */
 //                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
@@ -70,7 +70,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                       new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 2, 8),
 
                         /* Room */
-                       new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
+//                       new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
                 }
         }
 );
