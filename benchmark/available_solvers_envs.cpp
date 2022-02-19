@@ -23,7 +23,9 @@ MapfEnv *EmptyGrid::operator()() {
 
 SymmetricalBottleneck::SymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
                                                                              goal_reward(goal_reward) {
-    this->map_name="SymmetricalBottleneck";
+    std::ostringstream map_name;
+    map_name << "SymmetricalBottleneck-goal=" << goal_reward;
+    this->map_name=map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
 }
@@ -53,7 +55,9 @@ MapfEnv *SymmetricalBottleneck::operator()() {
 
 ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
                                                                                goal_reward(goal_reward) {
-    this->map_name="AsymmetricalBottleneck";
+    std::ostringstream map_name;
+    map_name << "AsymmetricalBottleneck-goal=" << goal_reward;
+    this->map_name=map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
 }
