@@ -180,8 +180,8 @@ int main(int argc, char **argv) {
         std::cout << " timeout_rate:" << result.timeout_rate << "%";
         std::cout << " stuck_rate:" << result.stuck_rate << "%";
         std::cout << " collision_rate:" << result.collision_rate << "%";
-        std::cout << " ADR_STDERR:" << result.adr_stderr;
-        std::cout << " exec_time_STDERR:" << result.exec_time_stderr;
+//        std::cout << " ADR_STDERR:" << result.adr_stderr;
+//        std::cout << " exec_time_STDERR:" << result.exec_time_stderr;
         std::cout << " solver:" << std::string(result.solver_name);
 
         if (strcmp(result.init_time, "-")) {

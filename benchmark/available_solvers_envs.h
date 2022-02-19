@@ -13,7 +13,6 @@
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
 public:
-    size_t n_agents;
     size_t grid_size;
     int goal_reward;
 
@@ -48,8 +47,6 @@ public:
 class RoomEnv : public EnvCreator {
 public:
     size_t room_size;
-    size_t scen_id;
-    size_t n_agents;
     size_t n_rooms;
 
     RoomEnv(string name, size_t room_size, size_t n_rooms, size_t scen_id, size_t n_agents);
@@ -60,7 +57,6 @@ public:
 class SanityEnv : public EnvCreator {
 public:
     size_t room_size;
-    size_t n_agents;
     size_t n_rooms;
 
 
@@ -72,9 +68,7 @@ public:
 class MazeEnv : public EnvCreator {
 public:
     size_t maze_size;
-    size_t scen_id;
     size_t n_rooms;
-    size_t n_agents;
 
     MazeEnv(string name, size_t maze_size, size_t n_rooms, size_t scen_id, size_t n_agents);
 
@@ -84,9 +78,6 @@ public:
 
 class BerlinEnv : public EnvCreator {
 public:
-    size_t n_agents;
-    size_t scen_id;
-
     BerlinEnv(string name, size_t scen_id, size_t n_agents);
 
     virtual MapfEnv *operator()();
@@ -95,10 +86,6 @@ public:
 
 class GeneralEnv: public EnvCreator{
 public:
-    string map_name;
-    size_t scen_id;
-    size_t n_agents;
-
     GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents);
 
     virtual MapfEnv *operator()();

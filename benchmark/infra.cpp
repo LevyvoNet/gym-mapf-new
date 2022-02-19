@@ -45,7 +45,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
     strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
-    res.scen_id = problem.env_creator->scen_id;;
+    res.scen_id = problem.env_creator->scen_id;
     res.n_agents = problem.env_creator->n_agents;
     strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
     res.adr = eval_info->mdr;

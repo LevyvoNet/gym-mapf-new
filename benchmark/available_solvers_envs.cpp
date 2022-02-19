@@ -7,8 +7,9 @@
 /** Envs **********************************************************************************************************/
 EmptyGrid::EmptyGrid(string name, size_t grid_size, size_t n_agents, int goal_reward) : EnvCreator(name),
                                                                                         grid_size(grid_size),
-                                                                                        n_agents(n_agents),
                                                                                         goal_reward(goal_reward) {
+    this->n_agents = n_agents;
+    this->scen_id = 0;
     std::ostringstream map_name;
     map_name << "empty-" << this->grid_size << "-" << this->grid_size;
     this->map_name = map_name.str();
@@ -81,9 +82,9 @@ MapfEnv *ASymmetricalBottleneck::operator()() {
 
 RoomEnv::RoomEnv(string name, size_t room_size, size_t n_rooms, size_t scen_id, size_t n_agents) : EnvCreator(name),
                                                                                                    room_size(room_size),
-                                                                                                   scen_id(scen_id),
-                                                                                                   n_agents(n_agents),
                                                                                                    n_rooms(n_rooms) {
+    this->n_agents = n_agents;
+    this->scen_id = scen_id;
     std::ostringstream map_name;
     map_name << "room-" << this->room_size << "-" << this->room_size << "-" << this->n_rooms;
     this->map_name = map_name.str();
@@ -97,8 +98,8 @@ MapfEnv *RoomEnv::operator()() {
 
 SanityEnv::SanityEnv(string name, size_t n_rooms, size_t room_size, size_t n_agents) : EnvCreator(name),
                                                                                        room_size(room_size),
-                                                                                       n_agents(n_agents),
                                                                                        n_rooms(n_rooms) {
+    this->n_agents = n_agents;
     this->map_name = "SanityEnv";
     this->scen_id = 0;
 }
@@ -109,9 +110,9 @@ MapfEnv *SanityEnv::operator()() {
 
 MazeEnv::MazeEnv(string name, size_t maze_size, size_t n_rooms, size_t scen_id, size_t n_agents) : EnvCreator(name),
                                                                                                    maze_size(maze_size),
-                                                                                                   scen_id(scen_id),
-                                                                                                   n_agents(n_agents),
                                                                                                    n_rooms(n_rooms) {
+    this->n_agents = n_agents;
+    this->scen_id = scen_id;
     std::ostringstream map_name;
     map_name << "maze-" << this->maze_size << "-" << this->maze_size << "-" << this->n_rooms;
     this->map_name = map_name.str();
@@ -122,8 +123,9 @@ MapfEnv *MazeEnv::operator()() {
     return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
-BerlinEnv::BerlinEnv(string name, size_t scen_id, size_t n_agents) : EnvCreator(name), n_agents(n_agents),
-                                                                     scen_id(scen_id) {
+BerlinEnv::BerlinEnv(string name, size_t scen_id, size_t n_agents) : EnvCreator(name) {
+    this->n_agents = n_agents;
+    this->scen_id = scen_id;
     this->map_name = "Berlin_1_256";
 }
 
@@ -135,10 +137,11 @@ MapfEnv *GeneralEnv::operator()() {
     return create_mapf_env(this->map_name, this->scen_id, this->n_agents, FAIL_PROB, -1000, 0, -1);
 }
 
-GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name),
-                                                                                        map_name(map_name),
-                                                                                        n_agents(n_agents),
-                                                                                        scen_id(scen_id) {}
+GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name) {
+    this->map_name=map_name;
+    this->n_agents = n_agents;
+    this->scen_id = scen_id;
+}
 
 
 /** Policies *******************************************************************************************************/
