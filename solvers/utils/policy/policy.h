@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <chrono>
 #include <cmath>
+#include <string.h>
 //#include <time.h>
 
 #include <gym_mapf/gym_mapf.h>
@@ -24,15 +25,18 @@ using clk = std::chrono::steady_clock;
 //#define MEASURE_TIME const clock_t start_time = clock()
 //#define EPISODES_TIMEOUT_LIMIT (3)
 
-class EpisodeInfo{
-public:
+struct episode_info {
+    /* General fields */
     int reward;
     double time;
     bool collision;
     bool timeout;
     bool stuck;
 
-    EpisodeInfo(int reward, double time, bool collision, bool timeout, bool stuck);
+    /* Concrete policy proprietary fields */
+    int replans_max_size;
+    double replans_count;
+
 };
 
 class EvaluationInfo {
@@ -45,7 +49,8 @@ public:
     float collision_rate;
     float timeout_rate;
     float stuck_rate;
-    vector<EpisodeInfo> episodes_info;
+
+    vector<episode_info> episodes_info;
 
     std::unordered_map<std::string, std::string> *additional_data;
 
@@ -68,11 +73,11 @@ protected:
 
     TrainInfo *train_info;
 
-    EpisodeInfo evaluate_single_episode(std::size_t max_steps, double timeout_ms);
+    episode_info evaluate_single_episode(std::size_t max_steps, double timeout_ms);
 
-    virtual void eval_episode_info_update(EpisodeInfo episode_info);
+    virtual void eval_episode_info_update(episode_info *episode_info);
 
-    virtual void eval_episodes_info_process(EvaluationInfo* eval_info);
+    virtual void eval_episodes_info_process(EvaluationInfo *eval_info);
 
 public:
     std::string name;
@@ -86,10 +91,7 @@ public:
 
     TrainInfo *get_train_info();
 
-    EvaluationInfo *evaluate(std::size_t n_episodes,
-                             std::size_t max_steps,
-                             double episode_timeout_ms,
-                             double min_success_rate = 0);
+    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms);
 
     virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) = 0;
 

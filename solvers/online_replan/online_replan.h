@@ -61,6 +61,7 @@ public:
     int episodes_count;
     int replans_sum;
     size_t replans_max_size;
+    size_t replans_max_size_episode;
 
     OnlineReplanPolicy(MapfEnv *env,
                        float gamma,
@@ -78,7 +79,7 @@ public:
 
     virtual void eval_episodes_info_process(EvaluationInfo* eval_info) override;
 
-    virtual void eval_episode_info_update(EpisodeInfo episode_info) override;
+    virtual void eval_episode_info_update(episode_info *episode_info) override;
 };
 
 

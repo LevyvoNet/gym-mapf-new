@@ -31,25 +31,23 @@ void Policy::reset() {
 }
 
 /** Evaluation ************************************************************************************************/
-EpisodeInfo::EpisodeInfo(int reward, double time, bool collision, bool timeout, bool stuck) :
-        reward(reward), time(time), collision(collision), timeout(timeout), stuck(stuck) {}
-
 EvaluationInfo::EvaluationInfo() {
     this->mdr = 0;
     this->success_rate = 0;
     this->mean_episode_time = 0;
     this->collision_rate = 0;
+    this->stuck_rate = 0;
     this->timeout_rate = 0;
     this->additional_data = new std::unordered_map<std::string, std::string>;
 }
 
-void Policy::eval_episode_info_update(EpisodeInfo episode_info) {}
+void Policy::eval_episode_info_update(episode_info *episode_info) {}
 
 void Policy::eval_episodes_info_process(EvaluationInfo *eval_info) {
 
 }
 
-EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeout_ms) {
+episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeout_ms) {
     MEASURE_TIME;
     vector<Action> all_stay_vector(this->env->n_agents);
     for (size_t i = 0; i < this->env->n_agents; ++i) {
@@ -63,6 +61,10 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
     bool done = false;
     bool is_collision = false;
     MultiAgentAction *selected_action = nullptr;
+    struct episode_info res;
+
+    /* Initialize structs */
+    memset(&res, 0, sizeof(res));
 
     /* Reset policy */
     this->reset();
@@ -73,11 +75,21 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
         /* Select the best action */
         selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
         if (nullptr == selected_action) {
-            return EpisodeInfo(-999, ELAPSED_TIME_MS, false, true, false);
+            res.reward = -999;
+            res.time = ELAPSED_TIME_MS;
+            res.collision = false;
+            res.timeout = true;
+            res.stuck = false;
+            return res;
         }
         /* Check if we are stuck */
         if (*selected_action == all_stay) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, true);
+            res.reward = episode_reward;
+            res.time = ELAPSED_TIME_MS;
+            res.collision = false;
+            res.timeout = false;
+            res.stuck = true;
+            return res;
         }
 
         /* Step */
@@ -87,23 +99,38 @@ EpisodeInfo Policy::evaluate_single_episode(std::size_t max_steps, double timeou
 
         /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
         if (is_collision) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, true, false, false);
+            res.reward = episode_reward;
+            res.time = ELAPSED_TIME_MS;
+            res.collision = true;
+            res.timeout = false;
+            res.stuck = false;
+            return res;
         }
 
         /* The goal was reached, the episode is solved. Update its stats. */
         if (done) {
-            return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, false);
+            res.reward = episode_reward;
+            res.time = ELAPSED_TIME_MS;
+            res.collision = false;
+            res.timeout = false;
+            res.stuck = false;
+            return res;
         }
 
     } while (steps < max_steps);
 
-    return EpisodeInfo(episode_reward, ELAPSED_TIME_MS, false, false, true);
+    res.reward = episode_reward;
+    res.time = ELAPSED_TIME_MS;
+    res.collision = false;
+    res.timeout = false;
+    res.stuck = true;
+    return res;
 }
 
-float calc_mdr_std(vector<EpisodeInfo> episodes, float adr) {
+float calc_mdr_std(vector<episode_info> episodes, float adr) {
     float squared_distance_sum = 0;
     int count = 0;
-    for (EpisodeInfo episode: episodes) {
+    for (episode_info episode: episodes) {
         if (episode.collision) {
             continue;
         }
@@ -122,10 +149,10 @@ float calc_mdr_std(vector<EpisodeInfo> episodes, float adr) {
     return sqrt(squared_distance_sum / count);
 }
 
-float calc_time_std(vector<EpisodeInfo> episodes, float mean_time) {
+float calc_time_std(vector<episode_info> episodes, float mean_time) {
     float squared_distance_sum = 0;
     int count = 0;
-    for (EpisodeInfo episode: episodes) {
+    for (episode_info episode: episodes) {
         if (episode.collision) {
             continue;
         }
@@ -144,10 +171,7 @@ float calc_time_std(vector<EpisodeInfo> episodes, float mean_time) {
     return sqrt(squared_distance_sum / count);
 }
 
-EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
-                                 std::size_t max_steps,
-                                 double episode_timeout_ms,
-                                 double min_success_rate) {
+EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms) {
     EvaluationInfo *eval_info = new EvaluationInfo();
 
     if (episode_timeout_ms <= 0) {
@@ -156,12 +180,11 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     }
 
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
-        EpisodeInfo episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+        episode_info episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
         eval_info->episodes_info.push_back(episode_info);
 
         /* Give the inheriting policy a chance to collect inner data about the last episode */
-        this->eval_episode_info_update(episode_info);
-
+        this->eval_episode_info_update(&episode_info);
 
         /* If we don't have a chance, give up */
         if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT) {
@@ -182,7 +205,7 @@ EvaluationInfo *Policy::evaluate(std::size_t n_episodes,
     float timeout_count = 0;
     float collision_count = 0;
     float stuck_count = 0;
-    for (EpisodeInfo episode: eval_info->episodes_info) {
+    for (episode_info episode: eval_info->episodes_info) {
         if (episode.collision) {
             ++collision_count;
             continue;

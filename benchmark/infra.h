@@ -16,12 +16,10 @@
 /** Constants *******************************************************************************************************/
 #define MAX_MAP_NAME (100)
 #define MAX_SOLVER_NAME (50)
+#define EPISODE_COUNT (30)
 
 #define BGU_CLUSTER_WORKER_LIMIT (20)
 #define POLL_SLEEP_TIME_nS (200000)
-
-#define ANY_CHILD (-1)
-
 
 /** Structs *********************************************************************************************************/
 
@@ -58,6 +56,7 @@ struct problem_instance_result {
 
     char solver_name[MAX_SOLVER_NAME];
 
+    /* Aggregated data */
     double adr;
     int rate;
     double total_time;
@@ -68,6 +67,10 @@ struct problem_instance_result {
     float collision_rate;
     float adr_stderr;
     float exec_time_stderr;
+
+
+    /* Raw episode data */
+    struct episode_info episodes_data[EPISODE_COUNT];
 
     /* Solver proprietary information */
     char replans_max_size[8];
@@ -96,16 +99,11 @@ public:
 /** Macros **********************************************************************************************************/
 #define PROBLEM_STATUS_FAILED(result) (result.status != PROBLEM_SUCCESS)
 
-struct problem_instance_result solve(struct problem_instance problem,
-                                     double timeout_ms,
-                                     int episode_count,
-                                     int max_steps);
+struct problem_instance_result
+solve(struct problem_instance problem, double timeout_ms, int episode_count, int max_steps);
 
-void solve_problems(list<struct problem_instance> *problems,
-                    size_t workers_limit, ResultDatabase *db,
-                    double episode_timeout_ms,
-                    int eval_episodes_count,
-                    int max_steps);
+void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
+                    double episode_timeout_ms, int eval_episodes_count, int max_steps, string log_file);
 
 
 #endif //GYM_MAPF_INFRA_H

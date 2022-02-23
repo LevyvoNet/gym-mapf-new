@@ -142,6 +142,7 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
     /* Update information */
     ++this->replans_count;
     this->replans_max_size = max(group.size(), this->replans_max_size);
+    this->replans_max_size_episode = max(group.size(), this->replans_max_size_episode);
 
     /* Calculate the conflict area */
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
@@ -325,6 +326,7 @@ void OnlineReplanPolicy::reset() {
     Policy::reset();
 
     this->replans_count = 0;
+    this->replans_max_size_episode = 0;
     this->delete_replans();
 
     this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
@@ -359,9 +361,12 @@ void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
-void OnlineReplanPolicy::eval_episode_info_update(EpisodeInfo episode_info) {
+void OnlineReplanPolicy::eval_episode_info_update(episode_info* episode_info) {
     this->replans_sum += this->replans_count;
     ++this->episodes_count;
+
+    episode_info->replans_count = this->replans_count;
+    episode_info->replans_max_size = this->replans_max_size_episode;
 }
 
 void OnlineReplanPolicy::delete_replans() {

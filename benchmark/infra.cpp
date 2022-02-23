@@ -25,6 +25,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     struct problem_instance_result res;
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
+    bool should_log = false;
 
     /* Create the policy */
     env = (*problem.env_creator)();
@@ -105,6 +106,14 @@ struct problem_instance_result solve(struct problem_instance problem,
     }
     strncpy(res.replans_max_size, field_value.c_str(), 8);
 
+
+    /* Set the episodes raw data */
+    for (size_t i = 0; i < EPISODE_COUNT; ++i) {
+        res.episodes_data[i] = eval_info->episodes_info[i];
+
+
+    }
+
     return res;
 
 }
@@ -173,15 +182,94 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
     return result;
 }
 
-void solve_problems(list<struct problem_instance> *problems,
-                    size_t workers_limit,
-                    ResultDatabase *db,
-                    double episode_timeout_ms,
-                    int eval_episodes_count,
-                    int max_steps) {
+void create_log_file(string log_file) {
+    std::ostringstream file_name;
+    file_name << log_file << ".log.csv";
+    ofstream log_csv_file;
+
+    log_csv_file.open(file_name.str(), ios::out);
+
+    /* Write columns */
+    log_csv_file << "map_name";
+    log_csv_file << "," << "scen_id";
+    log_csv_file << "," << "n_agents";
+    log_csv_file << "," << "solver_name";
+    log_csv_file << "," << "reward";
+    log_csv_file << "," << "total_time";
+    log_csv_file << "," << "exec_time";
+    log_csv_file << "," << "train_time";
+    log_csv_file << "," << "end_reason";
+    /* Solver specific */
+    log_csv_file << "," << "replans_max_size";
+    log_csv_file << "," << "replans_count";
+    log_csv_file << "," << "n_conflicts";
+    log_csv_file << "," << "eval_time";
+    log_csv_file << "," << "init_time";
+    log_csv_file << "," << "conflicts_time";
+    log_csv_file << "," << "n_iterations";
+    log_csv_file << endl;
+
+    log_csv_file.close();
+}
+
+string end_reason(struct episode_info info) {
+    if (info.collision) {
+        return "collision";
+    }
+    if (info.timeout) {
+        return "timeout";
+    }
+    if (info.stuck) {
+        return "stuck";
+    }
+
+    return "success";
+}
+
+void log_if_needed(string log_file, struct problem_instance_result result) {
+    if (log_file == "") {
+        return;
+    }
+
+    /* Open the file */
+    std::ostringstream file_name;
+    file_name << log_file << ".log.csv";
+    ofstream log_csv_file;
+    log_csv_file.open(file_name.str(), ios::app);
+
+    /* For each episode, write its line */
+    for (size_t i = 0; i < EPISODE_COUNT; ++i) {
+        log_csv_file << result.map_name;
+        log_csv_file << "," << result.scen_id;
+        log_csv_file << "," << result.n_agents;
+        log_csv_file << "," << result.solver_name;
+        log_csv_file << "," << result.episodes_data[i].reward;
+        log_csv_file << "," << result.train_time + result.episodes_data[i].time;
+        log_csv_file << "," << result.episodes_data[i].time;
+        log_csv_file << "," << result.train_time;
+        log_csv_file << "," << end_reason(result.episodes_data[i]);
+        /* Solver specific */
+        log_csv_file << "," << result.episodes_data[i].replans_max_size;
+        log_csv_file << "," << result.episodes_data[i].replans_count;
+        log_csv_file << "," << result.n_conflicts;
+        log_csv_file << "," << result.eval_time;
+        log_csv_file << "," << result.init_time;
+        log_csv_file << "," << result.conflicts_time;
+        log_csv_file << "," << result.n_iterations;
+        log_csv_file << endl;
+    }
+    log_csv_file.close();
+
+}
+
+
+void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
+                    double episode_timeout_ms, int eval_episodes_count, int max_steps, string log_file) {
     list<struct worker_data> workers;
     size_t finished_count = 0;
     size_t problems_count = problems->size();
+
+    create_log_file(log_file);
 
     while (problems->size() > 0 || workers.size() > 0) {
         while (problems->size() > 0 && workers.size() < workers_limit) {
@@ -202,6 +290,7 @@ void solve_problems(list<struct problem_instance> *problems,
                 worker_to_delete = worker_iter;
                 struct problem_instance_result problem_result = read_result(*worker_iter);
                 db->insert(problem_result);
+                log_if_needed(log_file, problem_result);
                 ++finished_count;
                 cout << "finished " << finished_count << "/" << problems_count << endl;
                 worker_to_delete = worker_iter;

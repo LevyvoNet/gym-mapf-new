@@ -21,48 +21,48 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (180)
+#define EPISODE_TIMEOUT_SEC (120)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
-#define EPISODE_COUNT (30)
 #define WORKERS_LIMIT (2)
 
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
 #define MAX_SCEN_ID (25)
 #define MIN_AGENTS (2)
-#define MAX_AGENTS (8)
+#define MAX_AGENTS (2)
+#define AGENTS_INCREASE (1)
 vector<string> MAPS{
         /* City */
-        "berlin_1_256",
+//        "berlin_1_256",
 
         /* Dragon Age */
-        "ost003d"
+//        "ost003d"
 
         /* Open */
-        //        "empty-8-8",
-        //        "empty-16-16",
+        "empty-8-8",
+//                "empty-16-16",
         //        "empty-32-32",
-        "empty-48-48",
+//        "empty-48-48",
 
         /* Open + obstacles */
-        "random-64-64-10",
+//        "random-64-64-10",
 
         /* Maze */
-        "maze-128-128-10",
+//        "maze-128-128-10",
 
         /* Room */
 //        "room-32-32-4",
 //        "room-64-64-8",
-        "room-64-64-16",
+//        "room-64-64-16",
 
 
 };
 
 vector<SolverCreator *> SOLVERS{
-//        new vi("vi"),
+        new vi("vi"),
 //        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-//        new id_rtdp("id_rtdp"),
+        new id_rtdp("id_rtdp"),
         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
         new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
         new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
@@ -72,7 +72,7 @@ vector<SolverCreator *> SOLVERS{
 vector<EnvCreator *> generate_env_creators() {
     vector<EnvCreator *> res;
     for (string map: MAPS) {
-        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; n_agents += 2) {
+        for (size_t n_agents = MIN_AGENTS; n_agents <= MAX_AGENTS; n_agents += AGENTS_INCREASE) {
             for (size_t scen_id = MIN_SCEN_ID; scen_id <= MAX_SCEN_ID; ++scen_id) {
                 std::ostringstream env_name;
                 env_name << map << "_scen" << "-" << scen_id << "_agents=" << n_agents;
@@ -121,7 +121,7 @@ public:
 
         /* Write the column names row */
         this->csv_file << "map_name";
-        this->csv_file << "scen_id";
+        this->csv_file << "," << "scen_id";
         this->csv_file << "n_agents";
         this->csv_file << "," << "solver_name";
         this->csv_file << "," << "adr";
@@ -134,7 +134,13 @@ public:
         this->csv_file << "," << "timeout_rate";
         this->csv_file << "," << "stuck_rate";
         this->csv_file << "," << "collision_rate";
-
+        this->csv_file << "," << "replans_max_size";
+        this->csv_file << "," << "replans_mean";
+        this->csv_file << "," << "n_conflicts";
+        this->csv_file << "," << "eval_time";
+        this->csv_file << "," << "init_time";
+        this->csv_file << "," << "conflicts_time";
+        this->csv_file << "," << "n_iterations";
         this->csv_file << endl;
 
         this->csv_file.close();
@@ -160,7 +166,13 @@ public:
         this->csv_file << "," << result.timeout_rate;
         this->csv_file << "," << result.stuck_rate;
         this->csv_file << "," << result.collision_rate;
-
+        this->csv_file << "," << result.replans_max_size;
+        this->csv_file << "," << result.replans_mean;
+        this->csv_file << "," << result.n_conflicts;
+        this->csv_file << "," << result.eval_time;
+        this->csv_file << "," << result.init_time;
+        this->csv_file << "," << result.conflicts_time;
+        this->csv_file << "," << result.n_iterations;
         this->csv_file << endl;
 
         this->csv_file.close();
@@ -170,7 +182,6 @@ public:
 int main(int argc, char **argv) {
     list<problem_instance> *problems = generate_problems();
 
-
     /* Create the sanity benchmark db */
     CsvResultDataBase db(argv[1]);
 
@@ -179,7 +190,8 @@ int main(int argc, char **argv) {
                    &db,
                    EPISODE_TIMEOUT_MS,
                    EPISODE_COUNT,
-                   MAX_STEPS);
+                   MAX_STEPS,
+                   argv[1]);
 
     return 0;
 

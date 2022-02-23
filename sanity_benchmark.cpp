@@ -20,7 +20,6 @@
 #define EPISODE_TIMEOUT_SEC (180)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
-#define EPISODE_COUNT (30)
 #define WORKERS_LIMIT (1)
 
 /** Constants *******************************************************************************************************/
@@ -156,7 +155,7 @@ int main(int argc, char **argv) {
     /* Create the sanity benchmark db */
     SanityBenchmarksResultDatabase db(problems->size());
 
-    solve_problems(problems, WORKERS_LIMIT, &db, EPISODE_TIMEOUT_MS, EPISODE_COUNT, MAX_STEPS);
+    solve_problems(problems, WORKERS_LIMIT, &db, EPISODE_TIMEOUT_MS, EPISODE_COUNT, MAX_STEPS, "");
 
     /* Print every result */
     for (problem_instance_result result: db.results) {
