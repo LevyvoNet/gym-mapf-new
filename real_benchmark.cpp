@@ -29,8 +29,8 @@
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
 #define MAX_SCEN_ID (25)
-#define MIN_AGENTS (2)
-#define MAX_AGENTS (2)
+#define MIN_AGENTS (1)
+#define MAX_AGENTS (4)
 #define AGENTS_INCREASE (1)
 vector<string> MAPS{
         /* City */
