@@ -122,7 +122,7 @@ public:
         /* Write the column names row */
         this->csv_file << "map_name";
         this->csv_file << "," << "scen_id";
-        this->csv_file << "n_agents";
+        this->csv_file << "," << "n_agents";
         this->csv_file << "," << "solver_name";
         this->csv_file << "," << "adr";
         this->csv_file << "," << "adr_stderr";
