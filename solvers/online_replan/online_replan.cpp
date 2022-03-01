@@ -27,8 +27,7 @@ WindowPolicy::WindowPolicy(Policy *policy, GridArea area, int d) : policy(policy
 }
 
 bool WindowPolicy::might_live_lock() {
-    return false;
-//    return this->steps_count > LIVE_LOCK_THRESHOLD * this->d * this->d;
+    return this->steps_count > LIVE_LOCK_THRESHOLD * this->d * this->d;
 }
 
 
