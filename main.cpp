@@ -41,36 +41,36 @@ public:
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
 
                 },
                 /* lvl 4 */
                 {
-                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
-                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
-                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
+//                        new MazeEnv("maze-128-128-10_scen_2_5-agents", 128, 10, 2, 5),
+//                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
+//                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
                 }
         }
 );
@@ -78,30 +78,30 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi("vi"),
+//                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
                         new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
-                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
-                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp("")),
+//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline("")),
+//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline("")),
                 }
         }
 );
@@ -185,7 +185,7 @@ int run_benchmarks() {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {

@@ -23,7 +23,8 @@ class GridArea; /* Forward Declaration */
 GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const MultiAgentState &s);
 
 /** Constants ********************************************************************/
-#define BONUS_VALUE (100)
+//#define BONUS_VALUE (100)
+#define LIVE_LOCK_THRESHOLD (3)
 
 template<>
 class std::hash<vector<size_t>> {
@@ -50,11 +51,13 @@ private:
 
     vector<vector<size_t>> divide_to_groups(const MultiAgentState &s);
 
+    Policy* plan_window(vector<size_t> group, GridArea window_area,  double timeout_ms);
+
     WindowPolicy *search_window_policy(const vector<size_t> &group, const MultiAgentState &s);
 
     WindowPolicy *replan(const vector<size_t> &group, const MultiAgentState &s, double timeout_ms);
 
-    void extend_window(vector<size_t> group, WindowPolicy* window_policy);
+    void extend_window(vector<size_t> group, WindowPolicy* window_policy, double timeout_ms);
 
     int calc_distance(const Location &l1, const Location &l2);
 

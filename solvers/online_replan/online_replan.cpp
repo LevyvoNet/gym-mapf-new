@@ -28,7 +28,7 @@ WindowPolicy::WindowPolicy(Policy *policy, GridArea area) : policy(policy), area
 
 bool WindowPolicy::might_live_lock() {
     int window_area = abs(this->area.top_row - this->area.bottom_row) * abs(this->area.right_col - this->area.left_col);
-    return this->steps_count > 2 * window_area;
+    return this->steps_count > LIVE_LOCK_THRESHOLD * window_area;
 }
 
 
@@ -144,6 +144,69 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
+Policy *OnlineReplanPolicy::plan_window(vector<size_t> group, GridArea window_area, double timeout_ms) {
+    MEASURE_TIME;
+
+    /* Generate state space from the conflict area */
+    AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid,
+                                                                                       window_area,
+                                                                                       group.size());
+
+    /* Create an environment and set its state space to be our sub-space */
+    MapfEnv *area_env = get_local_view(this->env, group);
+    area_env->observation_space = conflict_area_state_space;
+
+    /* Set the girth of the area with a fixed value composed of the single agents values */
+    vector<ValueFunctionPolicy *> policies;
+    vector<vector<size_t>> agents_groups;
+//    vector<tsl::hopscotch_set<Location>> intended_locations;
+    for (size_t agent: group) {
+        Policy *agent_policy = this->local_policy->policies[agent];
+        policies.push_back((ValueFunctionPolicy *) agent_policy);
+        agents_groups.push_back({agent});
+//        intended_locations.push_back(
+//                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
+        if (ELAPSED_TIME_MS >= timeout_ms) {
+            return nullptr;
+        }
+    }
+    SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
+    h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
+
+    /* Only a single one outside the area */
+    GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, window_area, 1);
+    GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
+    AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
+    AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
+    Dictionary *girth_values = new Dictionary(0);
+    for (; *area_iter != *area_end; ++*area_iter) {
+        for (size_t agent_idx = 0; agent_idx < group.size(); ++agent_idx) {
+            GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
+            for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
+                MultiAgentState temp_state = **area_iter;
+                temp_state.locations[agent_idx] = girth_iter->ptr->locations[0];
+                temp_state.id = this->env->grid->calculate_multi_locations_id(temp_state.locations);
+
+                double value = (*h)(&temp_state);
+
+//                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
+//                    intended_locations[agent_idx].end()) {
+//                    value += BONUS_VALUE;
+//                }
+
+                girth_values->set(temp_state.id, value);
+            }
+        }
+    }
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "", girth_values);
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    delete girth_values;
+
+    return policy;
+}
+
 WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
                                          const MultiAgentState &s,
                                          double timeout_ms) {
@@ -159,64 +222,8 @@ WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
     /* Pad the area TODO: is it good? */
     conflict_area = pad_area(this->env->grid, conflict_area, this->k);
 
-    /* Generate state space from the conflict area */
-    AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid,
-                                                                                       conflict_area,
-                                                                                       group.size());
-
-    /* Create an environment and set its state space to be our sub-space */
-    MapfEnv *area_env = get_local_view(this->env, group);
-    area_env->observation_space = conflict_area_state_space;
-
-    /* Set the girth of the area with a fixed value composed of the single agents values */
-    vector<ValueFunctionPolicy *> policies;
-    vector<vector<size_t>> agents_groups;
-    vector<tsl::hopscotch_set<Location>> intended_locations;
-    for (size_t agent: group) {
-        Policy *agent_policy = this->local_policy->policies[agent];
-        policies.push_back((ValueFunctionPolicy *) agent_policy);
-        agents_groups.push_back({agent});
-        intended_locations.push_back(
-                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
-        if (ELAPSED_TIME_MS >= timeout_ms) {
-            return nullptr;
-        }
-    }
-    SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
-    h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
-
-    /* Only a single one outside the area */
-    GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, conflict_area, 1);
-    GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
-    AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
-    AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
-    Dictionary *girth_values = new Dictionary(0);
-    for (; *area_iter != *area_end; ++*area_iter) {
-        for (size_t agent_idx = 0; agent_idx < group.size(); ++agent_idx) {
-            GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
-            for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
-                MultiAgentState temp_state = **area_iter;
-                temp_state.locations[agent_idx] = girth_iter->ptr->locations[0];
-                temp_state.id = this->env->grid->calculate_multi_locations_id(temp_state.locations);
-
-                double value = (*h)(&temp_state);
-
-                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
-                    intended_locations[agent_idx].end()) {
-                    value += BONUS_VALUE;
-                }
-
-                girth_values->set(temp_state.id, value);
-            }
-        }
-    }
-
-
-
-    /* Solve the env by value iteration */
-    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "", girth_values);
-    policy->train(timeout_ms - ELAPSED_TIME_MS);
-    delete girth_values;
+    /* Replan for the group in the conflict area window */
+    Policy *policy = this->plan_window(group, conflict_area, timeout_ms - ELAPSED_TIME_MS);
 
     /* Save the new policy in replans cache */
     if (!this->replans->contains(group)) {
@@ -263,6 +270,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     vector<Location> casted_locations;
     MultiAgentState *group_state = nullptr;
     MultiAgentAction *a = nullptr;
+    WindowPolicy *window_policy = nullptr;
 
 
     /* In case of a single agent just return from the local window_policy */
@@ -270,7 +278,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
         policy = this->local_policy->policies[group[0]];
     } else {
         /* Search for an existing window_policy for that group and location */
-        WindowPolicy *window_policy = this->search_window_policy(group, s);
+        window_policy = this->search_window_policy(group, s);
         if (nullptr == window_policy) {
             /* Replan for this group */
             window_policy = this->replan(group, s, timeout_ms - ELAPSED_TIME_MS);
@@ -279,7 +287,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
             }
         }
         if (window_policy->might_live_lock()) {
-            this->extend_window(group, window_policy);
+            this->extend_window(group, window_policy, timeout_ms - ELAPSED_TIME_MS);
         }
 
         window_policy->steps_count++;
@@ -301,8 +309,6 @@ l_cleanup:
 }
 
 /** Public methods ***********************************************************************************************/
-
-
 OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        float gamma,
                                        const string &name,
@@ -401,8 +407,34 @@ void OnlineReplanPolicy::delete_replans() {
     delete this->replans;
 }
 
-void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *window_policy) {
+void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *window_policy, double timeout_ms) {
+//    int row_diff = (window_policy->area.bottom_row - window_policy->area.top_row) / 2 + 1;
+//    int col_diff = (window_policy->area.right_col - window_policy->area.left_col) / 2 + 1;
+
+    int row_diff = 1;
+    int col_diff = 1;
+
+
+    int new_top_row = max(0, window_policy->area.top_row - row_diff);
+    int new_bottom_row = min((int) this->env->grid->max_row, window_policy->area.bottom_row + row_diff);
+    int new_left_col = max(0, window_policy->area.left_col - col_diff);
+    int new_right_col = min((int) this->env->grid->max_col, window_policy->area.right_col + col_diff);
+
+    GridArea new_area = GridArea(new_top_row, new_bottom_row, new_left_col, new_right_col);
+
+    Policy *policy = this->plan_window(group, new_area, timeout_ms);
+
+    this->replans_count++;
+    this->k +=1;
+
+    /* Transfer ownership */
+    delete window_policy->policy;
+    window_policy->policy = policy;
+    window_policy->area = new_area;
+    window_policy->steps_count = 0;
 }
+
+
 
 
 
