@@ -22,7 +22,7 @@ size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
 }
 
 /** Private methods *********************************************************************************************/
-WindowPolicy::WindowPolicy(Policy *policy, GridArea area) : policy(policy), area(area) {
+WindowPolicy::WindowPolicy(Policy *policy, GridArea area, int d) : policy(policy), area(area),d(d) {
     this->steps_count = 0;
 }
 
@@ -47,7 +47,7 @@ vector<vector<size_t>> OnlineReplanPolicy::divide_to_groups(const MultiAgentStat
                 continue;
             }
 
-            if (this->calc_distance(s.locations[i], s.locations[j]) <= this->k) {
+            if (this->calc_distance(s.locations[i], s.locations[j]) <= this->d) {
                 direct_neighbours[i].push_back(j);
                 direct_neighbours[j].push_back(i);
             }
@@ -146,7 +146,7 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
 
 Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
                                         GridArea window_area,
-                                        const MultiAgentState& s,
+                                        const MultiAgentState &s,
                                         double timeout_ms) {
     MEASURE_TIME;
 
@@ -168,7 +168,7 @@ Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
         intended_locations.push_back(
-                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
+                get_intended_locations(agent_policy, s.locations[agent], 2 * this->d, timeout_ms - ELAPSED_TIME_MS));
         if (ELAPSED_TIME_MS >= timeout_ms) {
             return nullptr;
         }
@@ -223,7 +223,7 @@ WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
     GridArea conflict_area = construct_conflict_area(this->env->grid, group, s);
 
     /* Pad the area TODO: is it good? */
-    conflict_area = pad_area(this->env->grid, conflict_area, this->k);
+    conflict_area = pad_area(this->env->grid, conflict_area, this->d);
 
     /* Replan for the group in the conflict area window */
     Policy *policy = this->plan_window(group, conflict_area, s, timeout_ms - ELAPSED_TIME_MS);
@@ -232,7 +232,7 @@ WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
     if (!this->replans->contains(group)) {
         (*this->replans)[group] = new vector<WindowPolicy *>();
     }
-    WindowPolicy *window_policy = new WindowPolicy(policy, conflict_area);
+    WindowPolicy *window_policy = new WindowPolicy(policy, conflict_area, this->d);
     (*(*this->replans)[group]).push_back(window_policy);
 
 //    /* debug print */
@@ -316,9 +316,9 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        float gamma,
                                        const string &name,
                                        SolverCreator *low_level_planner_creator,
-                                       int k) :
+                                       int d) :
         Policy(env, gamma, name),
-        k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
+        d(d), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
         replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
     this->replans = new tsl::hopscotch_map<vector<size_t>, vector<WindowPolicy *> *>();
 }
@@ -412,7 +412,7 @@ void OnlineReplanPolicy::delete_replans() {
 
 void OnlineReplanPolicy::extend_window(vector<size_t> group,
                                        WindowPolicy *window_policy,
-                                       const MultiAgentState& s,
+                                       const MultiAgentState &s,
                                        double timeout_ms) {
 //    int row_diff = (window_policy->area.bottom_row - window_policy->area.top_row) / 2 + 1;
 //    int col_diff = (window_policy->area.right_col - window_policy->area.left_col) / 2 + 1;
@@ -431,14 +431,17 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group,
     Policy *policy = this->plan_window(group, new_area, s, timeout_ms);
 
     this->replans_count++;
-    this->k +=2;
-    this->delete_replans();
+
+    if (window_policy->d == this->d){
+        this->d += 2;
+    }
 
     /* Transfer ownership */
     delete window_policy->policy;
     window_policy->policy = policy;
     window_policy->area = new_area;
     window_policy->steps_count = 0;
+    window_policy->d = this->d;
 }
 
 

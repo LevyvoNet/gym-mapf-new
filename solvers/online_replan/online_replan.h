@@ -24,7 +24,7 @@ GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const 
 
 /** Constants ********************************************************************/
 #define BONUS_VALUE (100)
-#define LIVE_LOCK_THRESHOLD (5)
+#define LIVE_LOCK_THRESHOLD (3)
 
 template<>
 class std::hash<vector<size_t>> {
@@ -37,8 +37,9 @@ public:
     Policy *policy;
     GridArea area;
     int steps_count;
+    int d;
 
-    WindowPolicy(Policy *policy, GridArea area);
+    WindowPolicy(Policy *policy, GridArea area, int d);
 
     bool might_live_lock();
 };
@@ -67,7 +68,7 @@ private:
 
 public:
     SolverCreator *low_level_planner_creator;
-    int k;
+    int d;
     CrossedPolicy *local_policy;
     int replans_count;
     int episodes_count;
@@ -79,7 +80,7 @@ public:
                        float gamma,
                        const string &name,
                        SolverCreator *low_level_planner_creator,
-                       int k);
+                       int d);
 
     virtual ~OnlineReplanPolicy();
 
