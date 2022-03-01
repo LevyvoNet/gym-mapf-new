@@ -22,13 +22,12 @@ size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
 }
 
 /** Private methods *********************************************************************************************/
-WindowPolicy::WindowPolicy(Policy *policy, GridArea area, int d) : policy(policy), area(area),d(d) {
+WindowPolicy::WindowPolicy(Policy *policy, GridArea area, int d) : policy(policy), area(area), d(d) {
     this->steps_count = 0;
 }
 
 bool WindowPolicy::might_live_lock() {
-    int window_area = abs(this->area.top_row - this->area.bottom_row) * abs(this->area.right_col - this->area.left_col);
-    return this->steps_count > LIVE_LOCK_THRESHOLD * window_area;
+    return this->steps_count > LIVE_LOCK_THRESHOLD * this->d * this->d;
 }
 
 
