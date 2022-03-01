@@ -22,6 +22,8 @@
 class GridArea; /* Forward Declaration */
 GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const MultiAgentState &s);
 
+/** Constants ********************************************************************/
+#define BONUS_VALUE (100)
 
 template<>
 class std::hash<vector<size_t>> {
@@ -29,11 +31,16 @@ public:
     size_t operator()(const vector<size_t> &v) const;
 };
 
-class Window {
-    vector<size_t> agents;
+class WindowPolicy {
+public:
+    Policy *policy;
     GridArea area;
-};
+    int steps_count;
 
+    WindowPolicy(Policy *policy, GridArea area);
+
+    bool might_live_lock();
+};
 
 class OnlineReplanPolicy : public Policy {
 private:
@@ -43,15 +50,17 @@ private:
 
     vector<vector<size_t>> divide_to_groups(const MultiAgentState &s);
 
-    Policy *search_replan(const vector<size_t> &group, const MultiAgentState &s);
+    WindowPolicy *search_window_policy(const vector<size_t> &group, const MultiAgentState &s);
 
-    Policy *replan(const vector<size_t> &group, const MultiAgentState &s, double timeout_ms);
+    WindowPolicy *replan(const vector<size_t> &group, const MultiAgentState &s, double timeout_ms);
+
+    void extend_window(vector<size_t> group, WindowPolicy* window_policy);
 
     int calc_distance(const Location &l1, const Location &l2);
 
     void delete_replans();
 
-    tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *> *replans;
+    tsl::hopscotch_map<vector<size_t>, vector<WindowPolicy*> *> *replans;
 
 public:
     SolverCreator *low_level_planner_creator;
@@ -77,7 +86,7 @@ public:
 
     virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) override;
 
-    virtual void eval_episodes_info_process(EvaluationInfo* eval_info) override;
+    virtual void eval_episodes_info_process(EvaluationInfo *eval_info) override;
 
     virtual void eval_episode_info_update(episode_info *episode_info) override;
 };

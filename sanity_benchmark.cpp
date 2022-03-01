@@ -69,7 +69,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                       new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 2, 8),
 
                         /* Room */
-//                       new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
+                       new GeneralEnv("room-64-64-16_scen_1_8-agents", "room-64-64-16", 1, 8),
                 }
         }
 );

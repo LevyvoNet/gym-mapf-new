@@ -4,16 +4,15 @@
 
 #include "online_replan.h"
 
-#define BONUS_VALUE (100)
 /** Utilities ***************************************************************************************************/
 vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
 size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
     size_t h = 0;
-    for (size_t i = 0;i < v.
-                    size();
+    for (size_t i = 0; i < v.
+            size();
 
-            ++i) {
+         ++i) {
         h +=
                 pow(PRIMES[(i + 1) % PRIMES.size()], v[i]
                 );
@@ -23,6 +22,16 @@ size_t hash<vector<size_t>>::operator()(const vector<size_t> &v) const {
 }
 
 /** Private methods *********************************************************************************************/
+WindowPolicy::WindowPolicy(Policy *policy, GridArea area) : policy(policy), area(area) {
+    this->steps_count = 0;
+}
+
+bool WindowPolicy::might_live_lock() {
+    int window_area = abs(this->area.top_row - this->area.bottom_row) * abs(this->area.right_col - this->area.left_col);
+    return this->steps_count > 2 * window_area;
+}
+
+
 int OnlineReplanPolicy::calc_distance(const Location &l1, const Location &l2) {
     return abs(l1.row - l2.row) + abs(l1.col - l2.col);
 }
@@ -123,7 +132,7 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     for (size_t i = 1; i <= k; ++i) {
         MultiAgentState *curr_state = p->env->locations_to_state({curr_location});
         MultiAgentAction *a = p->act(*curr_state, timeout_ms - ELAPSED_TIME_MS);
-        if (ELAPSED_TIME_MS >= timeout_ms){
+        if (ELAPSED_TIME_MS >= timeout_ms) {
             return res;
         }
         curr_location = p->env->grid->execute(curr_location, a->actions[0]);
@@ -135,9 +144,9 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
-Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
-                                   const MultiAgentState &s,
-                                   double timeout_ms) {
+WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
+                                         const MultiAgentState &s,
+                                         double timeout_ms) {
     MEASURE_TIME;
     /* Update information */
     ++this->replans_count;
@@ -167,8 +176,9 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
         Policy *agent_policy = this->local_policy->policies[agent];
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
-        intended_locations.push_back(get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
-        if (ELAPSED_TIME_MS >= timeout_ms){
+        intended_locations.push_back(
+                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
+        if (ELAPSED_TIME_MS >= timeout_ms) {
             return nullptr;
         }
     }
@@ -210,9 +220,10 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
 
     /* Save the new policy in replans cache */
     if (!this->replans->contains(group)) {
-        (*this->replans)[group] = new tsl::hopscotch_map<GridArea, Policy *>();
+        (*this->replans)[group] = new vector<WindowPolicy *>();
     }
-    (*(*this->replans)[group])[conflict_area] = policy;
+    WindowPolicy *window_policy = new WindowPolicy(policy, conflict_area);
+    (*(*this->replans)[group]).push_back(window_policy);
 
 //    /* debug print */
 //    cout << "replanned for group [";
@@ -225,20 +236,19 @@ Policy *OnlineReplanPolicy::replan(const vector<size_t> &group,
 //
 //    cout << "full state is " << s << endl;
 
-    return policy;
+    return window_policy;
 }
 
-Policy *OnlineReplanPolicy::search_replan(const vector<size_t> &group, const MultiAgentState &s) {
+WindowPolicy *OnlineReplanPolicy::search_window_policy(const vector<size_t> &group, const MultiAgentState &s) {
     if (this->replans->contains(group)) {
         /* Search for an area which contains our state */
-        for (auto item: *(*this->replans)[group]) {
-            GridArea area = item.first;
+        for (WindowPolicy *item: *(*this->replans)[group]) {
             bool contains_all = true;
             for (size_t agent: group) {
-                contains_all = contains_all && area.contains(s.locations[agent]);
+                contains_all = contains_all && item->area.contains(s.locations[agent]);
             }
             if (contains_all) {
-                return item.second;
+                return item;
             }
         }
     }
@@ -255,23 +265,28 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
     MultiAgentAction *a = nullptr;
 
 
-    /* In case of a single agent just return from the local policy */
+    /* In case of a single agent just return from the local window_policy */
     if (1 == group.size()) {
         policy = this->local_policy->policies[group[0]];
     } else {
-        /* Search for an existing policy for that group and location */
-        policy = this->search_replan(group, s);
-        if (nullptr == policy) {
+        /* Search for an existing window_policy for that group and location */
+        WindowPolicy *window_policy = this->search_window_policy(group, s);
+        if (nullptr == window_policy) {
             /* Replan for this group */
-            policy = this->replan(group, s, timeout_ms - ELAPSED_TIME_MS);
-            if (ELAPSED_TIME_MS >= timeout_ms){
+            window_policy = this->replan(group, s, timeout_ms - ELAPSED_TIME_MS);
+            if (ELAPSED_TIME_MS >= timeout_ms) {
                 return nullptr;
             }
         }
+        if (window_policy->might_live_lock()) {
+            this->extend_window(group, window_policy);
+        }
 
+        window_policy->steps_count++;
+        policy = window_policy->policy;
     }
 
-    /* Extract the action from the retrieved policy */
+    /* Extract the action from the retrieved window_policy */
     for (size_t agent: group) {
         casted_locations.push_back(s.locations[agent]);
     }
@@ -296,7 +311,7 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
         Policy(env, gamma, name),
         k(k), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
         replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
-    this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
+    this->replans = new tsl::hopscotch_map<vector<size_t>, vector<WindowPolicy *> *>();
 }
 
 OnlineReplanPolicy::~OnlineReplanPolicy() {
@@ -329,7 +344,7 @@ void OnlineReplanPolicy::reset() {
     this->replans_max_size_episode = 0;
     this->delete_replans();
 
-    this->replans = new tsl::hopscotch_map<vector<size_t>, tsl::hopscotch_map<GridArea, Policy *> *>();
+    this->replans = new tsl::hopscotch_map<vector<size_t>, vector<WindowPolicy *> *>();
 
 }
 
@@ -361,7 +376,7 @@ void OnlineReplanPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
-void OnlineReplanPolicy::eval_episode_info_update(episode_info* episode_info) {
+void OnlineReplanPolicy::eval_episode_info_update(episode_info *episode_info) {
     this->replans_sum += this->replans_count;
     ++this->episodes_count;
 
@@ -373,7 +388,7 @@ void OnlineReplanPolicy::delete_replans() {
     /* Delete old replans */
     for (auto item: *this->replans) {
         for (auto nested_item: *item.second) {
-            Policy *policy = nested_item.second;
+            Policy *policy = nested_item->policy;
             delete policy->env;
             delete policy;
         }
@@ -384,6 +399,9 @@ void OnlineReplanPolicy::delete_replans() {
 //    cout << "---------------------------" << endl;
 
     delete this->replans;
+}
+
+void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *window_policy) {
 }
 
 
