@@ -144,7 +144,10 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
-Policy *OnlineReplanPolicy::plan_window(vector<size_t> group, GridArea window_area, double timeout_ms) {
+Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
+                                        GridArea window_area,
+                                        const MultiAgentState& s,
+                                        double timeout_ms) {
     MEASURE_TIME;
 
     /* Generate state space from the conflict area */
@@ -159,13 +162,13 @@ Policy *OnlineReplanPolicy::plan_window(vector<size_t> group, GridArea window_ar
     /* Set the girth of the area with a fixed value composed of the single agents values */
     vector<ValueFunctionPolicy *> policies;
     vector<vector<size_t>> agents_groups;
-//    vector<tsl::hopscotch_set<Location>> intended_locations;
+    vector<tsl::hopscotch_set<Location>> intended_locations;
     for (size_t agent: group) {
         Policy *agent_policy = this->local_policy->policies[agent];
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
-//        intended_locations.push_back(
-//                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
+        intended_locations.push_back(
+                get_intended_locations(agent_policy, s.locations[agent], 2 * this->k, timeout_ms - ELAPSED_TIME_MS));
         if (ELAPSED_TIME_MS >= timeout_ms) {
             return nullptr;
         }
@@ -189,10 +192,10 @@ Policy *OnlineReplanPolicy::plan_window(vector<size_t> group, GridArea window_ar
 
                 double value = (*h)(&temp_state);
 
-//                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
-//                    intended_locations[agent_idx].end()) {
-//                    value += BONUS_VALUE;
-//                }
+                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
+                    intended_locations[agent_idx].end()) {
+                    value += BONUS_VALUE;
+                }
 
                 girth_values->set(temp_state.id, value);
             }
@@ -223,7 +226,7 @@ WindowPolicy *OnlineReplanPolicy::replan(const vector<size_t> &group,
     conflict_area = pad_area(this->env->grid, conflict_area, this->k);
 
     /* Replan for the group in the conflict area window */
-    Policy *policy = this->plan_window(group, conflict_area, timeout_ms - ELAPSED_TIME_MS);
+    Policy *policy = this->plan_window(group, conflict_area, s, timeout_ms - ELAPSED_TIME_MS);
 
     /* Save the new policy in replans cache */
     if (!this->replans->contains(group)) {
@@ -287,7 +290,7 @@ MultiAgentAction *OnlineReplanPolicy::select_action_for_group(vector<size_t> gro
             }
         }
         if (window_policy->might_live_lock()) {
-            this->extend_window(group, window_policy, timeout_ms - ELAPSED_TIME_MS);
+            this->extend_window(group, window_policy, s, timeout_ms - ELAPSED_TIME_MS);
         }
 
         window_policy->steps_count++;
@@ -407,7 +410,10 @@ void OnlineReplanPolicy::delete_replans() {
     delete this->replans;
 }
 
-void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *window_policy, double timeout_ms) {
+void OnlineReplanPolicy::extend_window(vector<size_t> group,
+                                       WindowPolicy *window_policy,
+                                       const MultiAgentState& s,
+                                       double timeout_ms) {
 //    int row_diff = (window_policy->area.bottom_row - window_policy->area.top_row) / 2 + 1;
 //    int col_diff = (window_policy->area.right_col - window_policy->area.left_col) / 2 + 1;
 
@@ -422,7 +428,7 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *windo
 
     GridArea new_area = GridArea(new_top_row, new_bottom_row, new_left_col, new_right_col);
 
-    Policy *policy = this->plan_window(group, new_area, timeout_ms);
+    Policy *policy = this->plan_window(group, new_area, s, timeout_ms);
 
     this->replans_count++;
     this->k +=2;
