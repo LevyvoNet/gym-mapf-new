@@ -425,7 +425,7 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group, WindowPolicy *windo
     Policy *policy = this->plan_window(group, new_area, timeout_ms);
 
     this->replans_count++;
-    this->k +=1;
+    this->k +=2;
 
     /* Transfer ownership */
     delete window_policy->policy;
