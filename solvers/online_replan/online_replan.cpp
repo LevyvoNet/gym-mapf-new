@@ -417,27 +417,28 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group,
 //    int row_diff = (window_policy->area.bottom_row - window_policy->area.top_row) / 2 + 1;
 //    int col_diff = (window_policy->area.right_col - window_policy->area.left_col) / 2 + 1;
 
-//    int row_diff = 1;
-//    int col_diff = 1;
-//
-//
-//    int new_top_row = max(0, window_policy->area.top_row - row_diff);
-//    int new_bottom_row = min((int) this->env->grid->max_row, window_policy->area.bottom_row + row_diff);
-//    int new_left_col = max(0, window_policy->area.left_col - col_diff);
-//    int new_right_col = min((int) this->env->grid->max_col, window_policy->area.right_col + col_diff);
-//
-//    GridArea new_area = GridArea(new_top_row, new_bottom_row, new_left_col, new_right_col);
-//
-//    Policy *policy = this->plan_window(group, new_area, s, timeout_ms);
-//
-//    this->replans_count++;
-//    this->k +=2;
-//
-//    /* Transfer ownership */
-//    delete window_policy->policy;
-//    window_policy->policy = policy;
-//    window_policy->area = new_area;
-//    window_policy->steps_count = 0;
+    int row_diff = 1;
+    int col_diff = 1;
+
+
+    int new_top_row = max(0, window_policy->area.top_row - row_diff);
+    int new_bottom_row = min((int) this->env->grid->max_row, window_policy->area.bottom_row + row_diff);
+    int new_left_col = max(0, window_policy->area.left_col - col_diff);
+    int new_right_col = min((int) this->env->grid->max_col, window_policy->area.right_col + col_diff);
+
+    GridArea new_area = GridArea(new_top_row, new_bottom_row, new_left_col, new_right_col);
+
+    Policy *policy = this->plan_window(group, new_area, s, timeout_ms);
+
+    this->replans_count++;
+    this->k +=2;
+    this->delete_replans();
+
+    /* Transfer ownership */
+    delete window_policy->policy;
+    window_policy->policy = policy;
+    window_policy->area = new_area;
+    window_policy->steps_count = 0;
 }
 
 
