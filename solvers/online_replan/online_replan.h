@@ -24,7 +24,7 @@ GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const 
 
 /** Constants ********************************************************************/
 //#define BONUS_VALUE (100)
-#define LIVE_LOCK_THRESHOLD (3)
+#define LIVE_LOCK_THRESHOLD (10)
 
 template<>
 class std::hash<vector<size_t>> {
