@@ -432,16 +432,14 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group,
 
     this->replans_count++;
 
-    if (window_policy->d == this->d){
-        this->d += 2;
-    }
-
     /* Transfer ownership */
     delete window_policy->policy;
     window_policy->policy = policy;
     window_policy->area = new_area;
     window_policy->steps_count = 0;
-    window_policy->d = this->d;
+    window_policy->d += 2;
+
+    this->d = max(window_policy->d, this->d);
 }
 
 
