@@ -32,6 +32,12 @@ public:
     size_t operator()(const vector<size_t> &v) const;
 };
 
+typedef Policy *(*window_planner)(MapfEnv *, Dictionary *, float gamma, double timeout_ms);
+
+Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms);
+
+Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values,float gamma,  double timeout_ms);
+
 class WindowPolicy {
 public:
     Policy *policy;
@@ -58,7 +64,7 @@ private:
 
     WindowPolicy *replan(const vector<size_t> &group, const MultiAgentState &s, double timeout_ms);
 
-    void extend_window(vector<size_t> group, WindowPolicy *window_policy,const MultiAgentState &s, double timeout_ms);
+    void extend_window(vector<size_t> group, WindowPolicy *window_policy, const MultiAgentState &s, double timeout_ms);
 
     int calc_distance(const Location &l1, const Location &l2);
 
@@ -68,6 +74,7 @@ private:
 
 public:
     SolverCreator *low_level_planner_creator;
+    window_planner window_planner_func;
     int d;
     CrossedPolicy *local_policy;
     int replans_count;
@@ -80,7 +87,8 @@ public:
                        float gamma,
                        const string &name,
                        SolverCreator *low_level_planner_creator,
-                       int d);
+                       int d,
+                       window_planner window_planner_func);
 
     virtual ~OnlineReplanPolicy();
 

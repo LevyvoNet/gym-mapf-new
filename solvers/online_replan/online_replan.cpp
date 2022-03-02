@@ -143,6 +143,29 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
+Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms){
+    MEASURE_TIME;
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+
+    return policy;
+}
+
+Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values,float gamma,  double timeout_ms){
+    MEASURE_TIME;
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    double orig_fail_prob = env->fail_prob;
+    env->fail_prob=0;
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    env->fail_prob = orig_fail_prob;
+
+    return policy;
+}
+
 Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
                                         GridArea window_area,
                                         const MultiAgentState &s,
@@ -158,7 +181,7 @@ Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
     MapfEnv *area_env = get_local_view(this->env, group);
     area_env->observation_space = conflict_area_state_space;
 
-    /* Set the girth of the area with a fixed value composed of the single agents values */
+    /* Set the girth of the area with a fixed value` composed of the single agents values */
     vector<ValueFunctionPolicy *> policies;
     vector<vector<size_t>> agents_groups;
     vector<tsl::hopscotch_set<Location>> intended_locations;
@@ -201,9 +224,8 @@ Policy *OnlineReplanPolicy::plan_window(vector<size_t> group,
         }
     }
 
-    /* Solve the env by value iteration */
-    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, this->gamma, "", girth_values);
-    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    /* Solve the env */
+    Policy* policy = this->window_planner_func(area_env, girth_values, this->gamma, timeout_ms - ELAPSED_TIME_MS);
     delete girth_values;
 
     return policy;
@@ -315,9 +337,10 @@ OnlineReplanPolicy::OnlineReplanPolicy(MapfEnv *env,
                                        float gamma,
                                        const string &name,
                                        SolverCreator *low_level_planner_creator,
-                                       int d) :
+                                       int d, window_planner window_planner_func) :
         Policy(env, gamma, name),
         d(d), low_level_planner_creator(low_level_planner_creator), local_policy(nullptr),
+        window_planner_func(window_planner_func),
         replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
     this->replans = new tsl::hopscotch_map<vector<size_t>, vector<WindowPolicy *> *>();
 }

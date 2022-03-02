@@ -25,7 +25,7 @@ SymmetricalBottleneck::SymmetricalBottleneck(string name, int goal_reward) : Env
                                                                              goal_reward(goal_reward) {
     std::ostringstream map_name;
     map_name << "SymmetricalBottleneck-goal=" << goal_reward;
-    this->map_name=map_name.str();
+    this->map_name = map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
 }
@@ -57,7 +57,7 @@ ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : E
                                                                                goal_reward(goal_reward) {
     std::ostringstream map_name;
     map_name << "AsymmetricalBottleneck-goal=" << goal_reward;
-    this->map_name=map_name.str();
+    this->map_name = map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
 }
@@ -142,7 +142,7 @@ MapfEnv *GeneralEnv::operator()() {
 }
 
 GeneralEnv::GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents) : EnvCreator(name) {
-    this->map_name=map_name;
+    this->map_name = map_name;
     this->n_agents = n_agents;
     this->scen_id = scen_id;
 }
@@ -179,12 +179,12 @@ Policy *id_rtdp_default::operator()(MapfEnv *env, float gamma) {
     return new IdPolicy(env, gamma, this->name, new rtdp_dijkstra_rtdp(""), nullptr);
 }
 
-online_replan::online_replan(string name, int k, SolverCreator *low_level_planner) : SolverCreator(name),
-                                                                                     k(k), low_level_planner(
-                low_level_planner) {}
+online_replan::online_replan(string name, int k, SolverCreator *low_level_planner, window_planner window_planner_func) :
+        SolverCreator(name),
+        k(k), low_level_planner(low_level_planner), window_planner_func(window_planner_func) {}
 
 Policy *online_replan::operator()(MapfEnv *env, float gamma) {
-    return new OnlineReplanPolicy(env, gamma, this->name, this->low_level_planner, this->k);
+    return new OnlineReplanPolicy(env, gamma, this->name, this->low_level_planner, this->k, this->window_planner_func);
 }
 
 dijkstra_baseline::dijkstra_baseline(string name) : SolverCreator(name) {}
