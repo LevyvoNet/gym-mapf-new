@@ -471,6 +471,19 @@ void MapfEnv::add_mountain(GridArea mountain_area) {
     this->mountains->push_back(mountain_area);
 }
 
+void MapfEnv::reset_cache() {
+    delete this->transition_cache;
+    delete this->is_terminal_cache;
+    delete this->living_reward_cache;
+
+    /* Caches */
+    this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
+    this->living_reward_cache = new MultiAgentStateStorage<ActionToIntStorage *>(this->n_agents, nullptr);
+//    this->living_reward_cache = new MultiAgentStateStorage<tsl::hopscotch_map<MultiAgentAction, int> *>(this->n_agents,
+//                                                                                                        NULL);
+    this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
+}
+
 
 TransitionsList::TransitionsList() {
     this->transitions = new list<Transition *>();

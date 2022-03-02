@@ -161,6 +161,7 @@ Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *gir
     double orig_fail_prob = env->fail_prob;
     env->fail_prob=0;
     policy->train(timeout_ms - ELAPSED_TIME_MS);
+    env->reset_cache();
     env->fail_prob = orig_fail_prob;
 
     return policy;

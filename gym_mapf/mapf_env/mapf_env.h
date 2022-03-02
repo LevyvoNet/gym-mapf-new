@@ -121,6 +121,8 @@ public:
 
     ~MapfEnv();
 
+    void reset_cache();
+
     TransitionsList *get_transitions(const MultiAgentState &state, const MultiAgentAction &action, bool cache = true);
 
     void step(const MultiAgentAction &action,
