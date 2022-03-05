@@ -68,7 +68,7 @@ private:
 
     /* State */
     vector<Window *> *curr_windows;
-//    vector<Window *> archived_windows;
+    vector<Window *> *archived_windows;
 
     /* Metadata for statistics */
     int replans_count;
@@ -90,6 +90,8 @@ private:
     Window *merge_windows(Window *w1, Window *w2, const MultiAgentState &state);
 
     void plan_window(Window *pWindow, const MultiAgentState &s, double d);
+
+    Window* try_fit_to_archive(AgentsGroup , const MultiAgentState &state);
 
 public:
 

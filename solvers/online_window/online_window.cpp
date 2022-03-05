@@ -21,6 +21,8 @@ MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
     group_state = this->policy->env->locations_to_state(casted_locations);
     a = this->policy->act(*group_state, timeout_ms - ELAPSED_TIME_MS);
 
+    ++this->steps_count;
+
     return a;
 }
 
@@ -148,7 +150,15 @@ void OnlineWindowPolicy::clear_windows() {
             delete w->policy;
         }
     }
+
+    for (Window *w: *(this->archived_windows)) {
+        if (w->group.size() != 1) {
+            delete w->policy->env;
+            delete w->policy;
+        }
+    }
     this->curr_windows = new vector<Window *>();
+    this->archived_windows = new vector<Window *>();
 }
 
 bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
@@ -157,6 +167,8 @@ bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
             if (w1 != w2) {
                 if (distance(w1, w2, state) <= this->d) {
                     Window *new_window = this->merge_windows(w1, w2, state);
+                    this->archived_windows->push_back(w1);
+                    this->archived_windows->push_back(w2);
                     this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w1));
                     this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w2));
                     this->curr_windows->push_back(new_window);
@@ -167,6 +179,23 @@ bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
     }
 
     return false;
+}
+
+Window* OnlineWindowPolicy::try_fit_to_archive(AgentsGroup group, const MultiAgentState &state){
+    for (Window* w: *this->archived_windows){
+        if (w->group == group){
+            bool contains_all = true;
+            for (size_t agent: group){
+                contains_all = contains_all && w->area.contains(state.locations[agent]);
+            }
+
+            if (contains_all){
+                return w;
+            }
+        }
+    }
+
+    return nullptr;
 }
 
 void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, double timeout_ms) {
@@ -195,10 +224,17 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     /* Plan windows which don't have a policy */
     for (Window *w: *this->curr_windows) {
         if (nullptr == w->policy) {
-            this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
-            ++this->replans_count;
-            this->replans_max_size = max(w->group.size(), this->replans_max_size);
-            this->replans_max_size_episode = max(w->group.size(), this->replans_max_size_episode);
+            /* There was not an archived window which fits to the current state */
+            Window* archived_window = this->try_fit_to_archive(w->group, state);
+            if (nullptr != archived_window) {
+                this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
+                this->curr_windows->push_back(archived_window);
+            } else{
+                this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+                ++this->replans_count;
+                this->replans_max_size = max(w->group.size(), this->replans_max_size);
+                this->replans_max_size_episode = max(w->group.size(), this->replans_max_size_episode);
+            }
         }
     }
 }
@@ -275,6 +311,7 @@ OnlineWindowPolicy::OnlineWindowPolicy(MapfEnv *env, float gamma, const string &
         d(d), low_level_planner_creator(low_level_planner_creator), window_planner_func(window_planner_func),
         replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
     this->curr_windows = new vector<Window *>();
+    this->archived_windows = new vector<Window *>();
     this->singles_windows = new vector<Window *>();
 }
 
