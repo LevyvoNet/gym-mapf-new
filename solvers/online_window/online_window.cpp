@@ -60,50 +60,74 @@ int distance(Window *w1, Window *w2, const MultiAgentState &state) {
 /** OnlineWindowPolicy ************************************************************************************/
 
 /** internal **********************************************************************************************/
-//GridArea construct_conflict_area(Grid *grid, const AgentsGroup &group, const MultiAgentState &s) {
-//    int top_row = grid->max_row;
-//    int bottom_row = 0;
-//    int left_col = grid->max_col;
-//    int right_col = 0;
-//    for (size_t agent: group) {
-//        top_row = min(top_row, s.locations[agent].row);
-//        bottom_row = max(bottom_row, s.locations[agent].row);
-//        left_col = min(left_col, s.locations[agent].col);
-//        right_col = max(right_col, s.locations[agent].col);
-//    }
-//
-//    return GridArea(top_row, bottom_row, left_col, right_col);
-//}
-//
-//GridArea pad_area(Grid *grid, GridArea area, int k) {
-//    int extra_rows = max(k - (area.bottom_row - area.top_row + 1), 0);
-//    int extra_cols = max(k - (area.right_col - area.left_col + 1), 0);
-//
-//    int top_row = max(0, (int) floor(area.top_row - extra_rows / 2.0));
-//    int left_col = max(0, (int) floor(area.left_col - extra_cols / 2.0));
-//    int bottom_row = min(grid->max_row, (size_t) ceil(area.bottom_row + extra_rows / 2.0));
-//    int right_col = min(grid->max_col, (size_t) ceil(area.right_col + extra_cols / 2.0));
-//
-//    return GridArea(top_row, bottom_row, left_col, right_col);
-//}
-//tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k, double timeout_ms) {
-//    MEASURE_TIME;
-//    tsl::hopscotch_set<Location> res;
-//    Location curr_location = start;
-//    for (size_t i = 1; i <= k; ++i) {
-//        MultiAgentState *curr_state = p->env->locations_to_state({curr_location});
-//        MultiAgentAction *a = p->act(*curr_state, timeout_ms - ELAPSED_TIME_MS);
-//        if (ELAPSED_TIME_MS >= timeout_ms) {
-//            return res;
-//        }
-//        curr_location = p->env->grid->execute(curr_location, a->actions[0]);
-//        delete a;
-//        res.insert(curr_location);
-//    }
-//
-//
-//    return res;
-//}
+GridArea construct_conflict_area(Grid *grid, const AgentsGroup &group, const MultiAgentState &s) {
+    int top_row = grid->max_row;
+    int bottom_row = 0;
+    int left_col = grid->max_col;
+    int right_col = 0;
+    for (size_t agent: group) {
+        top_row = min(top_row, s.locations[agent].row);
+        bottom_row = max(bottom_row, s.locations[agent].row);
+        left_col = min(left_col, s.locations[agent].col);
+        right_col = max(right_col, s.locations[agent].col);
+    }
+
+    return GridArea(top_row, bottom_row, left_col, right_col);
+}
+
+GridArea pad_area(Grid *grid, GridArea area, int k) {
+    int extra_rows = max(k - (area.bottom_row - area.top_row + 1), 0);
+    int extra_cols = max(k - (area.right_col - area.left_col + 1), 0);
+
+    int top_row = max(0, (int) floor(area.top_row - extra_rows / 2.0));
+    int left_col = max(0, (int) floor(area.left_col - extra_cols / 2.0));
+    int bottom_row = min(grid->max_row, (size_t) ceil(area.bottom_row + extra_rows / 2.0));
+    int right_col = min(grid->max_col, (size_t) ceil(area.right_col + extra_cols / 2.0));
+
+    return GridArea(top_row, bottom_row, left_col, right_col);
+}
+tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k, double timeout_ms) {
+    MEASURE_TIME;
+    tsl::hopscotch_set<Location> res;
+    Location curr_location = start;
+    for (size_t i = 1; i <= k; ++i) {
+        MultiAgentState *curr_state = p->env->locations_to_state({curr_location});
+        MultiAgentAction *a = p->act(*curr_state, timeout_ms - ELAPSED_TIME_MS);
+        if (ELAPSED_TIME_MS >= timeout_ms) {
+            return res;
+        }
+        curr_location = p->env->grid->execute(curr_location, a->actions[0]);
+        delete a;
+        res.insert(curr_location);
+    }
+
+
+    return res;
+}
+
+Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms){
+    MEASURE_TIME;
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+
+    return policy;
+}
+
+Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values,float gamma,  double timeout_ms){
+    MEASURE_TIME;
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    double orig_fail_prob = env->fail_prob;
+    env->fail_prob=0;
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    env->reset_cache();
+    env->fail_prob = orig_fail_prob;
+
+    return policy;
+}
 /** private **********************************************************************************************/
 Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAgentState &s) {
     vector<size_t> new_group;

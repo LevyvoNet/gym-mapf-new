@@ -128,16 +128,6 @@ public:
     virtual Policy *operator()(MapfEnv *env, float gamma);
 };
 
-class online_replan : public SolverCreator {
-    int k;
-    SolverCreator *low_level_planner;
-    window_planner window_planner_func;
-
-public:
-    online_replan(string name, int k, SolverCreator *low_level_planner, window_planner window_planner_func);
-
-    virtual Policy *operator()(MapfEnv *env, float gamma);
-};
 
 class dijkstra_baseline : public SolverCreator {
 public:

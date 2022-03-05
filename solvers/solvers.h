@@ -13,7 +13,6 @@
 #include "solvers/heuristics/rtdp_dijkstra_heuristic.h"
 #include "solvers/rtdp/rtdp.h"
 #include "solvers/id/id.h"
-#include "solvers/online_replan/online_replan.h"
 #include "solvers/dijkstra_baseline/dijkstra_baseline.h"
 #include "utils/utils.h"
 #include "online_window/online_window.h"

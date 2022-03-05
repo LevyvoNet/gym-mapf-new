@@ -25,8 +25,6 @@ add_library(gym_mapf_solvers SHARED
         rtdp/rtdp.cpp
         id/id.h
         id/id.cpp
-        online_replan/online_replan.h
-        online_replan/online_replan.cpp
         utils/conflict/conflict.h
         utils/conflict/conflict.cpp
         utils/utils.h

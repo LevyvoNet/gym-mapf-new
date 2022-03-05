@@ -21,17 +21,17 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (120)
+#define EPISODE_TIMEOUT_SEC (150)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
-#define WORKERS_LIMIT (2)
+#define WORKERS_LIMIT (10)
 
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
 #define MAX_SCEN_ID (25)
-#define MIN_AGENTS (1)
+#define MIN_AGENTS (2)
 #define MAX_AGENTS (4)
-#define AGENTS_INCREASE (1)
+#define AGENTS_INCREASE (10)
 vector<string> MAPS{
         /* City */
 //        "berlin_1_256",
@@ -40,7 +40,7 @@ vector<string> MAPS{
 //        "ost003d"
 
         /* Open */
-        "empty-8-8",
+//        "empty-8-8",
 //                "empty-16-16",
         //        "empty-32-32",
 //        "empty-48-48",
@@ -54,19 +54,20 @@ vector<string> MAPS{
         /* Room */
 //        "room-32-32-4",
 //        "room-64-64-8",
-//        "room-64-64-16",
+        "room-64-64-16",
 
 
 };
 
 vector<SolverCreator *> SOLVERS{
-        new vi("vi"),
+//        new vi("vi"),
 //        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
-        new id_rtdp("id_rtdp"),
-//        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-//        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),
-        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),
+//        new id_rtdp("id_rtdp"),
+        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+        new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
+        new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
+
 };
 
 vector<EnvCreator *> generate_env_creators() {

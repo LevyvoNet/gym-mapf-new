@@ -101,7 +101,6 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
                         new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-                        new online_window("online_window_rtdp_5", 5, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
                         new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
 
