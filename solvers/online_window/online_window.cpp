@@ -129,7 +129,7 @@ vector<Window *> OnlineWindowPolicy::destruct_window(Window *w, const MultiAgent
 
     /* Push all agents which are out of the old window */
     for (size_t single_agent: outside_agents) {
-        new_windows.push_back(this->singles_windows[single_agent]);
+        new_windows.push_back((*this->singles_windows)[single_agent]);
     }
 
     /* Push the remaining agents in old window */
@@ -142,23 +142,24 @@ vector<Window *> OnlineWindowPolicy::destruct_window(Window *w, const MultiAgent
 
 
 void OnlineWindowPolicy::clear_windows() {
-    for (Window *w: this->curr_windows) {
-        delete w->policy->env;
-        delete w->policy;
+    for (Window *w: *(this->curr_windows)) {
+        if (w->group.size() != 1) {
+            delete w->policy->env;
+            delete w->policy;
+        }
     }
-
-    this->curr_windows.clear();
+    this->curr_windows = new vector<Window *>();
 }
 
 bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
-    for (Window *w1: this->curr_windows) {
-        for (Window *w2: this->curr_windows) {
+    for (Window *w1: *this->curr_windows) {
+        for (Window *w2: *this->curr_windows) {
             if (w1 != w2) {
                 if (distance(w1, w2, state) <= this->d) {
                     Window *new_window = this->merge_windows(w1, w2, state);
-                    std::remove(this->curr_windows.begin(), this->curr_windows.end(), w1);
-                    std::remove(this->curr_windows.begin(), this->curr_windows.end(), w2);
-                    this->curr_windows.push_back(new_window);
+                    std::remove(this->curr_windows->begin(), this->curr_windows->end(), w1);
+                    std::remove(this->curr_windows->begin(), this->curr_windows->end(), w2);
+                    this->curr_windows->push_back(new_window);
                     return true;
                 }
             }
@@ -171,17 +172,20 @@ bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
 void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, double timeout_ms) {
     MEASURE_TIME;
 
-    vector<Window *> old_windows = this->curr_windows;
+    vector<Window *> *old_windows = this->curr_windows;
     vector<Window *> new_windows;
     bool merged = true;
 
     /* Destruct required windows */
-    for (Window *old_window: old_windows) {
+    for (Window *old_window: *old_windows) {
         for (Window *new_window: this->destruct_window(old_window, state)) {
             new_windows.push_back(new_window);
         }
     }
-    this->curr_windows = new_windows;
+    this->curr_windows->clear();
+    for (Window *new_window: new_windows) {
+        this->curr_windows->push_back(new_window);
+    }
 
     /* Merge required new windows */
     while (merged) {
@@ -189,13 +193,12 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* Plan windows which don't have a policy */
-    for (Window *w: this->curr_windows) {
+    for (Window *w: *this->curr_windows) {
         if (nullptr == w->policy) {
             this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
         }
     }
 }
-
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
@@ -215,7 +218,7 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
     vector<vector<size_t>> agents_groups;
     vector<tsl::hopscotch_set<Location>> intended_locations;
     for (size_t agent: w->group) {
-        Policy *agent_policy = this->singles_windows[agent]->policy;
+        Policy *agent_policy = (*this->singles_windows)[agent]->policy;
         policies.push_back((ValueFunctionPolicy *) agent_policy);
         agents_groups.push_back({agent});
         intended_locations.push_back(
@@ -267,7 +270,10 @@ OnlineWindowPolicy::OnlineWindowPolicy(MapfEnv *env, float gamma, const string &
                                        window_planner window_planner_func) :
         Policy(env, gamma, name),
         d(d), low_level_planner_creator(low_level_planner_creator), window_planner_func(window_planner_func),
-        replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {}
+        replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0) {
+    this->curr_windows = new vector<Window *>();
+    this->singles_windows = new vector<Window *>();
+}
 
 void OnlineWindowPolicy::train(double timeout_ms) {
     MEASURE_TIME;
@@ -289,8 +295,8 @@ void OnlineWindowPolicy::train(double timeout_ms) {
     /* Initialize the current windows where each agent is in its own window which spans an all of the grid */
     GridArea all_grid = GridArea(0, this->env->grid->max_row, 0, this->env->grid->max_col);
     for (AgentsGroup group: groups) {
-        this->curr_windows.push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
-        this->singles_windows.push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
+        this->curr_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
+        this->singles_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
     }
 
 
@@ -323,6 +329,10 @@ void OnlineWindowPolicy::reset() {
     this->replans_count = 0;
     this->replans_max_size_episode = 0;
     this->clear_windows();
+
+    for (Window *w: *this->singles_windows) {
+        this->curr_windows->push_back(new Window(w->area, w->policy, w->group));
+    }
 }
 
 MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double timeout_ms) {
@@ -333,7 +343,7 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
     this->update_current_windows(state, timeout_ms - ELAPSED_TIME_MS);
 
 
-    for (Window *w: this->curr_windows) {
+    for (Window *w: *this->curr_windows) {
         window_action = w->act(state, timeout_ms - ELAPSED_TIME_MS);
         for (size_t i = 0; i < w->group.size(); ++i) {
             selected_actions[w->group[i]] = window_action->actions[i];

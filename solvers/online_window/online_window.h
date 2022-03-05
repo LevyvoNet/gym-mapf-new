@@ -64,10 +64,10 @@ private:
     int d;
 
     /* Consts */
-    vector<Window *> singles_windows;
+    vector<Window *>* singles_windows;
 
     /* State */
-    vector<Window *> curr_windows;
+    vector<Window *> *curr_windows;
 //    vector<Window *> archived_windows;
 
     /* Metadata for statistics */
