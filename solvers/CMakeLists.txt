@@ -32,5 +32,7 @@ add_library(gym_mapf_solvers SHARED
         utils/utils.h
         dijkstra_baseline/dijkstra_baseline.h
         dijkstra_baseline/dijkstra_baseline.cpp
+        online_window/online_window.h
+        online_window/online_window.cpp
         )
 target_include_directories(gym_mapf_solvers PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

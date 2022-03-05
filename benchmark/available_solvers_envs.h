@@ -146,6 +146,16 @@ public:
     virtual Policy *operator()(MapfEnv *env, float gamma);
 };
 
+class online_window: public SolverCreator {
+    int d;
+    SolverCreator *low_level_planner;
+    window_planner window_planner_func;
+
+public:
+    online_window(string name, int d, SolverCreator *low_level_planner, window_planner window_planner_func);
+
+    virtual Policy *operator()(MapfEnv *env, float gamma);
+};
 
 
 

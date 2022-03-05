@@ -4,6 +4,7 @@
 
 #include "online_replan.h"
 
+
 /** Utilities ***************************************************************************************************/
 vector<size_t> PRIMES = {2, 3, 5, 7, 9, 11, 13, 17, 19};
 
@@ -464,8 +465,6 @@ void OnlineReplanPolicy::extend_window(vector<size_t> group,
 
     this->d = max(window_policy->d, this->d);
 }
-
-
 
 
 

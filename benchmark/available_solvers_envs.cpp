@@ -193,3 +193,10 @@ Policy *dijkstra_baseline::operator()(MapfEnv *env, float gamma) {
     return new DijkstraBaselinePolicy(env, gamma, this->name);
 }
 
+online_window::online_window(string name, int d, SolverCreator *low_level_planner, window_planner window_planner_func) :
+        SolverCreator(name),
+        d(d), low_level_planner(low_level_planner), window_planner_func(window_planner_func) {}
+
+Policy *online_window::operator()(MapfEnv *env, float gamma) {
+    return new OnlineWindowPolicy(env, gamma, this->name, this->low_level_planner, this->d, this->window_planner_func);
+}

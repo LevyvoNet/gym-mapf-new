@@ -16,5 +16,6 @@
 #include "solvers/online_replan/online_replan.h"
 #include "solvers/dijkstra_baseline/dijkstra_baseline.h"
 #include "utils/utils.h"
+#include "online_window/online_window.h"
 
 #endif //GYM_MAPF_SOLVERS_H
