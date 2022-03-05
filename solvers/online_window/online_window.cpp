@@ -6,7 +6,19 @@
 
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
-        area(area), policy(policy), group(group), steps_count(0) {}
+        area(area), policy(policy), group(group), steps_count(0) {
+    this->max_steps = calc_max_steps();
+}
+
+int Window::calc_max_steps() {
+    double total_cells =
+            (this->area.bottom_row - this->area.top_row + 1) * (this->area.right_col - this->area.left_col + 1);
+    double max_steps = total_cells;
+
+    max_steps *= LIVE_LOCK_BUFFER;
+
+    return max_steps;
+}
 
 MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
     MEASURE_TIME;
@@ -106,6 +118,15 @@ Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAge
 
     GridArea new_area_padded = pad_area(this->env->grid, new_area, this->d);
 
+    /* Look for the desired window in our archive */
+    for (Window* archived:*this->archived_windows){
+        if (archived->group == new_group && archived->area==new_area_padded){
+            this->archived_windows->erase(std::remove(this->archived_windows->begin(),
+                                                      this->archived_windows->end(), archived));
+            return archived;
+        }
+    }
+
     return new Window(new_area_padded, nullptr, new_group);
 }
 
@@ -167,10 +188,10 @@ bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
             if (w1 != w2) {
                 if (distance(w1, w2, state) <= this->d) {
                     Window *new_window = this->merge_windows(w1, w2, state);
-                    if (nullptr != w1->policy){
+                    if (nullptr != w1->policy) {
                         this->archived_windows->push_back(w1);
                     }
-                    if (nullptr != w2->policy){
+                    if (nullptr != w2->policy) {
                         this->archived_windows->push_back(w2);
                     }
                     this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w1));
@@ -202,12 +223,45 @@ Window *OnlineWindowPolicy::try_fit_to_archive(AgentsGroup group, const MultiAge
     return nullptr;
 }
 
+bool OnlineWindowPolicy::might_live_lock(Window *w) {
+    return w->steps_count >= w->max_steps;
+}
+
+
+void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
+
+    int row_count = w->area.bottom_row - w->area.top_row + 1;
+    int col_count = w->area.right_col - w->area.left_col + 1;
+
+    int row_diff = row_count / 4 + 1;
+    int col_diff = col_count / 4 + 1;
+
+    int new_top = max(0, w->area.top_row - row_diff);
+    int new_bottom = min((int) this->env->grid->max_row, w->area.bottom_row + row_diff);
+    int new_left = max(0, w->area.left_col - col_diff);
+    int new_right = min((int) this->env->grid->max_col, w->area.right_col + col_diff);
+
+    GridArea new_area = GridArea(new_top, new_bottom, new_left, new_right);
+    GridArea old_area = w->area;
+
+    /* Set window attributes after expansion */
+    w->area = new_area;
+    w->steps_count = 0;
+    w->max_steps = w->calc_max_steps();
+
+    if (!(new_area == old_area)){
+        this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+    }
+
+}
+
 void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, double timeout_ms) {
     MEASURE_TIME;
 
     vector<Window *> *old_windows = this->curr_windows;
     vector<Window *> new_windows;
-    bool merged = true;
+    bool merge_possible = true;
 
     /* Destruct required windows */
     for (Window *old_window: *old_windows) {
@@ -215,13 +269,14 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
         for (Window *new_window: this->destruct_window(old_window, state)) {
             ++new_windows_count;
             new_windows.push_back(new_window);
-            for (Window* archived: *this->archived_windows){
-                if (archived->group == new_window->group and archived->area == new_window->area){
-                    this->archived_windows->erase(std::remove(this->archived_windows->begin(), this->archived_windows->end(), archived));
+            for (Window *archived: *this->archived_windows) {
+                if (archived->group == new_window->group and archived->area == new_window->area) {
+                    this->archived_windows->erase(
+                            std::remove(this->archived_windows->begin(), this->archived_windows->end(), archived));
                 }
             }
         }
-        if (new_windows_count > 1){
+        if (new_windows_count > 1) {
             this->archived_windows->push_back(old_window);
         }
     }
@@ -231,8 +286,16 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* Merge required new windows */
-    while (merged) {
-        merged = this->merge_current_windows(state);
+    while (merge_possible) {
+        merge_possible = this->merge_current_windows(state);
+
+        /* Expand windows which might be in live lock */
+        for (Window *w: *this->curr_windows) {
+            if (this->might_live_lock(w)) {
+                this->expand_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+                merge_possible = true;
+            }
+        }
     }
 
     /* Plan windows which don't have a policy */
@@ -248,9 +311,6 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                                                           archived_window));
             } else {
                 this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
-                ++this->replans_count;
-                this->replans_max_size = max(w->group.size(), this->replans_max_size);
-                this->replans_max_size_episode = max(w->group.size(), this->replans_max_size_episode);
             }
         }
     }
@@ -259,6 +319,11 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
     MEASURE_TIME;
+
+    /* Update statistics */
+    ++this->replans_count;
+    this->replans_max_size = max(w->group.size(), this->replans_max_size);
+    this->replans_max_size_episode = max(w->group.size(), this->replans_max_size_episode);
 
     /* Generate state space from the conflict area */
     AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid,

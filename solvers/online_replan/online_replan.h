@@ -23,7 +23,7 @@ class GridArea; /* Forward Declaration */
 GridArea construct_conflict_area(Grid *grid, const vector<size_t> &group, const MultiAgentState &s);
 
 /** Constants ********************************************************************/
-#define BONUS_VALUE (0)
+#define BONUS_VALUE (100)
 #define LIVE_LOCK_THRESHOLD (10)
 
 template<>

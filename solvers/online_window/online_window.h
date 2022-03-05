@@ -21,7 +21,8 @@
 
 
 /** Constants *****************************************************************************************/
-#define BONUS_VALUE (0)
+#define BONUS_VALUE (100)
+#define LIVE_LOCK_BUFFER (4)
 
 
 /** Utility Types ********************************************************************************************/
@@ -49,10 +50,13 @@ public:
     Policy *policy;
     AgentsGroup group;
     int steps_count;
+    int max_steps;
 
     Window(GridArea area, Policy *policy, AgentsGroup group);
 
     MultiAgentAction *act(const MultiAgentState &state, double timeout_ms);
+
+    int calc_max_steps();
 
 };
 
@@ -92,6 +96,10 @@ private:
     void plan_window(Window *pWindow, const MultiAgentState &s, double d);
 
     Window* try_fit_to_archive(AgentsGroup , const MultiAgentState &state);
+
+    bool might_live_lock(Window* w);
+
+    void expand_window(Window* w, const MultiAgentState &state, double timeout_ms);
 
 public:
 
