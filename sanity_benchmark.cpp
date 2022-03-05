@@ -60,10 +60,10 @@ vector<vector<EnvCreator *>> env_creators(
                         new GeneralEnv("ost003d_scen_10_8-agents", "ost003d", 10, 8),
 
                         /* Open */
-//                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
+                        new GeneralEnv("empty-16-16_scen_1_6-agents", "empty-16-16", 1, 6),
 
                         /* Open + obstacles */
-//                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 10, 8),
+                        new GeneralEnv("random-64-64-10_scen_14_4-agents", "random-64-64-10", 10, 8),
 
                         /* Maze */
                        new MazeEnv("maze-32-32-4-scen_16_8-agents", 32, 4, 2, 8),
