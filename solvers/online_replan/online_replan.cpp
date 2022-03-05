@@ -117,8 +117,8 @@ GridArea pad_area(Grid *grid, GridArea area, int k) {
     int extra_rows = max(k - (area.bottom_row - area.top_row + 1), 0);
     int extra_cols = max(k - (area.right_col - area.left_col + 1), 0);
 
-    int top_row = max(0, (int) floor(area.top_row - extra_rows / 2.0));
-    int left_col = max(0, (int) floor(area.left_col - extra_cols / 2.0));
+    int top_row = max(0, (int) ceil(area.top_row - extra_rows / 2.0));
+    int left_col = max(0, (int) ceil(area.left_col - extra_cols / 2.0));
     int bottom_row = min(grid->max_row, (size_t) ceil(area.bottom_row + extra_rows / 2.0));
     int right_col = min(grid->max_col, (size_t) ceil(area.right_col + extra_cols / 2.0));
 

@@ -31,7 +31,7 @@ int locations_distance(const Location &l1, const Location &l2) {
 }
 
 int distance(Window *w1, Window *w2, const MultiAgentState &state) {
-    int min_agents_distance = std::numeric_limits<int>::infinity();
+    int min_agents_distance = 99999;
 
     for (size_t a1: w1->group) {
         for (size_t a2: w2->group) {
@@ -157,8 +157,8 @@ bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
             if (w1 != w2) {
                 if (distance(w1, w2, state) <= this->d) {
                     Window *new_window = this->merge_windows(w1, w2, state);
-                    std::remove(this->curr_windows->begin(), this->curr_windows->end(), w1);
-                    std::remove(this->curr_windows->begin(), this->curr_windows->end(), w2);
+                    this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w1));
+                    this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w2));
                     this->curr_windows->push_back(new_window);
                     return true;
                 }
@@ -188,8 +188,13 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* Merge required new windows */
+    int count = 0;
     while (merged) {
         merged = this->merge_current_windows(state);
+        ++count;
+        if (count == 10){
+            cout << "oh no" << endl;
+        }
     }
 
     /* Plan windows which don't have a policy */
