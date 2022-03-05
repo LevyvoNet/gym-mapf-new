@@ -188,19 +188,17 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* Merge required new windows */
-    int count = 0;
     while (merged) {
         merged = this->merge_current_windows(state);
-        ++count;
-        if (count == 10){
-            cout << "oh no" << endl;
-        }
     }
 
     /* Plan windows which don't have a policy */
     for (Window *w: *this->curr_windows) {
         if (nullptr == w->policy) {
             this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+            ++this->replans_count;
+            this->replans_max_size = max(w->group.size(), this->replans_max_size);
+            this->replans_max_size_episode = max(w->group.size(), this->replans_max_size_episode);
         }
     }
 }
