@@ -11,6 +11,7 @@ Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
 }
 
 int Window::calc_max_steps() {
+    return 20;
     double total_cells =
             (this->area.bottom_row - this->area.top_row + 1) * (this->area.right_col - this->area.left_col + 1);
     double max_steps = total_cells;
