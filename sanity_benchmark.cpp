@@ -57,21 +57,19 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("ost003d_scen_7_6-agents", "ost003d", 7, 6),
-                        new GeneralEnv("ost003d_scen_10_6-agents", "ost003d", 10, 6),
+                        new GeneralEnv("", "ost003d", 5, 6),
 
                         /* Open */
-                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
-                        new GeneralEnv("random-64-64-10_scen_10_6-agents", "random-64-64-10", 10, 6),
+                        new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
-                       new MazeEnv("", 128, 10, 1, 5),
+//                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
                         new GeneralEnv("", "room-64-64-16", 1, 8),
-                        new GeneralEnv("", "room-64-64-16", 2, 8),
                 }
         }
 );
@@ -100,14 +98,9 @@ vector<vector<SolverCreator *>> solver_creators(
                 /* lvl 4 */
                 {
                         new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-                        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+//                        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
-                        new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
-
-//                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-//                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-//                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),
-//                        new online_replan("online_replan_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),
+//                        new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
                 }
         }
 );

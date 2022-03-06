@@ -151,6 +151,8 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
         struct worker_data new_worker;
         strncpy(new_worker.env_name, problem.env_creator->name.c_str(), MAX_MAP_NAME);
         strncpy(new_worker.solver_name, problem.solver_creator->name.c_str(), MAX_SOLVER_NAME);
+        new_worker.scen_id = problem.env_creator->scen_id;
+        new_worker.n_agents = problem.env_creator->n_agents;
         new_worker.problem_id = problem.id;
         new_worker.pid = pid;
         new_worker.fd = fds[0];
@@ -172,6 +174,9 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
             result.id = worker_data.problem_id;
             strncpy(result.map_name, worker_data.env_name, MAX_MAP_NAME);
             strncpy(result.solver_name, worker_data.solver_name, MAX_SOLVER_NAME);
+            result.scen_id = worker_data.scen_id;
+            result.n_agents = worker_data.n_agents;
+
             return result;
         }
 

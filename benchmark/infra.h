@@ -30,6 +30,8 @@ struct worker_data {
 
     char env_name[MAX_MAP_NAME];
     char solver_name[MAX_SOLVER_NAME];
+    int scen_id;
+    int n_agents;
 };
 
 struct problem_instance {
