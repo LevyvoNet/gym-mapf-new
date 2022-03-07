@@ -76,7 +76,7 @@ bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
         return false;
     }
 
-    if (curr_eval_info->success_rate < MIN_SUCCESS_RATE) {
+    if (prev_eval_info->success_rate < MIN_SUCCESS_RATE || curr_eval_info->success_rate < MIN_SUCCESS_RATE) {
         return false;
     }
 
