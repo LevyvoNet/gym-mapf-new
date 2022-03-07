@@ -115,6 +115,45 @@ Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, d
     return policy;
 }
 
+AllStayExceptFirstActionSpaceIterator &AllStayExceptFirstActionSpaceIterator::operator++() {
+    this->ptr->actions[0] = (Action) (int(this->ptr->actions[0]) + 1);
+    if (this->ptr->actions[0] == LAST_INVALID_ACTION){
+        this->reach_end();
+    }
+    this->ptr->id++;
+    return *this;
+}
+
+AllStayExceptFirstActionSpaceIterator::AllStayExceptFirstActionSpaceIterator(size_t n_agents)
+        : MultiAgentActionIterator(n_agents) {}
+
+AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t nAgents, MultiAgentActionSpace *action_space)
+        : MultiAgentActionSpace(action_space->n_agents) {
+
+}
+
+AllStayExceptFirstActionSpaceIterator AllStayExceptFirstActionSpace::begin() {
+    return AllStayExceptFirstActionSpaceIterator(this->n_agents);
+}
+
+AllStayExceptFirstActionSpaceIterator AllStayExceptFirstActionSpace::end() {
+    AllStayExceptFirstActionSpaceIterator iter = AllStayExceptFirstActionSpaceIterator(this->n_agents);
+    iter.reach_end();
+
+    return iter;
+}
+
+Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms){
+    MEASURE_TIME;
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    env->action_space = new AllStayExceptFirstActionSpace(0, env->action_space);
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+
+    return policy;
+}
+
 Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values,float gamma,  double timeout_ms){
     MEASURE_TIME;
 
@@ -457,7 +496,7 @@ OnlineWindowPolicy::~OnlineWindowPolicy() {
 
 void OnlineWindowPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     float replans_mean = float(this->replans_sum) / this->episodes_count;
-    (*eval_info->additional_data)["replans_mean"] = std::to_string((int) round(replans_mean * 100) / 100);
+    (*eval_info->additional_data)["replans_mean"] = std::to_string( round(replans_mean * 100) / 100);
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
@@ -498,14 +537,6 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
 
     return actions_to_action(selected_actions);
 }
-
-
-
-
-
-
-
-
 
 
 

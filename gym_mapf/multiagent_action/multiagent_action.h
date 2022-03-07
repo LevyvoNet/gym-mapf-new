@@ -25,11 +25,9 @@ public:
 
 
 class MultiAgentActionIterator {
-private:
+public:
     MultiAgentAction *ptr;
     size_t n_agents;
-
-public:
 
     MultiAgentActionIterator(size_t n_agents);
 
@@ -53,10 +51,9 @@ public:
 };
 
 class MultiAgentActionSpace {
-private:
+public:
     size_t n_agents;
 
-public:
     MultiAgentActionSpace(size_t n_agents);
 
     MultiAgentActionIterator begin();

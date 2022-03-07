@@ -12,7 +12,7 @@
 
 #include <tsl/hopscotch_set.h>
 
-#include <gym_mapf/grid/grid.h>
+#include <gym_mapf/gym_mapf.h>
 #include <solvers/utils/policy/policy.h>
 #include <solvers/utils/policy/crossed_policy.h>
 #include <solvers/utils/utils.h>
@@ -30,10 +30,29 @@ typedef Policy *(*window_planner)(MapfEnv *, Dictionary *, float gamma, double t
 
 Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms);
 
+Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms);
+
 Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env,
                                                    Dictionary *girth_values,
                                                    float gamma,
                                                    double timeout_ms);
+
+class AllStayExceptFirstActionSpaceIterator: public MultiAgentActionIterator{
+public:
+
+    AllStayExceptFirstActionSpaceIterator(size_t nAgents);
+
+    AllStayExceptFirstActionSpaceIterator& operator++();
+};
+
+class AllStayExceptFirstActionSpace : public MultiAgentActionSpace {
+public:
+    AllStayExceptFirstActionSpace(size_t nAgents, MultiAgentActionSpace *action_space);
+
+    AllStayExceptFirstActionSpaceIterator begin();
+
+    AllStayExceptFirstActionSpaceIterator end();
+};
 
 typedef vector<size_t> AgentsGroup;
 
