@@ -543,11 +543,11 @@ TEST(MafpEnvTests, ActionSpaceIteration) {
                 0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
 
     list<MultiAgentAction *> actions;
-    MultiAgentActionIterator iter = env.action_space->begin();
-    MultiAgentActionIterator end = env.action_space->end();
+    MultiAgentActionIterator *iter = env.action_space->begin();
+    MultiAgentActionIterator *end = env.action_space->end();
 
-    for (iter.reach_begin(); iter != end; ++iter) {
-        actions.push_back(new MultiAgentAction(iter->actions, iter->id));
+    for (iter->reach_begin(); *iter != *end; ++*iter) {
+        actions.push_back(new MultiAgentAction((*iter)->actions, (*iter)->id));
     }
 
 

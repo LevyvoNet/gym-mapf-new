@@ -47,11 +47,11 @@ public:
 
 class AllStayExceptFirstActionSpace : public MultiAgentActionSpace {
 public:
-    AllStayExceptFirstActionSpace(size_t nAgents, MultiAgentActionSpace *action_space);
+    AllStayExceptFirstActionSpace(size_t nAgents);
 
-    AllStayExceptFirstActionSpaceIterator begin();
+    MultiAgentActionIterator* begin();
 
-    AllStayExceptFirstActionSpaceIterator end();
+    MultiAgentActionIterator* end();
 };
 
 typedef vector<size_t> AgentsGroup;

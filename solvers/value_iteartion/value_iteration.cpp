@@ -26,13 +26,13 @@ ValueIterationPolicy::ValueIterationPolicy(MapfEnv *env, float gamma, const stri
 void ValueIterationPolicy::train(double timeout_milliseconds) {
     size_t i = 0;
     MultiAgentStateIterator *s = this->env->observation_space->begin();
-    MultiAgentActionIterator a = this->env->action_space->begin();
+    MultiAgentActionIterator* a = this->env->action_space->begin();
     double q_sa = 0;
     double v_s = -std::numeric_limits<double>::max();
     list<Transition *> *transitions = NULL;
     double max_diff = 0;
     Dictionary *prev_v = NULL;
-    MultiAgentActionIterator action_end = this->env->action_space->end();
+    MultiAgentActionIterator *action_end = this->env->action_space->end();
     MultiAgentStateIterator *state_end = this->env->observation_space->end();
     int states_count = 0;
     double value = 0;
@@ -53,9 +53,9 @@ void ValueIterationPolicy::train(double timeout_milliseconds) {
             ++states_count;
             v_s = -std::numeric_limits<double>::max();
             /* Calculate Q(s,a) and keep the maximum one */
-            for (a.reach_begin(); a != action_end; ++a) {
+            for (a->reach_begin(); *a != *action_end; ++*a) {
                 q_sa = 0;
-                transitions = this->env->get_transitions(**s, *a)->transitions;
+                transitions = this->env->get_transitions(**s, **a)->transitions;
                 if (ELAPSED_TIME_MS >= timeout_milliseconds) {
                     /* timeout */
                     return;

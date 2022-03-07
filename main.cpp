@@ -99,7 +99,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-                        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+//                        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
 //                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
 //                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
 //                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),

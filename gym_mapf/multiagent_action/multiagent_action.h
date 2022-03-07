@@ -41,7 +41,7 @@ public:
 
     MultiAgentAction operator*() const;
 
-    MultiAgentActionIterator& operator++();
+    virtual MultiAgentActionIterator& operator++();
 
     bool operator==(const MultiAgentActionIterator &other) const;
 
@@ -56,9 +56,9 @@ public:
 
     MultiAgentActionSpace(size_t n_agents);
 
-    MultiAgentActionIterator begin();
+    virtual MultiAgentActionIterator* begin();
 
-    MultiAgentActionIterator end();
+    virtual MultiAgentActionIterator* end();
 };
 
 #endif //GYM_MAPF_MULTIAGENT_STATE_H

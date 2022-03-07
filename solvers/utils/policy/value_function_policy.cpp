@@ -13,12 +13,12 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
     list<Transition *> *transitions = NULL;
     MultiAgentAction best_action = MultiAgentAction(this->env->n_agents);
     double max_q = -std::numeric_limits<double>::max();
-    MultiAgentActionIterator action_space_end = this->env->action_space->end();
-    MultiAgentActionIterator a = this->env->action_space->begin();
+    MultiAgentActionIterator *action_space_end = this->env->action_space->end();
+    MultiAgentActionIterator *a = this->env->action_space->begin();
 
-    for (a.reach_begin(); a != action_space_end; ++a) {
+    for (a->reach_begin(); *a != *action_space_end; ++*a) {
         q_sa = 0;
-        transitions = this->env->get_transitions(s, *a)->transitions;
+        transitions = this->env->get_transitions(s, **a)->transitions;
         if (ELAPSED_TIME_MS >= timeout_ms) {
             return;
         }
@@ -32,7 +32,7 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
         }
 
         if (q_sa > max_q) {
-            best_action = *a;
+            best_action = **a;
             max_q = q_sa;
         }
     }

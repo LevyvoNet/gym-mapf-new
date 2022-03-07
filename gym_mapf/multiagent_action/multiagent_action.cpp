@@ -130,13 +130,13 @@ MultiAgentActionSpace::MultiAgentActionSpace(size_t n_agents) {
     this->n_agents = n_agents;
 }
 
-MultiAgentActionIterator MultiAgentActionSpace::begin() {
-    return MultiAgentActionIterator(this->n_agents);
+MultiAgentActionIterator* MultiAgentActionSpace::begin() {
+    return new MultiAgentActionIterator(this->n_agents);
 }
 
-MultiAgentActionIterator MultiAgentActionSpace::end() {
-    MultiAgentActionIterator iter = MultiAgentActionIterator(this->n_agents);
-    iter.reach_end();
+MultiAgentActionIterator* MultiAgentActionSpace::end() {
+    MultiAgentActionIterator *iter = new MultiAgentActionIterator(this->n_agents);
+    iter->reach_end();
 
     return iter;
 }

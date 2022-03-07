@@ -127,18 +127,18 @@ AllStayExceptFirstActionSpaceIterator &AllStayExceptFirstActionSpaceIterator::op
 AllStayExceptFirstActionSpaceIterator::AllStayExceptFirstActionSpaceIterator(size_t n_agents)
         : MultiAgentActionIterator(n_agents) {}
 
-AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t nAgents, MultiAgentActionSpace *action_space)
-        : MultiAgentActionSpace(action_space->n_agents) {
+AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t n_agents)
+        : MultiAgentActionSpace(n_agents) {
 
 }
 
-AllStayExceptFirstActionSpaceIterator AllStayExceptFirstActionSpace::begin() {
-    return AllStayExceptFirstActionSpaceIterator(this->n_agents);
+MultiAgentActionIterator* AllStayExceptFirstActionSpace::begin() {
+    return new AllStayExceptFirstActionSpaceIterator(this->n_agents);
 }
 
-AllStayExceptFirstActionSpaceIterator AllStayExceptFirstActionSpace::end() {
-    AllStayExceptFirstActionSpaceIterator iter = AllStayExceptFirstActionSpaceIterator(this->n_agents);
-    iter.reach_end();
+MultiAgentActionIterator* AllStayExceptFirstActionSpace::end() {
+    AllStayExceptFirstActionSpaceIterator* iter = new AllStayExceptFirstActionSpaceIterator(this->n_agents);
+    iter->reach_end();
 
     return iter;
 }
@@ -148,7 +148,7 @@ Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gam
 
     /* Solve the env by value iteration */
     ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
-    env->action_space = new AllStayExceptFirstActionSpace(0, env->action_space);
+    env->action_space = new AllStayExceptFirstActionSpace(env->n_agents);
     policy->train(timeout_ms - ELAPSED_TIME_MS);
 
     return policy;
