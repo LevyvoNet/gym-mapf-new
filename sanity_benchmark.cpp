@@ -70,6 +70,18 @@ vector<vector<EnvCreator *>> env_creators(
 
                         /* Room */
                         new GeneralEnv("", "room-64-64-16", 1, 8),
+                        new GeneralEnv("", "room-64-64-16", 2, 8),
+                        new GeneralEnv("", "room-64-64-16", 3, 8),
+                        new GeneralEnv("", "room-64-64-16", 4, 8),
+                        new GeneralEnv("", "room-64-64-16", 5, 8),
+                        new GeneralEnv("", "room-64-64-16", 6, 8),
+                        new GeneralEnv("", "room-64-64-16", 7, 8),
+                        new GeneralEnv("", "room-64-64-16", 8, 8),
+                        new GeneralEnv("", "room-64-64-16", 9, 8),
+                        new GeneralEnv("", "room-64-64-16", 10, 8),
+                        new GeneralEnv("", "room-64-64-16", 11, 8),
+                        new GeneralEnv("", "room-64-64-16", 12, 8),
+
                 }
         }
 );
@@ -77,30 +89,30 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-                        new vi("vi"),
+//                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-                        new rtdp_dijkstra("rtdp_dijkstra"),
+//                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-                        new id_rtdp_default("id_rtdp_default"),
-                        new id_rtdp("id_rtdp"),
+//                        new id_rtdp_default("id_rtdp_default"),
+//                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
 //                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
                         new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""), window_planner_vi),
-                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
+//                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""), window_planner_vi),
+//                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
 //                        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
 //                        new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
                 }
