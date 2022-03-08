@@ -69,18 +69,18 @@ vector<vector<EnvCreator *>> env_creators(
 //                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
-                        new GeneralEnv("", "room-64-64-16", 2, 8),
-                        new GeneralEnv("", "room-64-64-16", 1, 8),
-                        new GeneralEnv("", "room-64-64-16", 3, 8),
-                        new GeneralEnv("", "room-64-64-16", 4, 8),
-                        new GeneralEnv("", "room-64-64-16", 5, 8),
-                        new GeneralEnv("", "room-64-64-16", 6, 8),
-                        new GeneralEnv("", "room-64-64-16", 7, 8),
-                        new GeneralEnv("", "room-64-64-16", 8, 8),
-                        new GeneralEnv("", "room-64-64-16", 9, 8),
-                        new GeneralEnv("", "room-64-64-16", 10, 8),
-                        new GeneralEnv("", "room-64-64-16", 11, 8),
-                        new GeneralEnv("", "room-64-64-16", 12, 8),
+                        new GeneralEnv("", "room-64-64-16", 1, 6),
+                        new GeneralEnv("", "room-64-64-16", 2, 6),
+                        new GeneralEnv("", "room-64-64-16", 3, 6),
+                        new GeneralEnv("", "room-64-64-16", 4, 6),
+                        new GeneralEnv("", "room-64-64-16", 5, 6),
+                        new GeneralEnv("", "room-64-64-16", 6, 6),
+                        new GeneralEnv("", "room-64-64-16", 7, 6),
+                        new GeneralEnv("", "room-64-64-16", 8, 6),
+                        new GeneralEnv("", "room-64-64-16", 9, 6),
+                        new GeneralEnv("", "room-64-64-16", 10, 6),
+                        new GeneralEnv("", "room-64-64-16", 11, 6),
+                        new GeneralEnv("", "room-64-64-16", 12, 6),
 
                 }
         }
