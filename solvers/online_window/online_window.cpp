@@ -314,6 +314,7 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
     w->max_steps = w->calc_max_steps();
 
     if (!(new_area == old_area)){
+        cout << "expanding window of "<< w->group.size() << " agents" << endl;
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
     }
 
@@ -398,7 +399,7 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
     MapfEnv *area_env = get_local_view(this->env, w->group);
     area_env->observation_space = conflict_area_state_space;
 
-    /* Set the girth of the area with a fixed value` composed of the single agents values */
+    /* Set the girth of the area with a fixed value composed of the single agents values */
     vector<ValueFunctionPolicy *> policies;
     vector<vector<size_t>> agents_groups;
     vector<tsl::hopscotch_set<Location>> intended_locations;

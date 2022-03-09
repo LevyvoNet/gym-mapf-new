@@ -57,13 +57,13 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("", "ost003d", 5, 5),
+//                        new GeneralEnv("", "ost003d", 5, 5),
 
                         /* Open */
 //                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
-                        new GeneralEnv("", "random-64-64-10", 1, 4),
+//                        new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
 //                       new MazeEnv("", 128, 10, 1, 5),
