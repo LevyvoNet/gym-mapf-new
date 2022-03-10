@@ -109,7 +109,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+//                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""), window_planner_vi),
 //                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
 //                        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
