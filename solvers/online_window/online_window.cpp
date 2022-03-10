@@ -317,7 +317,8 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
     w->max_steps = w->calc_max_steps();
 
     if (!(new_area == old_area)) {
-        cout << "expanding window of " << w->group.size() << " agents" << endl;
+//        /* debug print */
+//        cout << "expanding window of " << w->group.size() << " agents" << endl;
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
     }
 
@@ -385,10 +386,11 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
-    cout << "planning window with " << w->group.size() << " agents on area: ";
-    cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << "," << w->area.right_col
-         << ")";
-    cout << endl;
+//    /* debug print */
+//    cout << "planning window with " << w->group.size() << " agents on area: ";
+//    cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << "," << w->area.right_col
+//         << ")";
+//    cout << endl;
 
     MEASURE_TIME;
 
