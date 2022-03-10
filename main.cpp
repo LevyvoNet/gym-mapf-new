@@ -62,7 +62,7 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 3 */
                 {
-//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
 //                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
 
                 },
@@ -72,7 +72,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 //                        new GeneralEnv("", "room-64-64-16", 1, 8),
-                        new GeneralEnv("", "room-64-64-16", 2, 6),
+//                        new GeneralEnv("", "room-64-64-16", 2, 6),
                 }
         }
 );

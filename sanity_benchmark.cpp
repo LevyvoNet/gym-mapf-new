@@ -66,9 +66,10 @@ vector<vector<EnvCreator *>> env_creators(
                         new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
-                       new MazeEnv("", 128, 10, 1, 5),
+//                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
+                        new GeneralEnv("", "room-64-64-16", 1, 6),
                         new GeneralEnv("", "room-64-64-16", 1, 8),
 //                        new GeneralEnv("", "room-64-64-16", 2, 6),
 //                        new GeneralEnv("", "room-64-64-16", 3, 6),
