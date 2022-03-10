@@ -382,7 +382,13 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
-    cout << "planning window with " << w->group.size() << " agents" << endl;
+    cout << "planning window with " << w->group.size() << " agents";
+    cout << "top_row: " << w->area.top_row;
+    cout << "bottom_row: " << w->area.bottom_row;
+    cout << "left_col: " << w->area.left_col;
+    cout << "right_col: " << w->area.right_col;
+    cout << endl;
+
     MEASURE_TIME;
 
     /* Update statistics */

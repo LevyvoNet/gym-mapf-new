@@ -45,7 +45,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
 //                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
 //                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                 },
@@ -72,6 +72,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 //                        new GeneralEnv("", "room-64-64-16", 1, 8),
+                        new GeneralEnv("", "room-64-64-16", 2, 6),
                 }
         }
 );
@@ -99,8 +100,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-//                        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
+                        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+//                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
 //                        new online_replan("online_replan_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
 //                        new online_replan("online_replan_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
 //                        new online_replan("online_replan_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi_deterministic_relaxation),
