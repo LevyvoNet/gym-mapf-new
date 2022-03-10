@@ -12,7 +12,7 @@
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define MIN_SUCCESS_RATE (100)
-#define MIN_CONSECUTIVE_SUCCESS_COUNT (3)
+#define MIN_CONSECUTIVE_SUCCESS_COUNT (5)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration(double timeout_ms) {
