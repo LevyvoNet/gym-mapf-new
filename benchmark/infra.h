@@ -104,8 +104,14 @@ public:
 struct problem_instance_result
 solve(struct problem_instance problem, double timeout_ms, int episode_count, int max_steps);
 
-void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
-                    double episode_timeout_ms, int eval_episodes_count, int max_steps, string log_file);
+void solve_problems(list<struct problem_instance> *problems,
+                    size_t workers_limit,
+                    ResultDatabase *db,
+                    double train_timeout_ms,
+                    double episode_exec_timeout_ms,
+                    int eval_episodes_count,
+                    int max_steps,
+                    string log_file);
 
 
 #endif //GYM_MAPF_INFRA_H

@@ -19,7 +19,8 @@ void close_all_fds(list<struct worker_data> other_workers) {
 }
 
 struct problem_instance_result solve(struct problem_instance problem,
-                                     double timeout_ms,
+                                     double train_timeout_ms,
+                                     double exec_timeout_ms,
                                      int episode_count,
                                      int max_steps) {
     struct problem_instance_result res;
@@ -34,14 +35,14 @@ struct problem_instance_result solve(struct problem_instance problem,
     /* Add the mountains to env */
     add_mountains_to_env(env);
 
-    MEASURE_TIME;
-
     /* Train and evaluate */
-    policy->train(timeout_ms);
+    policy->train(train_timeout_ms);
     TrainInfo *train_info = policy->get_train_info();
+
+    MEASURE_TIME;
     EvaluationInfo *eval_info = policy->evaluate(episode_count,
                                                  max_steps,
-                                                 timeout_ms - ELAPSED_TIME_MS);
+                                                 exec_timeout_ms - ELAPSED_TIME_MS);
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;
@@ -120,7 +121,8 @@ struct problem_instance_result solve(struct problem_instance problem,
 
 struct worker_data spawn_worker(list<struct worker_data> other_workers,
                                 struct problem_instance problem,
-                                double timeout_ms,
+                                double train_timeout_ms,
+                                double exec_timeout_ms,
                                 int episode_count,
                                 int max_steps) {
     int fds[2] = {0};
@@ -137,7 +139,8 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
     if (0 == pid) {
         close(fds[0]);
         close_all_fds(other_workers);
-        struct problem_instance_result result = solve(problem, timeout_ms, episode_count, max_steps);
+        struct problem_instance_result result = solve(problem, train_timeout_ms, exec_timeout_ms, episode_count,
+                                                      max_steps);
         do {
             written_bytes += write(fds[1], &result, sizeof(result));
         } while (written_bytes < sizeof(result));
@@ -269,7 +272,8 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
 
 
 void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
-                    double episode_timeout_ms, int eval_episodes_count, int max_steps, string log_file) {
+                    double train_timeout_ms, double episode_exec_timeout_ms, int eval_episodes_count, int max_steps,
+                    string log_file) {
     list<struct worker_data> workers;
     size_t finished_count = 0;
     size_t problems_count = problems->size();
@@ -280,7 +284,12 @@ void solve_problems(list<struct problem_instance> *problems, size_t workers_limi
         while (problems->size() > 0 && workers.size() < workers_limit) {
             /* Add another worker */
             workers.push_back(
-                    spawn_worker(workers, *problems->begin(), episode_timeout_ms, eval_episodes_count, max_steps));
+                    spawn_worker(workers,
+                                 *problems->begin(),
+                                 train_timeout_ms,
+                                 episode_exec_timeout_ms,
+                                 eval_episodes_count,
+                                 max_steps));
             problems->erase(problems->begin());
         }
 

@@ -21,8 +21,10 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TIMEOUT_SEC (150)
-#define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
+#define EPISODE_TRAIN_TIMEOUT_SEC (180)
+#define EPISODE_EXEC_TIMEOUT_SEC (180)
+#define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
+#define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (2000)
 #define WORKERS_LIMIT (10)
 
@@ -189,7 +191,8 @@ int main(int argc, char **argv) {
     solve_problems(problems,
                    WORKERS_LIMIT,
                    &db,
-                   EPISODE_TIMEOUT_MS,
+                   EPISODE_TRAIN_TIMEOUT_MS,
+                   EPISODE_EXEC_TIMEOUT_MS,
                    EPISODE_COUNT,
                    MAX_STEPS,
                    argv[1]);
