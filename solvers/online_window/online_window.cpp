@@ -86,6 +86,7 @@ GridArea pad_area(Grid *grid, GridArea area, int k) {
 
     return GridArea(top_row, bottom_row, left_col, right_col);
 }
+
 tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k, double timeout_ms) {
     MEASURE_TIME;
     tsl::hopscotch_set<Location> res;
@@ -105,7 +106,7 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
-Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms){
+Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms) {
     MEASURE_TIME;
 
     /* Solve the env by value iteration */
@@ -117,7 +118,7 @@ Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, d
 
 AllStayExceptFirstActionSpaceIterator &AllStayExceptFirstActionSpaceIterator::operator++() {
     this->ptr->actions[0] = (Action) (int(this->ptr->actions[0]) + 1);
-    if (this->ptr->actions[0] == LAST_INVALID_ACTION){
+    if (this->ptr->actions[0] == LAST_INVALID_ACTION) {
         this->reach_end();
     }
     this->ptr->id++;
@@ -132,18 +133,18 @@ AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t n_agents)
 
 }
 
-MultiAgentActionIterator* AllStayExceptFirstActionSpace::begin() {
+MultiAgentActionIterator *AllStayExceptFirstActionSpace::begin() {
     return new AllStayExceptFirstActionSpaceIterator(this->n_agents);
 }
 
-MultiAgentActionIterator* AllStayExceptFirstActionSpace::end() {
-    AllStayExceptFirstActionSpaceIterator* iter = new AllStayExceptFirstActionSpaceIterator(this->n_agents);
+MultiAgentActionIterator *AllStayExceptFirstActionSpace::end() {
+    AllStayExceptFirstActionSpaceIterator *iter = new AllStayExceptFirstActionSpaceIterator(this->n_agents);
     iter->reach_end();
 
     return iter;
 }
 
-Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms){
+Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms) {
     MEASURE_TIME;
 
     /* Solve the env by value iteration */
@@ -154,19 +155,21 @@ Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gam
     return policy;
 }
 
-Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values,float gamma,  double timeout_ms){
+Policy *
+window_planner_vi_deterministic_relaxation(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms) {
     MEASURE_TIME;
 
     /* Solve the env by value iteration */
     ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
     double orig_fail_prob = env->fail_prob;
-    env->fail_prob=0;
+    env->fail_prob = 0;
     policy->train(timeout_ms - ELAPSED_TIME_MS);
     env->reset_cache();
     env->fail_prob = orig_fail_prob;
 
     return policy;
 }
+
 /** private **********************************************************************************************/
 Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAgentState &s) {
     vector<size_t> new_group;
@@ -182,8 +185,8 @@ Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAge
     GridArea new_area_padded = pad_area(this->env->grid, new_area, this->d);
 
     /* Look for the desired window in our archive */
-    for (Window* archived:*this->archived_windows){
-        if (archived->group == new_group && archived->area==new_area_padded){
+    for (Window *archived: *this->archived_windows) {
+        if (archived->group == new_group && archived->area == new_area_padded) {
             this->archived_windows->erase(std::remove(this->archived_windows->begin(),
                                                       this->archived_windows->end(), archived));
             return archived;
@@ -313,8 +316,8 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
     w->steps_count = 0;
     w->max_steps = w->calc_max_steps();
 
-    if (!(new_area == old_area)){
-        cout << "expanding window of "<< w->group.size() << " agents" << endl;
+    if (!(new_area == old_area)) {
+        cout << "expanding window of " << w->group.size() << " agents" << endl;
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
     }
 
@@ -382,11 +385,9 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
-    cout << "planning window with " << w->group.size() << " agents";
-    cout << "top_row: " << w->area.top_row;
-    cout << "bottom_row: " << w->area.bottom_row;
-    cout << "left_col: " << w->area.left_col;
-    cout << "right_col: " << w->area.right_col;
+    cout << "planning window with " << w->group.size() << " agents on area: ";
+    cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << "," << w->area.right_col
+         << ")";
     cout << endl;
 
     MEASURE_TIME;
@@ -504,7 +505,7 @@ OnlineWindowPolicy::~OnlineWindowPolicy() {
 
 void OnlineWindowPolicy::eval_episodes_info_process(EvaluationInfo *eval_info) {
     float replans_mean = float(this->replans_sum) / this->episodes_count;
-    (*eval_info->additional_data)["replans_mean"] = std::to_string( round(replans_mean * 100) / 100);
+    (*eval_info->additional_data)["replans_mean"] = std::to_string(round(replans_mean * 100) / 100);
     (*eval_info->additional_data)["replans_max_size"] = std::to_string(this->replans_max_size);
 }
 
