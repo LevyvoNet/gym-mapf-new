@@ -29,7 +29,7 @@ public:
 
     RtdpPolicy(MapfEnv *env, float gamma, const string &name, Heuristic *h);
 
-    bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info)
+    bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info);
 
     virtual ~RtdpPolicy();
 
