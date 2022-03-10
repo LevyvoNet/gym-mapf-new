@@ -8,7 +8,7 @@
 
 /** Constants ***************************************************************************************************/
 #define MAX_ITERATIONS (20000)
-#define BATCH_SIZE (100)
+#define BATCH_SIZE (400)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define MIN_SUCCESS_RATE (100)
