@@ -12,6 +12,7 @@
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define MIN_SUCCESS_RATE (100)
+#define MIN_CONSECUTIVE_SUCCESS_COUNT (3)
 
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration(double timeout_ms) {
@@ -71,8 +72,18 @@ l_cleanup:
     delete a;
 }
 
-bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info) {
+bool RtdpPolicy::should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info) {
     if (nullptr == prev_eval_info || nullptr == curr_eval_info) {
+        return false;
+    }
+
+    if (curr_eval_info->success_rate >= MIN_SUCCESS_RATE){
+        this->consecutive_success++;
+    } else {
+        this->consecutive_success = 0;
+    }
+
+    if (this->consecutive_success < MIN_CONSECUTIVE_SUCCESS_COUNT){
         return false;
     }
 
@@ -100,6 +111,7 @@ RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
     this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, nullptr);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
     this->in_train = true;
+    this->consecutive_success = 0;
 }
 
 
@@ -137,7 +149,7 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        eval_info = this->evaluate(200, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30);
+        eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30);
         this->in_train = true;
         const auto eval_end = clk::now();
         total_eval_time += ((ms)(eval_end - eval_begin)).count();

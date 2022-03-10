@@ -60,7 +60,7 @@ vector<vector<EnvCreator *>> env_creators(
                         new GeneralEnv("", "ost003d", 5, 5),
 
                         /* Open */
-                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
                         new GeneralEnv("", "random-64-64-10", 1, 4),
