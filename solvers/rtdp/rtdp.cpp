@@ -206,10 +206,10 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
     MEASURE_TIME;
     MultiAgentAction *a = nullptr;
 
-    a = this->cache->get(state);
-    if (nullptr != a) {
-        return new MultiAgentAction(a->actions, a->id);
-    }
+//    a = this->cache->get(state);
+//    if (nullptr != a) {
+//        return new MultiAgentAction(a->actions, a->id);
+//    }
 
     /* If this is an unfamiliar state, return all stay action */
 //    if (nullptr == this->v->get(state)) {
@@ -221,7 +221,7 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
     if (ELAPSED_TIME_MS >= timeout_ms){
         return nullptr;
     }
-    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
+//    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
 
     return a;
 }
