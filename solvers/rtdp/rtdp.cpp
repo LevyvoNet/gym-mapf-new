@@ -14,6 +14,8 @@
 #define MIN_SUCCESS_RATE (100)
 #define MIN_CONSECUTIVE_SUCCESS_COUNT (5)
 
+#define NON_EXISTING_DEFAULT_VALUE (99999999)
+
 /** Private ****************************************************************************************************/
 void RtdpPolicy::single_iteration(double timeout_ms) {
     MEASURE_TIME;
@@ -41,9 +43,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
         }
 
         /* Bellman update the current state */
-        new_value_ptr = new double;
-        *new_value_ptr = new_value;
-        this->v->set(*s, new_value_ptr);
+        this->v->set(s->id, new_value);
 
         /* Sample the next state from the transition function */
         this->env->step(*a, s, &reward, &done, &is_collision);
@@ -59,9 +59,8 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
         if (ELAPSED_TIME_MS >= timeout_ms){
             return;
         }
-        new_value_ptr = new double;
         *new_value_ptr = new_value;
-        this->v->set(path[i], new_value_ptr);
+        this->v->set(path[i].id, new_value);
     }
 
     this->env->reset();
@@ -108,7 +107,7 @@ void RtdpPolicy::clear_cache() {
 RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
                        const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
     this->h = h;
-    this->v = new MultiAgentStateStorage<double *>(this->env->n_agents, nullptr);
+    this->v = new Dictionary(NON_EXISTING_DEFAULT_VALUE);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
     this->in_train = true;
     this->consecutive_success = 0;
@@ -180,9 +179,9 @@ l_cleanup:
 }
 
 double RtdpPolicy::get_value(MultiAgentState *s) {
-    double *value = this->v->get(*s);
+    double value = this->v->get(s->id);
     double h_value = 0;
-    if (nullptr == value) {
+    if (NON_EXISTING_DEFAULT_VALUE == value) {
         h_value = (*(this->h))(s);
 //        if (this->in_train) {
 //            value = new double;
@@ -193,7 +192,7 @@ double RtdpPolicy::get_value(MultiAgentState *s) {
         return h_value;
     }
 
-    return *value;
+    return value;
 }
 
 RtdpPolicy::~RtdpPolicy() {

@@ -6,6 +6,7 @@
 #define GYM_MAPF_RTDP_H
 
 #include <gym_mapf/gym_mapf.h>
+#include <gym_mapf/utils/dictionary/dictionary.h>
 #include "solvers/utils/policy/policy.h"
 #include <solvers/utils/policy/value_function_policy.h>
 #include "solvers/heuristics/heuristic.h"
@@ -14,7 +15,7 @@
 
 class RtdpPolicy : public ValueFunctionPolicy {
 private:
-    MultiAgentStateStorage<double *> *v;
+    Dictionary* v;
     Heuristic *h;
     vector<int> train_rewards;
     MultiAgentStateStorage<MultiAgentAction *> *cache;
