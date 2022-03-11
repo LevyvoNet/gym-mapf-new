@@ -28,7 +28,6 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
     MultiAgentAction *a = new MultiAgentAction(this->env->n_agents);
     int diff = 0;
     double new_value = 0;
-    double *new_value_ptr = nullptr;
 
     MultiAgentState *s = this->env->reset();
 
@@ -59,7 +58,6 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
         if (ELAPSED_TIME_MS >= timeout_ms){
             return;
         }
-        *new_value_ptr = new_value;
         this->v->set(path[i].id, new_value);
     }
 
