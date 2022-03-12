@@ -43,7 +43,7 @@ struct problem_instance_result solve(struct problem_instance problem,
 
     rl.rlim_max = MAX_RAM;
     rl.rlim_cur = MAX_RAM;
-    if (setrlimit(RLIMIT_AS, &rl) < 0){
+    if (setrlimit(RLIMIT_AS, &rl) < 0) {
         std::cout << "failed to limit" << std::endl;
     }
 
@@ -64,19 +64,6 @@ struct problem_instance_result solve(struct problem_instance problem,
         res.scen_id = problem.env_creator->scen_id;
         res.n_agents = problem.env_creator->n_agents;
         field_value = "-";
-        if (eval_info->additional_data->find("replans_mean") != eval_info->additional_data->end()) {
-            field_value = (*(eval_info->additional_data))["replans_mean"];
-        }
-        strncpy(res.replans_mean, field_value.c_str(), 8);
-
-        field_value = "-";
-        if (eval_info->additional_data->find("replans_max_size") != eval_info->additional_data->end()) {
-            field_value = (*(eval_info->additional_data))["replans_max_size"];
-        }
-        strncpy(res.replans_max_size, field_value.c_str(), 8);
-
-        std::cout << "exceeded memory limit" << std::endl;
-
         return res;
     }
 
