@@ -31,6 +31,9 @@ struct problem_instance_result solve(struct problem_instance problem,
     TrainInfo *train_info = nullptr;
     string field_value;
 
+    /* Initialize structs */
+    memset(&res, 0, sizeof(res));
+
     /* Create the policy */
     env = (*problem.env_creator)();
     policy = (*problem.solver_creator)(env, 1.0);
