@@ -29,6 +29,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     bool should_log = false;
     EvaluationInfo *eval_info = nullptr;
     TrainInfo *train_info = nullptr;
+    string field_value;
 
     /* Create the policy */
     env = (*problem.env_creator)();
@@ -97,7 +98,6 @@ struct problem_instance_result solve(struct problem_instance problem,
     res.adr_stderr = eval_info->mdr_stderr;
     res.exec_time_stderr = eval_info->mean_episode_time_stderr;
 
-    string field_value;
     /* Set solvers train additional data */
     field_value = "-";
     if (train_info->additional_data->find("n_iterations") != train_info->additional_data->end()) {
