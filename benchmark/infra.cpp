@@ -57,9 +57,22 @@ struct problem_instance_result solve(struct problem_instance problem,
                                      exec_timeout_ms - ELAPSED_TIME_MS);
     } catch (std::bad_alloc const &) {
         res.status = PROBLEM_FAIL;
+        strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
+        strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
         res.id = problem.id;
         res.scen_id = problem.env_creator->scen_id;
         res.n_agents = problem.env_creator->n_agents;
+        field_value = "-";
+        if (eval_info->additional_data->find("replans_mean") != eval_info->additional_data->end()) {
+            field_value = (*(eval_info->additional_data))["replans_mean"];
+        }
+        strncpy(res.replans_mean, field_value.c_str(), 8);
+
+        field_value = "-";
+        if (eval_info->additional_data->find("replans_max_size") != eval_info->additional_data->end()) {
+            field_value = (*(eval_info->additional_data))["replans_max_size"];
+        }
+        strncpy(res.replans_max_size, field_value.c_str(), 8);
 
         std::cout << "exceeded memory limit" << std::endl;
 
