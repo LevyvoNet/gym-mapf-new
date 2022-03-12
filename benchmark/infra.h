@@ -8,6 +8,7 @@
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <unistd.h>
+#include <sys/resource.h>
 
 #include "gym_mapf/gym_mapf.h"
 #include "solvers/solvers.h"
@@ -17,6 +18,8 @@
 #define MAX_MAP_NAME (100)
 #define MAX_SOLVER_NAME (50)
 #define EPISODE_COUNT (30)
+
+#define MAX_RAM (8000000000)
 
 #define BGU_CLUSTER_WORKER_LIMIT (20)
 #define POLL_SLEEP_TIME_nS (200000)

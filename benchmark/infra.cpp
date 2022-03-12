@@ -27,6 +27,8 @@ struct problem_instance_result solve(struct problem_instance problem,
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
     bool should_log = false;
+    EvaluationInfo *eval_info = nullptr;
+    TrainInfo *train_info = nullptr;
 
     /* Create the policy */
     env = (*problem.env_creator)();
@@ -35,14 +37,35 @@ struct problem_instance_result solve(struct problem_instance problem,
     /* Add the mountains to env */
     add_mountains_to_env(env);
 
-    /* Train and evaluate */
-    policy->train(train_timeout_ms);
-    TrainInfo *train_info = policy->get_train_info();
+    /* Limit memory usage */
+    struct rlimit rl;
 
-    MEASURE_TIME;
-    EvaluationInfo *eval_info = policy->evaluate(episode_count,
-                                                 max_steps,
-                                                 exec_timeout_ms - ELAPSED_TIME_MS);
+    rl.rlim_max = MAX_RAM;
+    rl.rlim_cur = MAX_RAM;
+    if (setrlimit(RLIMIT_AS, &rl) < 0){
+        std::cout << "failed to limit" << std::endl;
+    }
+
+    /* Train and evaluate */
+    try {
+        policy->train(train_timeout_ms);
+        train_info = policy->get_train_info();
+
+        MEASURE_TIME;
+        eval_info = policy->evaluate(episode_count,
+                                     max_steps,
+                                     exec_timeout_ms - ELAPSED_TIME_MS);
+    } catch (std::bad_alloc const &) {
+        res.status = PROBLEM_FAIL;
+        res.id = problem.id;
+        res.scen_id = problem.env_creator->scen_id;
+        res.n_agents = problem.env_creator->n_agents;
+
+        std::cout << "exceeded memory limit" << std::endl;
+
+        return res;
+    }
+
     /* Set res fields */
     res.status = PROBLEM_SUCCESS;
     res.id = problem.id;

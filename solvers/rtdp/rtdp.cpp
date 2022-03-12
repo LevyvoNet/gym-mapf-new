@@ -7,12 +7,12 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (20000)
-#define BATCH_SIZE (400)
+#define MAX_ITERATIONS (30000)
+#define BATCH_SIZE (500)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define MIN_SUCCESS_RATE (100)
-#define MIN_CONSECUTIVE_SUCCESS_COUNT (5)
+#define MIN_CONSECUTIVE_SUCCESS_COUNT (12)
 
 #define NON_EXISTING_DEFAULT_VALUE (99999999)
 
@@ -203,10 +203,10 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
     MEASURE_TIME;
     MultiAgentAction *a = nullptr;
 
-//    a = this->cache->get(state);
-//    if (nullptr != a) {
-//        return new MultiAgentAction(a->actions, a->id);
-//    }
+    a = this->cache->get(state);
+    if (nullptr != a) {
+        return new MultiAgentAction(a->actions, a->id);
+    }
 
     /* If this is an unfamiliar state, return all stay action */
 //    if (nullptr == this->v->get(state)) {
@@ -218,7 +218,7 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
     if (ELAPSED_TIME_MS >= timeout_ms){
         return nullptr;
     }
-//    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
+    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
 
     return a;
 }
