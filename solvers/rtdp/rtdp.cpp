@@ -40,8 +40,8 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
             return;
         }
 
-        /* Bellman update the current state */
-        this->v->set(s->id, new_value);
+//        /* Bellman update the current state */
+//        this->v->set(s->id, new_value);
 
         /* Sample the next state from the transition function */
         this->env->step(*a, s, &reward, &done, &is_collision);

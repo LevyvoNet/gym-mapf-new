@@ -84,7 +84,6 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         }
         /* Check if we are stuck */
         if (*selected_action == all_stay) {
-            cout << "all stay was chosen" << endl;
             res.reward = episode_reward;
             res.time = ELAPSED_TIME_MS;
             res.collision = false;
@@ -119,8 +118,6 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         }
 
     } while (steps < max_steps);
-
-    cout << "reached maximum steps" << endl;
 
     res.reward = episode_reward;
     res.time = ELAPSED_TIME_MS;
