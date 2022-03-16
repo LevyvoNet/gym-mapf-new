@@ -200,11 +200,11 @@ RtdpPolicy::~RtdpPolicy() {
 
 MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_ms) {
     MEASURE_TIME;
-    MultiAgentAction *selected_action = nullptr;
+    MultiAgentAction *a = nullptr;
 
-    selected_action = this->cache->get(state);
-    if (nullptr != selected_action) {
-        return new MultiAgentAction(selected_action->actions, selected_action->id);
+    a = this->cache->get(state);
+    if (nullptr != a) {
+        return new MultiAgentAction(a->actions, a->id);
     }
 
     /* If this is an unfamiliar state, return all stay action */
@@ -213,47 +213,13 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
 //        return new MultiAgentAction(a_iter->actions, a_iter->id);
 //    }
 
-    double q_sa = 0;
-    list<Transition *> *transitions = NULL;
-    MultiAgentAction best_action = MultiAgentAction(this->env->n_agents);
-    double max_q = -std::numeric_limits<double>::max();
-    MultiAgentActionIterator *action_space_end = this->env->action_space->end();
-    MultiAgentActionIterator *a = this->env->action_space->begin();
-
-    for (a->reach_begin(); *a != *action_space_end; ++*a) {
-        /* Skip all stay action */
-        if ((*a)->id == 0){
-            continue;
-        }
-
-        q_sa = 0;
-        transitions = this->env->get_transitions(state, **a)->transitions;
-        if (ELAPSED_TIME_MS >= timeout_ms) {
-            return nullptr;
-        }
-        for (Transition *t: *transitions) {
-            if (t->is_collision) {
-                q_sa = -std::numeric_limits<double>::max();
-                break;
-            }
-
-            q_sa += t->p * (t->reward + this->gamma * this->get_value(t->next_state));
-        }
-
-        if (q_sa > max_q) {
-            best_action = **a;
-            max_q = q_sa;
-        }
-    }
-
-    selected_action = new MultiAgentAction(best_action.actions, best_action.id);
-
+    a = ValueFunctionPolicy::act(state, timeout_ms);
     if (ELAPSED_TIME_MS >= timeout_ms){
         return nullptr;
     }
-    this->cache->set(state, new MultiAgentAction(selected_action->actions, selected_action->id));
+    this->cache->set(state, new MultiAgentAction(a->actions, a->id));
 
-    return selected_action;
+    return a;
 }
 
 /** RTDP merger ************************************************************************************************/
