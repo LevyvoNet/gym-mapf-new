@@ -17,7 +17,7 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TRAIN_TIMEOUT_SEC (600)
+#define EPISODE_TRAIN_TIMEOUT_SEC (60)
 #define EPISODE_EXEC_TIMEOUT_SEC (120)
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
