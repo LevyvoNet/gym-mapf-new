@@ -73,6 +73,7 @@ vector<vector<EnvCreator *>> env_creators(
 
                         /* Room */
                         new GeneralEnv("", "room-64-64-16", 10, 2),
+                        new GeneralEnv("", "room-64-64-16", 12, 2),
                 }
         }
 );
