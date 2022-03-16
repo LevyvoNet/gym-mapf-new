@@ -246,7 +246,7 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
         }
     }
 
-    *selected_action = best_action;
+    selected_action = new MultiAgentAction(best_action.actions, best_action.id);
 
     if (ELAPSED_TIME_MS >= timeout_ms){
         return nullptr;
