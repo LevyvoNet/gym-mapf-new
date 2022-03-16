@@ -7,7 +7,7 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (0)
+#define MAX_ITERATIONS (30000)
 #define BATCH_SIZE (500)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
@@ -30,7 +30,6 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
     double new_value = 0;
 
     MultiAgentState *s = this->env->reset();
-
 
     while (!done && steps < MAX_STEPS) {
         ++steps;
