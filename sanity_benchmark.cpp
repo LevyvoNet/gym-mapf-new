@@ -17,7 +17,7 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TRAIN_TIMEOUT_SEC (300)
+#define EPISODE_TRAIN_TIMEOUT_SEC (600)
 #define EPISODE_EXEC_TIMEOUT_SEC (120)
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
@@ -104,8 +104,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 4 */
                 {
-//                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
-                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+//                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),window_planner_vi),
                 }
         }

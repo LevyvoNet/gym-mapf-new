@@ -25,7 +25,7 @@ std::string RESULT_NOT_SOLVED = "NOT_SOLVED";
 #define EPISODE_TIMEOUT_SEC (180)
 #define EPISODE_TIMEOUT_MS (EPISODE_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (4000)
-#define EPISODE_COUNT (30)
+#define EPISODE_COUNT (200)
 
 class TestResult {
 public:
