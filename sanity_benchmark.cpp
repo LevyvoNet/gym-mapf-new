@@ -70,7 +70,7 @@ vector<vector<EnvCreator *>> env_creators(
 
                         /* Maze */
 //                       new MazeEnv("", 128, 10, 1, 5),
-                        new GeneralEnv("", "maze-128-128-10", 17, 4),
+                        new GeneralEnv("", "ost003d", 4, 4),
 
 
                         /* Room */
