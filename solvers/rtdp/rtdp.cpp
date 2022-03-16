@@ -34,6 +34,9 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
     while (!done && steps < MAX_STEPS) {
         ++steps;
 
+        /* Add the current state to the path */
+        path.push_back(*s);
+
         /* Select action */
         this->select_max_value_action(*s, &new_value, a, timeout_ms - ELAPSED_TIME_MS);
         if (ELAPSED_TIME_MS >= timeout_ms){
@@ -46,9 +49,6 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
         /* Sample the next state from the transition function */
         this->env->step(*a, s, &reward, &done, &is_collision);
         total_reward += reward;
-
-        /* Add the next state to the path */
-        path.push_back(*s);
     }
 
     /* Backward update */
