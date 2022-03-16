@@ -17,7 +17,7 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TRAIN_TIMEOUT_SEC (300)
+#define EPISODE_TRAIN_TIMEOUT_SEC (600)
 #define EPISODE_EXEC_TIMEOUT_SEC (120)
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
@@ -70,10 +70,12 @@ vector<vector<EnvCreator *>> env_creators(
 
                         /* Maze */
 //                       new MazeEnv("", 128, 10, 1, 5),
+                        new GeneralEnv("", "maze-128-128-10", 17, 4),
+
 
                         /* Room */
-                        new GeneralEnv("", "room-64-64-16", 10, 2),
-                        new GeneralEnv("", "room-64-64-16", 12, 2),
+//                        new GeneralEnv("", "room-64-64-16", 10, 2),
+//                        new GeneralEnv("", "room-64-64-16", 12, 2),
                 }
         }
 );
