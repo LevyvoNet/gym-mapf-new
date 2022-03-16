@@ -84,6 +84,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         }
         /* Check if we are stuck */
         if (*selected_action == all_stay) {
+//            cout << "chosen all stay" << endl;
             res.reward = episode_reward;
             res.time = ELAPSED_TIME_MS;
             res.collision = false;
