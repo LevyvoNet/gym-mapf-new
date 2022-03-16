@@ -7,7 +7,7 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (30000)
+#define MAX_ITERATIONS (0)
 #define BATCH_SIZE (500)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
