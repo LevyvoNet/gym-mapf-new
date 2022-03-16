@@ -72,7 +72,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
-                        new GeneralEnv("", "room-64-64-16", 1, 2),
+                        new GeneralEnv("", "room-64-64-16", 10, 2),
                 }
         }
 );
@@ -103,9 +103,6 @@ vector<vector<SolverCreator *>> solver_creators(
 //                        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
                         new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),window_planner_vi),
-//                        new online_window("online_window_rtdp_2_vi_king", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi_king),
-//                        new online_window("online_window_rtdp_3", 3, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-//                        new online_window("online_window_dijkstra_3", 3, new dijkstra_baseline(""), window_planner_vi),
                 }
         }
 );
