@@ -16,10 +16,6 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
     MultiAgentActionIterator *action_space_end = this->env->action_space->end();
     MultiAgentActionIterator *a = this->env->action_space->begin();
 
-//    /* Skip all stay action */
-//    a->reach_begin();
-//    ++*a;
-
     for (a->reach_begin(); *a != *action_space_end; ++*a) {
         /* Skip all stay action */
         if ((*a)->id == 0){
