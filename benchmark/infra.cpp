@@ -55,7 +55,6 @@ struct problem_instance_result solve(struct problem_instance problem,
         policy->train(train_timeout_ms);
         train_info = policy->get_train_info();
 
-        cout << "---------------------------------------now evaluating----------------------------------------------------" << endl;
         MEASURE_TIME;
         eval_info = policy->evaluate(episode_count,
                                      max_steps,
