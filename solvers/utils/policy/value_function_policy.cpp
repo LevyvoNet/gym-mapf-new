@@ -21,6 +21,11 @@ void ValueFunctionPolicy::select_max_value_action(const MultiAgentState &s,
 //    ++*a;
 
     for (a->reach_begin(); *a != *action_space_end; ++*a) {
+        /* Skip all stay action */
+        if ((*a)->id == 0){
+            continue;
+        }
+
         q_sa = 0;
         transitions = this->env->get_transitions(s, **a)->transitions;
         if (ELAPSED_TIME_MS >= timeout_ms) {
