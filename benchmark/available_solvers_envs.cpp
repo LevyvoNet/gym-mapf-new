@@ -58,7 +58,7 @@ PaperExample::PaperExample(string name) : EnvCreator(name) {
     map_name << "PaperExample";
     this->map_name = map_name.str();
     this->scen_id = 0;
-    this->n_agents = 3;
+    this->n_agents = 2;
 }
 
 MapfEnv *PaperExample::operator()() {
@@ -78,12 +78,12 @@ MapfEnv *PaperExample::operator()() {
                        {
                                g->get_location(1, 0),
                                g->get_location(1, 5),
-                               g->get_location(5, 0)
+//                               g->get_location(5, 0)
                        },
                        {
                                g->get_location(0, 5),
                                g->get_location(0, 0),
-                               g->get_location(5, 5)
+//                               g->get_location(5, 5)
                        },
                        FAIL_PROB,
                        -1000,
