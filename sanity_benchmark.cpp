@@ -93,7 +93,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
