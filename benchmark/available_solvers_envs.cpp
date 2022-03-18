@@ -68,7 +68,7 @@ MapfEnv *PaperExample::operator()() {
                                           "..@...",
                                           "..@...",
                                           "..@...",
-                                          "......",
+                                          "..@...",
                                   });
 
     Grid *g = new Grid(map_lines);
@@ -81,8 +81,8 @@ MapfEnv *PaperExample::operator()() {
 //                               g->get_location(5, 0)
                        },
                        {
-                               g->get_location(0, 5),
-                               g->get_location(0, 0),
+                               g->get_location(1, 5),
+                               g->get_location(1, 0),
 //                               g->get_location(5, 5)
                        },
                        FAIL_PROB,
