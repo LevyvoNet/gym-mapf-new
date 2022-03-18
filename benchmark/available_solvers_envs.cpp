@@ -67,6 +67,7 @@ MapfEnv *PaperExample::operator()() {
                                           "......",
                                           "..@...",
                                           "..@...",
+                                          "..@...",
                                           "......",
                                   });
 
@@ -77,12 +78,12 @@ MapfEnv *PaperExample::operator()() {
                        {
                                g->get_location(1, 0),
                                g->get_location(1, 5),
-                               g->get_location(4, 0)
+                               g->get_location(5, 0)
                        },
                        {
                                g->get_location(0, 5),
                                g->get_location(0, 0),
-                               g->get_location(4, 5)
+                               g->get_location(5, 5)
                        },
                        FAIL_PROB,
                        -1000,
