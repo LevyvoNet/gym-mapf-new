@@ -45,7 +45,7 @@ void render_solver_on_env(EnvCreator *env_creator, SolverCreator *solver_creator
             window.clear();
             render(policy->env, &window);
             window.display();
-//            usleep(SLEEP_TIME_nS);
+            usleep(SLEEP_TIME_nS*20);
 
             /* Execute new action */
             selected_action = policy->act(*(policy->env->s), LONG_TIME_MS);

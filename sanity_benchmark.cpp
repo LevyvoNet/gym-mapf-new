@@ -36,7 +36,6 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new PaperExample("paper_example"),
 
                 },
                 /* lvl 1 */
@@ -57,6 +56,8 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 4 */
                 {
+                        new PaperExample("paper_example"),
+
                         /* City */
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
@@ -93,7 +94,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
@@ -104,7 +105,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 {
                         new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
 //                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),window_planner_vi),
+                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
+                                          window_planner_vi),
                 }
         }
 );
@@ -147,7 +149,7 @@ public:
 };
 
 int main(int argc, char **argv) {
-    list <problem_instance> *problems = nullptr;
+    list<problem_instance> *problems = nullptr;
     bool sanity_test_failed = false;
     std::string last_name = "";
     int last_scen_id = -1;
