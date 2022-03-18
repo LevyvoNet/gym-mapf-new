@@ -63,13 +63,11 @@ PaperExample::PaperExample(string name) : EnvCreator(name) {
 
 MapfEnv *PaperExample::operator()() {
     vector<std::string> map_lines({
-                                          "..@...",
-                                          "..@...",
-                                          "......",
-                                          "..@...",
-                                          "..@...",
-                                          "......",
-                                          "......",
+                                          "..@..",
+                                          "..@..",
+                                          ".....",
+                                          "..@..",
+                                          "..@..",
                                   });
 
     Grid *g = new Grid(map_lines);
@@ -77,14 +75,14 @@ MapfEnv *PaperExample::operator()() {
     return new MapfEnv(g,
                        this->n_agents,
                        {
-                               g->get_location(2, 0),
-                               g->get_location(2, 5),
-                               g->get_location(7, 1)
+                               g->get_location(0, 0),
+                               g->get_location(4, 0),
+                               g->get_location(0, 0)
                        },
                        {
-                               g->get_location(1, 5),
-                               g->get_location(1, 0),
-                               g->get_location(7, 3)
+                               g->get_location(4, 1),
+                               g->get_location(1, 1),
+                               g->get_location(4, 4)
                        },
                        FAIL_PROB,
                        -1000,
