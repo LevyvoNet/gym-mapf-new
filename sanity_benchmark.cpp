@@ -82,7 +82,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
