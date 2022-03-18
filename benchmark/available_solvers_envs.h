@@ -44,6 +44,14 @@ public:
 
 };
 
+class PaperExample : public EnvCreator {
+public:
+
+    virtual MapfEnv *operator()();
+
+    PaperExample(string name);
+};
+
 class RoomEnv : public EnvCreator {
 public:
     size_t room_size;
@@ -84,7 +92,7 @@ public:
 };
 
 
-class GeneralEnv: public EnvCreator{
+class GeneralEnv : public EnvCreator {
 public:
     GeneralEnv(string name, string map_name, size_t scen_id, size_t n_agents);
 
@@ -92,6 +100,7 @@ public:
 
 
 };
+
 /** Policies *******************************************************************************************************/
 class vi : public SolverCreator {
 public:
@@ -136,7 +145,7 @@ public:
     virtual Policy *operator()(MapfEnv *env, float gamma);
 };
 
-class online_window: public SolverCreator {
+class online_window : public SolverCreator {
     int d;
     SolverCreator *low_level_planner;
     window_planner window_planner_func;
@@ -146,9 +155,6 @@ public:
 
     virtual Policy *operator()(MapfEnv *env, float gamma);
 };
-
-
-
 
 
 #endif //GYM_MAPF_AVAILABLE_SOLVERS_ENVS_H

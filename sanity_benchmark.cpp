@@ -29,51 +29,52 @@
 vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
-                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
-                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck", 0),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+                        new PaperExample("paper_example"),
 
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
                         /* City */
-                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
+//                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
 //                        new GeneralEnv("", "ost003d", 5, 4),
-                        new GeneralEnv("", "ost003d", 4, 4),
+//                        new GeneralEnv("", "ost003d", 4, 4),
 
                         /* Open */
-                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
-                        new GeneralEnv("", "random-64-64-10", 1, 4),
+//                        new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
-                       new MazeEnv("", 128, 10, 1, 5),
+//                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
-                        new GeneralEnv("", "room-64-64-16", 1, 8),
+//                        new GeneralEnv("", "room-64-64-16", 1, 8),
                 }
         }
 );
@@ -81,7 +82,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
@@ -92,7 +93,7 @@ vector<vector<SolverCreator *>> solver_creators(
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {

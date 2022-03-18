@@ -53,6 +53,39 @@ MapfEnv *SymmetricalBottleneck::operator()() {
 
 }
 
+PaperExample::PaperExample(string name) : EnvCreator(name) {
+    std::ostringstream map_name;
+    map_name << "PaperExample";
+    this->map_name = map_name.str();
+    this->scen_id = 0;
+    this->n_agents = 3;
+}
+
+MapfEnv *PaperExample::operator()() {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "......",
+                                  });
+
+    Grid *g = new Grid(map_lines);
+
+    return new MapfEnv(g,
+                       this->n_agents,
+                       {g->get_location(2, 0),
+                        g->get_location(2, 5),
+                        g->get_location(4, 0)},
+                       {g->get_location(1, 5),
+                        g->get_location(1, 0),
+                        g->get_location(4, 5)},
+                       FAIL_PROB,
+                       -1000,
+                       0,
+                       -1);
+}
+
 ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
                                                                                goal_reward(goal_reward) {
     std::ostringstream map_name;
@@ -192,3 +225,5 @@ online_window::online_window(string name, int d, SolverCreator *low_level_planne
 Policy *online_window::operator()(MapfEnv *env, float gamma) {
     return new OnlineWindowPolicy(env, gamma, this->name, this->low_level_planner, this->d, this->window_planner_func);
 }
+
+
