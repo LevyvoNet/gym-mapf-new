@@ -44,6 +44,14 @@ public:
 
 };
 
+class PossibleBug : public EnvCreator {
+public:
+
+    virtual MapfEnv *operator()();
+
+    PossibleBug(string name);
+};
+
 class PaperExample : public EnvCreator {
 public:
 

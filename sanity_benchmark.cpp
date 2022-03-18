@@ -56,6 +56,7 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 4 */
                 {
+                        new PossibleBug("possible_bug"),
                         new PaperExample("paper_example"),
 
                         /* City */

@@ -53,6 +53,46 @@ MapfEnv *SymmetricalBottleneck::operator()() {
 
 }
 
+PossibleBug::PossibleBug(string name) : EnvCreator(name) {
+    std::ostringstream map_name;
+    map_name << "PaperExample";
+    this->map_name = map_name.str();
+    this->scen_id = 0;
+    this->n_agents = 3;
+}
+
+MapfEnv *PossibleBug::operator()() {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@...",
+                                          "..@...",
+                                          "......"
+                                  });
+
+    Grid *g = new Grid(map_lines);
+    return new MapfEnv(g,
+                       this->n_agents,
+                       {
+                               g->get_location(2, 0),
+                               g->get_location(2, 5),
+                               g->get_location(6, 0)
+                       },
+                       {
+                               g->get_location(1, 5),
+                               g->get_location(1, 0),
+                               g->get_location(6, 5)
+                       },
+                       FAIL_PROB,
+                       -1000,
+                       0,
+                       -1);
+
+}
+
+
 PaperExample::PaperExample(string name) : EnvCreator(name) {
     std::ostringstream map_name;
     map_name << "PaperExample";
