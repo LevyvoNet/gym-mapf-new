@@ -68,27 +68,28 @@ MapfEnv *PaperExample::operator()() {
                                           "......",
                                           "..@...",
                                           "..@...",
+                                          "..@...",
                                           "......"
                                   });
 
     Grid *g = new Grid(map_lines);
-
     return new MapfEnv(g,
                        this->n_agents,
                        {
                                g->get_location(2, 0),
                                g->get_location(2, 5),
-                               g->get_location(5, 0)
+                               g->get_location(6, 0)
                        },
                        {
-                               g->get_location(1, 0),
                                g->get_location(1, 5),
-                               g->get_location(5, 5)
+                               g->get_location(1, 0),
+                               g->get_location(6, 5)
                        },
                        FAIL_PROB,
                        -1000,
                        0,
                        -1);
+
 }
 
 ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
