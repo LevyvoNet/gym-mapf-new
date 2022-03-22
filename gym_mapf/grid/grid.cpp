@@ -12,8 +12,6 @@ Cell::Cell(bool is_obstacle) {
 }
 
 
-
-
 /** GridIterator************************************************************/
 GridIterator::GridIterator(const Grid *grid) {
     this->grid = grid;
@@ -193,7 +191,7 @@ bool Grid::is_legal(const Location &l) const {
     return this->loc_to_id[l.row][l.col] != ILLEGAL_LOCATION;
 }
 
-uint64_t Grid::calculate_multi_locations_id(vector<Location> locations) const{
+uint64_t Grid::calculate_multi_locations_id(vector<Location> locations) const {
     uint64_t mul = 1;
     uint64_t sum = 0;
     int n_options = this->id_to_loc.size();
@@ -255,4 +253,11 @@ bool GridArea::operator==(const GridArea &other) const {
             (this->bottom_row == other.bottom_row) &&
             (this->left_col == other.left_col) &&
             (this->right_col == other.right_col));
+}
+
+std::ostream &operator<<(ostream &os, const GridArea &a) {
+    os << "rows: " << a.top_row << "->" << a.bottom_row;
+    os << " cols: " << a.left_col << "->" << a.left_col;
+
+    return os;
 }

@@ -38,6 +38,18 @@ MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
     return a;
 }
 
+std::ostream &operator<<(ostream &os, const Window &w) {
+    os << "group: ";
+    for (size_t agent: w.group) {
+        os << agent << ",";
+    }
+
+
+    os << " area: " << w.area;
+
+    return os;
+}
+
 
 /** Utilities *********************************************************************************************/
 int locations_distance(const Location &l1, const Location &l2) {
@@ -330,6 +342,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     vector<Window *> *old_windows = this->curr_windows;
     vector<Window *> new_windows;
     bool merge_possible = true;
+    Window *archived_window = nullptr;
 
     /* Destruct required windows */
     for (Window *old_window: *old_windows) {
@@ -345,6 +358,9 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
             }
         }
         if (new_windows_count > 1) {
+            if (old_window->policy == nullptr) {
+                cout << "OMG" << endl;
+            }
             this->archived_windows->push_back(old_window);
         }
     }
@@ -370,16 +386,32 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     for (Window *w: *this->curr_windows) {
         if (nullptr == w->policy) {
             /* There was not an archived window which fits to the current state */
-            Window *archived_window = this->try_fit_to_archive(w->group, state);
+            archived_window = this->try_fit_to_archive(w->group, state);
             if (nullptr != archived_window) {
                 this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
                 this->curr_windows->push_back(archived_window);
                 this->archived_windows->erase(std::remove(this->archived_windows->begin(),
                                                           this->archived_windows->end(),
                                                           archived_window));
+
+                cout << "pulled window " << *archived_window << " from archive instead of " << *w << endl;
+
+                if (archived_window->policy == nullptr) {
+                    cout << "OMG22" << endl;
+                }
             } else {
                 this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+                cout << "planned for window " << *w << endl;
+                if (w->policy == nullptr) {
+                    cout << "OMG" << endl;
+                }
             }
+        }
+    }
+
+    for (Window *w: *this->curr_windows) {
+        if (nullptr == w->policy) {
+            cout << *w << " had a NULL policy" << endl;
         }
     }
 }

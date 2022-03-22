@@ -110,6 +110,7 @@ public:
     bool operator==(const GridIterator &other) const;
 
     bool operator!=(const GridIterator &other) const;
+
 };
 
 
@@ -125,6 +126,8 @@ public:
     bool contains(const Location &l);
 
     bool operator==(const GridArea &other) const;
+
+    friend std::ostream& operator<<(std::ostream& os, const GridArea& a);
 };
 
 template<>

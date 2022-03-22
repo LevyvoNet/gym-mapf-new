@@ -77,6 +77,8 @@ public:
 
     int calc_max_steps();
 
+    friend std::ostream& operator<<(std::ostream& os, const Window& w);
+
 };
 
 class OnlineWindowPolicy : public Policy {

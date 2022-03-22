@@ -48,7 +48,8 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new PaperExample("paper_example"),
+//                        new PaperExample("paper_example"),
+                        new PossibleBug("possible_bug")
                 },
                 /* lvl 1 */
                 {
