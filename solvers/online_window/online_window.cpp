@@ -339,7 +339,7 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
 }
 
 void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, double timeout_ms) {
-    cout << "----------------------------updating windows------------------------------" << endl
+    cout << "----------------------------updating windows------------------------------" << endl;
     MEASURE_TIME;
 
     vector<Window *> *old_windows = this->curr_windows;
