@@ -378,7 +378,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
             if (this->might_live_lock(w)) {
                 cout << "expanding " << w;
                 this->expand_window(w, state, timeout_ms - ELAPSED_TIME_MS);
-                cout << ", new window is " << w;
+                cout << ", new window is " << w << endl;
                 merge_possible = true;
             }
         }
@@ -408,6 +408,8 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                     cout << "OMG" << endl;
                 }
             }
+        } else {
+            cout << "nothing to do for " << w << endl;
         }
     }
 
