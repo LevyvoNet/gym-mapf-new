@@ -410,9 +410,9 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                     cout << "OMG" << endl;
                 }
             }
-        } else {
-            cout << "nothing to do for " << *w << endl;
         }
+
+        cout << "Settled on window " << w << endl;
     }
 
     for (Window *w: *this->curr_windows) {

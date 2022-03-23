@@ -8,7 +8,7 @@
 #include "gym_mapf/gym_mapf.h"
 #include "solvers/solvers.h"
 
-#define FAIL_PROB (0)
+#define FAIL_PROB (0.3)
 
 /** Envs **********************************************************************************************************/
 class EmptyGrid : public EnvCreator {
