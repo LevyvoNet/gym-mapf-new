@@ -205,6 +205,7 @@ Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAge
         }
     }
 
+    sort(new_group.begin(), new_group.end());
     return new Window(new_area_padded, nullptr, new_group);
 }
 
@@ -235,6 +236,7 @@ vector<Window *> OnlineWindowPolicy::destruct_window(Window *w, const MultiAgent
 
     /* Push the remaining agents in old window */
     if (!remain_agents.empty()) {
+        sort(remain_agents.begin(), remain_agents.end());
         new_windows.push_back(new Window(w->area, nullptr, remain_agents));
     }
 
@@ -509,7 +511,7 @@ OnlineWindowPolicy::OnlineWindowPolicy(MapfEnv *env, float gamma, const string &
 
 void OnlineWindowPolicy::train(double timeout_ms) {
     MEASURE_TIME;
-    vector<vector<size_t>> groups(env->n_agents);
+    vector<AgentsGroup> groups(env->n_agents);
 
     /* Solve Independently for each agent */
     for (size_t i = 0; i < env->n_agents; ++i) {
@@ -520,7 +522,8 @@ void OnlineWindowPolicy::train(double timeout_ms) {
     CrossedPolicy *singles_policy = solve_local_and_cross(this->env,
                                                           this->gamma,
                                                           timeout_ms - ELAPSED_TIME_MS,
-                                                          this->low_level_planner_creator, &groups);
+                                                          this->low_level_planner_creator,
+                                                          &groups);
 
 
 
