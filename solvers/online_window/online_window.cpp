@@ -367,10 +367,6 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
             this->archived_windows->push_back(old_window);
         }
     }
-    this->curr_windows->clear();
-    for (Window *new_window: new_windows) {
-        this->curr_windows->push_back(new_window);
-    }
 
     /* Merge required new windows */
     while (merge_possible) {
@@ -388,12 +384,13 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* Plan windows which don't have a policy */
-    for (Window *w: *this->curr_windows) {
+    this->curr_windows->clear();
+    for (Window *w: new_windows) {
         if (nullptr == w->policy) {
             /* There was not an archived window which fits to the current state */
             archived_window = this->try_fit_to_archive(w->group, state);
             if (nullptr != archived_window) {
-                this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
+//                this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
                 this->curr_windows->push_back(archived_window);
                 this->archived_windows->erase(std::remove(this->archived_windows->begin(),
                                                           this->archived_windows->end(),
