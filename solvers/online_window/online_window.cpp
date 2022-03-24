@@ -340,6 +340,13 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
 
 void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, double timeout_ms) {
     cout << "----------------------------updating windows------------------------------" << endl;
+    cout << "state is " << state << endl;
+    /* DEBUG */
+    cout << "-------old windows: --------" << state << endl;
+    for (Window *w: *this->curr_windows) {
+        cout << *w << endl;
+    }
+
     MEASURE_TIME;
 
     vector<Window *> *old_windows = this->curr_windows;
@@ -367,9 +374,19 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
             this->archived_windows->push_back(old_window);
         }
     }
+
+
+
+
     this->curr_windows->clear();
     for (Window *new_window: new_windows) {
         this->curr_windows->push_back(new_window);
+    }
+
+    /* DEBUG */
+    cout << "-------new windows: --------" << state << endl;
+    for (Window *w: *this->curr_windows) {
+        cout << *w << endl;
     }
 
     /* Merge required new windows */
@@ -385,6 +402,12 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                 merge_possible = true;
             }
         }
+    }
+
+    /* DEBUG */
+    cout << "-------new windows after merge: --------" << state << endl;
+    for (Window *w: *this->curr_windows) {
+        cout << *w << endl;
     }
 
     /* Plan windows which don't have a policy */
