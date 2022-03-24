@@ -257,7 +257,7 @@ bool GridArea::operator==(const GridArea &other) const {
 
 std::ostream &operator<<(ostream &os, const GridArea &a) {
     os << "rows: " << a.top_row << "->" << a.bottom_row;
-    os << " cols: " << a.left_col << "->" << a.left_col;
+    os << " cols: " << a.left_col << "->" << a.right_col;
 
     return os;
 }
