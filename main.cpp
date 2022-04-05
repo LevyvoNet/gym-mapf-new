@@ -48,8 +48,8 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-//                        new PaperExample("paper_example"),
-                        new PossibleBug("possible_bug")
+                        new PaperExample("paper_example"),
+//                        new PossibleBug("possible_bug")
                 },
                 /* lvl 1 */
                 {
@@ -188,7 +188,7 @@ int run_benchmarks() {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-//                    pid = fork();
+                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {
