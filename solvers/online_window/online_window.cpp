@@ -410,6 +410,8 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
         cout << *w << endl;
     }
 
+    vector<Window*> final_windows;
+
     /* Plan windows which don't have a policy */
     for (Window *w: *this->curr_windows) {
         cout << "iterated over window " << *w << endl;
@@ -417,8 +419,9 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
             /* There was not an archived window which fits to the current state */
             archived_window = this->try_fit_to_archive(w->group, state);
             if (nullptr != archived_window) {
-                this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
-                this->curr_windows->push_back(archived_window);
+//                this->curr_windows->erase(std::remove(this->curr_windows->begin(), this->curr_windows->end(), w));
+//                this->curr_windows->push_back(archived_window);
+                    final_windows.push_back(archived_window);
                 this->archived_windows->erase(std::remove(this->archived_windows->begin(),
                                                           this->archived_windows->end(),
                                                           archived_window));
@@ -430,12 +433,20 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                 }
             } else {
                 this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
+                final_windows.push_back(w);
                 cout << "planned for window " << *w << endl;
                 if (w->policy == nullptr) {
                     cout << "OMG" << endl;
                 }
             }
+        } else {
+            final_windows.push_back(w);
         }
+    }
+
+    this->curr_windows->clear();
+    for (Window *final_window: final_windows) {
+        this->curr_windows->push_back(final_window);
     }
 
     for (Window *w: *this->curr_windows) {
