@@ -342,7 +342,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     cout << "----------------------------updating windows------------------------------" << endl;
     cout << "state is " << state << endl;
     /* DEBUG */
-    cout << "-------old windows: --------" << state << endl;
+    cout << "-------old windows: --------" << endl;
     for (Window *w: *this->curr_windows) {
         cout << *w << endl;
     }
@@ -384,7 +384,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* DEBUG */
-    cout << "-------new windows: --------" << state << endl;
+    cout << "-------new windows after destruction: --------"  << endl;
     for (Window *w: *this->curr_windows) {
         cout << *w << endl;
     }
@@ -405,13 +405,14 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     }
 
     /* DEBUG */
-    cout << "-------new windows after merge: --------" << state << endl;
+    cout << "-------new windows after merge: --------" << endl;
     for (Window *w: *this->curr_windows) {
         cout << *w << endl;
     }
 
     /* Plan windows which don't have a policy */
     for (Window *w: *this->curr_windows) {
+        cout << "iterated over window " << *w << endl;
         if (nullptr == w->policy) {
             /* There was not an archived window which fits to the current state */
             archived_window = this->try_fit_to_archive(w->group, state);
