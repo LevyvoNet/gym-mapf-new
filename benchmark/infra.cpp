@@ -60,7 +60,7 @@ struct problem_instance_result solve(struct problem_instance problem,
                                      max_steps,
                                      exec_timeout_ms - ELAPSED_TIME_MS);
     } catch (std::bad_alloc const &) {
-        res.status = PROBLEM_FAIL;
+        res.status = PROBLEM_FAIL_OUT_OF_MEMORY;
         strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
         strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
         res.id = problem.id;
@@ -197,7 +197,7 @@ struct problem_instance_result read_result(struct worker_data worker_data) {
     do {
         read_result = read(worker_data.fd, &result, sizeof(result));
         if (0 >= read_result) {
-            result.status = PROBLEM_FAIL;
+            result.status = PROBLEM_FAIL_UNKNOWN;
             result.id = worker_data.problem_id;
             strncpy(result.map_name, worker_data.env_name, MAX_MAP_NAME);
             strncpy(result.solver_name, worker_data.solver_name, MAX_SOLVER_NAME);
@@ -244,7 +244,13 @@ void create_log_file(string log_file) {
     log_csv_file.close();
 }
 
-string end_reason(struct episode_info info) {
+string end_reason(struct problem_instance_result problem_result, struct episode_info info) {
+    if (PROBLEM_RESULT_STATUS_FAILED(problem_result.status)) {
+        if (problem_result.status == PROBLEM_FAIL_OUT_OF_MEMORY) {
+            return "out_of_memory";
+        }
+        return "unknown_failure";
+    }
     if (info.collision) {
         return "collision";
     }
@@ -272,14 +278,14 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
     /* For each episode, write its line */
     for (size_t i = 0; i < EPISODE_COUNT; ++i) {
         log_csv_file << result.map_name;
+        log_csv_file << "," << result.solver_name;
         log_csv_file << "," << result.scen_id;
         log_csv_file << "," << result.n_agents;
-        log_csv_file << "," << result.solver_name;
         log_csv_file << "," << result.episodes_data[i].reward;
         log_csv_file << "," << result.train_time + result.episodes_data[i].time;
         log_csv_file << "," << result.episodes_data[i].time;
         log_csv_file << "," << result.train_time;
-        log_csv_file << "," << end_reason(result.episodes_data[i]);
+        log_csv_file << "," << end_reason(result, result.episodes_data[i]);
         /* Solver specific */
         log_csv_file << "," << result.episodes_data[i].replans_max_size;
         log_csv_file << "," << result.episodes_data[i].replans_count;
