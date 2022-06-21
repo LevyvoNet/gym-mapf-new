@@ -35,10 +35,10 @@ void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<
                      vector<Location> *goal_locations) {
     std::ifstream infile(file_path);
     std::string line;
-    std::string start_row;
-    std::string start_col;
-    std::string goal_row;
-    std::string goal_col;
+    std::string start_row_str;
+    std::string start_col_str;
+    std::string goal_row_str;
+    std::string goal_col_str;
     std::string delimiter = "\t";
     size_t i = 0;
     size_t j = 0;
@@ -59,26 +59,32 @@ void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<
 
         /* cut start col */
         pos = line.find(delimiter);
-        start_col = line.substr(0, pos);
+        start_col_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
         /* cut start row */
         pos = line.find(delimiter);
-        start_row = line.substr(0, pos);
+        start_row_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
         /* cut goal col */
         pos = line.find(delimiter);
-        goal_col = line.substr(0, pos);
+        goal_col_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
         /* cut goal row */
         pos = line.find(delimiter);
-        goal_row = line.substr(0, pos);
+        goal_row_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
+        
+        /* Adjust row and col, we count from zero. The scenarios count from 1 */
+        int start_row = std::stoi(start_row_str);
+        int start_col = std::stoi(start_col_str);
+        int goal_row = std::stoi(goal_row_str);
+        int goal_col = std::stoi(goal_col_str);
 
-        Location start_loc = grid->get_location(std::stoi(start_row), std::stoi(start_col));
-        Location goal_loc = grid->get_location(std::stoi(goal_row), std::stoi(goal_col));
+        Location start_loc = grid->get_location(start_row, start_col);
+        Location goal_loc = grid->get_location(goal_row, goal_col);
 
         start_locations->push_back(start_loc);
         goal_locations->push_back(goal_loc);

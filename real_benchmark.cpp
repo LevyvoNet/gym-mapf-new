@@ -21,18 +21,18 @@
 #include "benchmark/infra.h"
 
 /** Experiment Settings ********************************************************************************************/
-#define EPISODE_TRAIN_TIMEOUT_SEC (600)
+#define EPISODE_TRAIN_TIMEOUT_SEC (120)
 #define EPISODE_EXEC_TIMEOUT_SEC (180)
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (4000)
-#define WORKERS_LIMIT (20)
+#define WORKERS_LIMIT (1)
 
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
-#define MAX_SCEN_ID (25)
-#define MIN_AGENTS (2)
-#define MAX_AGENTS (6)
+#define MAX_SCEN_ID (2)
+#define MIN_AGENTS (4)
+#define MAX_AGENTS (4)
 #define AGENTS_INCREASE (2)
 vector<string> MAPS{
         /* City */
@@ -52,13 +52,12 @@ vector<string> MAPS{
 
         /* Maze */
 //        "maze-128-128-10",
+        "maze-32-32-4",
 
         /* Room */
 //        "room-32-32-4",
 //        "room-64-64-8",
-        "room-64-64-16",
-
-
+//        "room-64-64-16",
 };
 
 vector<SolverCreator *> SOLVERS{
@@ -67,7 +66,7 @@ vector<SolverCreator *> SOLVERS{
 //        new id_rtdp("id_rtdp"),
 //        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
         new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
-        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+//        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
 
 };
 

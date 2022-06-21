@@ -137,8 +137,6 @@ struct problem_instance_result solve(struct problem_instance problem,
     /* Set the episodes raw data */
     for (size_t i = 0; i < EPISODE_COUNT; ++i) {
         res.episodes_data[i] = eval_info->episodes_info[i];
-
-
     }
 
     return res;

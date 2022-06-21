@@ -48,7 +48,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
 //                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
-                        new PaperExample("paper_example"),
+//                        new PaperExample("paper_example"),
 //                        new PossibleBug("possible_bug")
                 },
                 /* lvl 1 */
@@ -74,7 +74,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new RoomEnv("room-64-64-16_scen_1_10-agents", 64, 16, 1, 10),
 //                        new SanityEnv("conflict_between_pair_and_single_large_map", 2, 32, 3),
 //                        new GeneralEnv("", "room-64-64-16", 1, 8),
-//                        new GeneralEnv("", "room-64-64-16", 2, 6),
+                        new GeneralEnv("", "maze-32-32-4", 1, 4),
                 }
         }
 );
@@ -188,7 +188,7 @@ int run_benchmarks() {
                     /* Open a pipe for the new child and fork*/
                     pipe(fds);
                     std::cout.flush();
-                    pid = fork();
+//                    pid = fork();
 
                     /* Child process, solve the instance and return the result */
                     if (0 == pid) {

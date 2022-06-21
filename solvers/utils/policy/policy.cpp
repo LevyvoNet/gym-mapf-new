@@ -182,10 +182,9 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
 
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
         episode_info episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
-        eval_info->episodes_info.push_back(episode_info);
-
         /* Give the inheriting policy a chance to collect inner data about the last episode */
         this->eval_episode_info_update(&episode_info);
+        eval_info->episodes_info.push_back(episode_info);
 
         /* If we don't have a chance, give up */
         if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT) {
