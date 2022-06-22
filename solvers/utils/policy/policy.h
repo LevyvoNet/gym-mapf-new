@@ -25,13 +25,19 @@ using clk = std::chrono::steady_clock;
 //#define MEASURE_TIME const clock_t start_time = clock()
 //#define EPISODES_TIMEOUT_LIMIT (3)
 
+enum episode_status_code {
+    EPISODE_SUCCESS = 0,
+    EPISODE_TIMEOUT = 1,
+    EPISODE_STUCK = 2,
+    EPISODE_COLLISION = 3,
+    EPISODE_OUT_OF_MEMORY = 4,
+};
+
 struct episode_info {
     /* General fields */
+    episode_status_code end_reason;
     int reward;
     double time;
-    bool collision;
-    bool timeout;
-    bool stuck;
 
     /* Concrete policy proprietary fields */
     int replans_max_size;
@@ -49,6 +55,7 @@ public:
     float collision_rate;
     float timeout_rate;
     float stuck_rate;
+    float oom_rate;
 
     vector<episode_info> episodes_info;
 

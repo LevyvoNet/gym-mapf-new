@@ -50,33 +50,32 @@ struct problem_instance_result solve(struct problem_instance problem,
         std::cout << "failed to limit" << std::endl;
     }
 
-    /* Train and evaluate */
-    try {
-        policy->train(train_timeout_ms);
-        train_info = policy->get_train_info();
-
-        MEASURE_TIME;
-        eval_info = policy->evaluate(episode_count,
-                                     max_steps,
-                                     exec_timeout_ms - ELAPSED_TIME_MS);
-    } catch (std::bad_alloc const &) {
-        res.status = PROBLEM_FAIL_OUT_OF_MEMORY;
-        strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
-        strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
-        res.id = problem.id;
-        res.scen_id = problem.env_creator->scen_id;
-        res.n_agents = problem.env_creator->n_agents;
-        field_value = "-";
-        return res;
-    }
-
-    /* Set res fields */
-    res.status = PROBLEM_SUCCESS;
+    /* Set the already known fields */
     res.id = problem.id;
     strncpy(res.map_name, problem.env_creator->map_name.c_str(), MAX_MAP_NAME);
     res.scen_id = problem.env_creator->scen_id;
     res.n_agents = problem.env_creator->n_agents;
     strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
+
+    /* Train */
+    try {
+        policy->train(train_timeout_ms);
+        train_info = policy->get_train_info();
+
+
+    } catch (std::bad_alloc const &) {
+        res.status = PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN;
+        return res;
+    }
+
+    /* Evaluate */
+    MEASURE_TIME;
+    eval_info = policy->evaluate(episode_count,
+                                 max_steps,
+                                 exec_timeout_ms - ELAPSED_TIME_MS);
+
+    /* Set res fields */
+
     res.adr = eval_info->mdr;
     res.rate = eval_info->success_rate;
     res.total_time = eval_info->mean_episode_time + train_info->time;
@@ -84,6 +83,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     res.train_time = train_info->time;
     res.timeout_rate = eval_info->timeout_rate;
     res.stuck_rate = eval_info->stuck_rate;
+    res.oom_rate = eval_info->oom_rate;
     res.collision_rate = eval_info->collision_rate;
     res.adr_stderr = eval_info->mdr_stderr;
     res.exec_time_stderr = eval_info->mean_episode_time_stderr;
@@ -246,22 +246,27 @@ void create_log_file(string log_file) {
 
 string end_reason(struct problem_instance_result problem_result, struct episode_info info) {
     if (PROBLEM_RESULT_STATUS_FAILED(problem_result.status)) {
-        if (problem_result.status == PROBLEM_FAIL_OUT_OF_MEMORY) {
+        if (problem_result.status == PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN) {
             return "out_of_memory";
         }
         return "unknown_failure";
     }
-    if (info.collision) {
-        return "collision";
-    }
-    if (info.timeout) {
-        return "timeout";
-    }
-    if (info.stuck) {
-        return "stuck";
-    }
 
-    return "success";
+    switch (info.end_reason) {
+        case EPISODE_SUCCESS:
+            return "success";
+        case EPISODE_COLLISION:
+            return "collision";
+        case EPISODE_TIMEOUT:
+            return "timeout";
+        case EPISODE_STUCK:
+            return "stuck";
+        case EPISODE_OUT_OF_MEMORY:
+            return "out_of_memory";
+        default:
+            return "unknown";
+
+    }
 }
 
 void log_if_needed(string log_file, struct problem_instance_result result) {

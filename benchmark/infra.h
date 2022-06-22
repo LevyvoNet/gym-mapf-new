@@ -47,7 +47,7 @@ struct problem_instance {
 
 enum problem_status_code {
     PROBLEM_SUCCESS = 0,
-    PROBLEM_FAIL_OUT_OF_MEMORY = 1,
+    PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN = 1,
     PROBLEM_FAIL_UNKNOWN = 2,
 };
 
@@ -71,6 +71,7 @@ struct problem_instance_result {
     double exec_time;
     double train_time;
     float timeout_rate;
+    float oom_rate;
     float stuck_rate;
     float collision_rate;
     float adr_stderr;

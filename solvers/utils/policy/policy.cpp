@@ -38,6 +38,7 @@ EvaluationInfo::EvaluationInfo() {
     this->collision_rate = 0;
     this->stuck_rate = 0;
     this->timeout_rate = 0;
+    this->oom_rate = 0;
     this->additional_data = new std::unordered_map<std::string, std::string>;
 }
 
@@ -75,11 +76,8 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         /* Select the best action */
         selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
         if (nullptr == selected_action) {
-            res.reward = -999;
             res.time = ELAPSED_TIME_MS;
-            res.collision = false;
-            res.timeout = true;
-            res.stuck = false;
+            res.end_reason = EPISODE_TIMEOUT;
             return res;
         }
         /* Check if we are stuck */
@@ -87,9 +85,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
 //            cout << "chosen all stay" << endl;
             res.reward = episode_reward;
             res.time = ELAPSED_TIME_MS;
-            res.collision = false;
-            res.timeout = false;
-            res.stuck = true;
+            res.end_reason = EPISODE_STUCK;
             return res;
         }
 
@@ -102,9 +98,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         if (is_collision) {
             res.reward = episode_reward;
             res.time = ELAPSED_TIME_MS;
-            res.collision = true;
-            res.timeout = false;
-            res.stuck = false;
+            res.end_reason = EPISODE_COLLISION;
             return res;
         }
 
@@ -112,9 +106,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         if (done) {
             res.reward = episode_reward;
             res.time = ELAPSED_TIME_MS;
-            res.collision = false;
-            res.timeout = false;
-            res.stuck = false;
+            res.end_reason = EPISODE_SUCCESS;
             return res;
         }
 
@@ -122,9 +114,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
 
     res.reward = episode_reward;
     res.time = ELAPSED_TIME_MS;
-    res.collision = false;
-    res.timeout = false;
-    res.stuck = true;
+    res.end_reason = EPISODE_STUCK;
     return res;
 }
 
@@ -132,16 +122,9 @@ float calc_mdr_std(vector<episode_info> episodes, float adr) {
     float squared_distance_sum = 0;
     int count = 0;
     for (episode_info episode: episodes) {
-        if (episode.collision) {
+        if (episode.end_reason != EPISODE_SUCCESS) {
             continue;
         }
-        if (episode.timeout) {
-            continue;
-        }
-        if (episode.stuck) {
-            continue;
-        }
-
         ++count;
 
         squared_distance_sum += pow(episode.reward - adr, 2);
@@ -154,13 +137,7 @@ float calc_time_std(vector<episode_info> episodes, float mean_time) {
     float squared_distance_sum = 0;
     int count = 0;
     for (episode_info episode: episodes) {
-        if (episode.collision) {
-            continue;
-        }
-        if (episode.timeout) {
-            continue;
-        }
-        if (episode.stuck) {
+        if (episode.end_reason != EPISODE_SUCCESS) {
             continue;
         }
 
@@ -175,13 +152,20 @@ float calc_time_std(vector<episode_info> episodes, float mean_time) {
 EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms) {
     EvaluationInfo *eval_info = new EvaluationInfo();
 
+
     if (episode_timeout_ms <= 0) {
         eval_info->timeout_rate = 100;
         return eval_info;
     }
 
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
-        episode_info episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+        struct episode_info episode_info;
+        memset(&episode_info, 0, sizeof(episode_info));
+        try {
+            episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+        } catch (std::bad_alloc const &) {
+            episode_info.end_reason = EPISODE_OUT_OF_MEMORY;
+        }
         /* Give the inheriting policy a chance to collect inner data about the last episode */
         this->eval_episode_info_update(&episode_info);
         eval_info->episodes_info.push_back(episode_info);
@@ -190,7 +174,7 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
         if (eval_info->episodes_info.size() == EPISODES_TIMEOUT_LIMIT) {
             bool all_timeouts = true;
             for (size_t i = 0; i < EPISODES_TIMEOUT_LIMIT; ++i) {
-                all_timeouts = all_timeouts && eval_info->episodes_info[i].timeout;
+                all_timeouts = all_timeouts && eval_info->episodes_info[i].end_reason == EPISODE_TIMEOUT;
             }
             if (all_timeouts) {
                 break;
@@ -205,17 +189,22 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
     float timeout_count = 0;
     float collision_count = 0;
     float stuck_count = 0;
+    float oom_count = 0;
     for (episode_info episode: eval_info->episodes_info) {
-        if (episode.collision) {
+        if (episode.end_reason == EPISODE_COLLISION) {
             ++collision_count;
             continue;
         }
-        if (episode.timeout) {
+        if (episode.end_reason == EPISODE_TIMEOUT) {
             ++timeout_count;
             continue;
         }
-        if (episode.stuck) {
+        if (episode.end_reason == EPISODE_STUCK) {
             ++stuck_count;
+            continue;
+        }
+        if (episode.end_reason == EPISODE_OUT_OF_MEMORY) {
+            ++oom_count;
             continue;
         }
 
@@ -252,6 +241,10 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
 
     if (stuck_count > 0) {
         eval_info->stuck_rate = round((stuck_count / n_episodes) * 100);
+    }
+
+    if (oom_count > 0) {
+        eval_info->oom_rate = round((oom_count / n_episodes) * 100);
     }
 
 
