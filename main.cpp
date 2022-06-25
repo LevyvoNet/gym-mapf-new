@@ -127,7 +127,7 @@ std::string benchmark_solver_on_env(EnvCreator *env_creator, SolverCreator *solv
     TrainInfo *train_info = policy->get_train_info();
     EvaluationInfo *eval_info = policy->evaluate(EPISODE_COUNT,
                                                  MAX_STEPS,
-                                                 EPISODE_TIMEOUT_MS - ELAPSED_TIME_MS);
+                                                 EPISODE_TIMEOUT_MS - ELAPSED_TIME_MS, false);
 
     /* Print results */
     std::cout << "ADR:" << eval_info->mdr;

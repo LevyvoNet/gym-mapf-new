@@ -9,6 +9,7 @@
 #include <chrono>
 #include <cmath>
 #include <string.h>
+#include <unistd.h>
 //#include <time.h>
 
 #include <gym_mapf/gym_mapf.h>
@@ -31,6 +32,7 @@ enum episode_status_code {
     EPISODE_STUCK = 2,
     EPISODE_COLLISION = 3,
     EPISODE_OUT_OF_MEMORY = 4,
+    EPISODE_UNKNOWN_FAILURE=5,
 };
 
 struct episode_info {
@@ -98,7 +100,7 @@ public:
 
     TrainInfo *get_train_info();
 
-    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms);
+    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked);
 
     virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) = 0;
 

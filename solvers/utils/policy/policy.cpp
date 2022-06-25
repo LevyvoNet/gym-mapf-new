@@ -63,6 +63,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
     bool is_collision = false;
     MultiAgentAction *selected_action = nullptr;
     struct episode_info res;
+    pid_t pid = 0;
 
     /* Initialize structs */
     memset(&res, 0, sizeof(res));
@@ -70,51 +71,72 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
     /* Reset policy */
     this->reset();
 
-    do {
-        steps++;
+    try {
+        do {
+            steps++;
 
-        /* Select the best action */
-        selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
-        if (nullptr == selected_action) {
-            res.time = ELAPSED_TIME_MS;
-            res.end_reason = EPISODE_TIMEOUT;
-            return res;
-        }
-        /* Check if we are stuck */
-        if (*selected_action == all_stay) {
+            /* Select the best action */
+            selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
+            if (nullptr == selected_action) {
+                res.time = ELAPSED_TIME_MS;
+                res.end_reason = EPISODE_TIMEOUT;
+                /* Give the inheriting policy a chance to collect inner data about the last episode */
+                this->eval_episode_info_update(&res);
+                return res;
+            }
+            /* Check if we are stuck */
+            if (*selected_action == all_stay) {
 //            cout << "chosen all stay" << endl;
-            res.reward = episode_reward;
-            res.time = ELAPSED_TIME_MS;
-            res.end_reason = EPISODE_STUCK;
-            return res;
-        }
+                res.reward = episode_reward;
+                res.time = ELAPSED_TIME_MS;
+                res.end_reason = EPISODE_STUCK;
+                /* Give the inheriting policy a chance to collect inner data about the last episode */
+                this->eval_episode_info_update(&res);
+                return res;
+            }
 
-        /* Step */
-        this->env->step(*selected_action, &next_state, &reward, &done, &is_collision);
-        episode_reward += reward;
-        delete selected_action;
+            /* Step */
+            this->env->step(*selected_action, &next_state, &reward, &done, &is_collision, false);
+            episode_reward += reward;
+            delete selected_action;
 
-        /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
-        if (is_collision) {
-            res.reward = episode_reward;
-            res.time = ELAPSED_TIME_MS;
-            res.end_reason = EPISODE_COLLISION;
-            return res;
-        }
+            /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
+            if (is_collision) {
+                res.reward = episode_reward;
+                res.time = ELAPSED_TIME_MS;
+                res.end_reason = EPISODE_COLLISION;
+                /* Give the inheriting policy a chance to collect inner data about the last episode */
+                this->eval_episode_info_update(&res);
+                return res;
+            }
 
-        /* The goal was reached, the episode is solved. Update its stats. */
-        if (done) {
-            res.reward = episode_reward;
-            res.time = ELAPSED_TIME_MS;
-            res.end_reason = EPISODE_SUCCESS;
-            return res;
-        }
+            /* The goal was reached, the episode is solved. Update its stats. */
+            if (done) {
+                res.reward = episode_reward;
+                res.time = ELAPSED_TIME_MS;
+                res.end_reason = EPISODE_SUCCESS;
+                /* Give the inheriting policy a chance to collect inner data about the last episode */
+                this->eval_episode_info_update(&res);
+                return res;
+            }
 
-    } while (steps < max_steps);
+        } while (steps < max_steps);
+    } catch (std::bad_alloc const &) {
+        res.end_reason = EPISODE_OUT_OF_MEMORY;
+        /* Give the inheriting policy a chance to collect inner data about the last episode */
+        this->eval_episode_info_update(&res);
+        return res;
+    }
 
     res.reward = episode_reward;
     res.time = ELAPSED_TIME_MS;
     res.end_reason = EPISODE_STUCK;
+
+    /* Give the inheriting policy a chance to collect inner data about the last episode */
+    this->eval_episode_info_update(&res);
+
+    this->reset();
+
     return res;
 }
 
@@ -149,7 +171,7 @@ float calc_time_std(vector<episode_info> episodes, float mean_time) {
     return sqrt(squared_distance_sum / count);
 }
 
-EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms) {
+EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked) {
     EvaluationInfo *eval_info = new EvaluationInfo();
 
 
@@ -160,14 +182,45 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
 
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
         struct episode_info episode_info;
-        memset(&episode_info, 0, sizeof(episode_info));
-        try {
+        if (!forked) {
             episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
-        } catch (std::bad_alloc const &) {
-            episode_info.end_reason = EPISODE_OUT_OF_MEMORY;
+
+        } else {
+            int fds[2] = {0};
+            pid_t pid = 0;
+            ssize_t written_bytes = 0;
+
+            pipe(fds);
+            std::cout.flush();
+            pid = fork();
+
+            if (pid == 0){
+                close(fds[0]);
+                struct episode_info episode_info_child = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+                do {
+                    written_bytes += write(fds[1], &episode_info_child, sizeof(episode_info_child));
+                } while (written_bytes < sizeof(episode_info_child));
+                close(fds[1]);
+                exit(0);
+
+            } else {
+                close(fds[1]);
+                ssize_t read_result = 0;
+                ssize_t read_bytes = 0;
+                memset(&episode_info, 0, sizeof(episode_info));
+
+                do {
+                    read_result = read(fds[0], &episode_info, sizeof(episode_info));
+                    if (0 >= read_result) {
+                        episode_info.end_reason = EPISODE_UNKNOWN_FAILURE;
+                        break;
+                    }
+                    read_bytes += read_result;
+                } while (read_bytes < sizeof(episode_info));
+            }
         }
-        /* Give the inheriting policy a chance to collect inner data about the last episode */
-        this->eval_episode_info_update(&episode_info);
+
+        /* Insert the current episode info to the episodes raw data storage */
         eval_info->episodes_info.push_back(episode_info);
 
         /* If we don't have a chance, give up */

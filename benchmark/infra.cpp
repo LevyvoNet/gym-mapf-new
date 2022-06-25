@@ -61,8 +61,6 @@ struct problem_instance_result solve(struct problem_instance problem,
     try {
         policy->train(train_timeout_ms);
         train_info = policy->get_train_info();
-
-
     } catch (std::bad_alloc const &) {
         res.status = PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN;
         return res;
@@ -72,7 +70,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     MEASURE_TIME;
     eval_info = policy->evaluate(episode_count,
                                  max_steps,
-                                 exec_timeout_ms - ELAPSED_TIME_MS);
+                                 exec_timeout_ms - ELAPSED_TIME_MS, true);
 
     /* Set res fields */
 
