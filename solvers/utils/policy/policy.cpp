@@ -78,8 +78,9 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
             /* Select the best action */
             selected_action = this->act(*(this->env->s), timeout_ms - ELAPSED_TIME_MS);
             if (nullptr == selected_action) {
-                res.time = ELAPSED_TIME_MS;
                 res.end_reason = EPISODE_TIMEOUT;
+                res.time = ELAPSED_TIME_MS;
+                res.steps = steps;
                 /* Give the inheriting policy a chance to collect inner data about the last episode */
                 this->eval_episode_info_update(&res);
                 return res;
@@ -87,9 +88,10 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
             /* Check if we are stuck */
             if (*selected_action == all_stay) {
 //            cout << "chosen all stay" << endl;
+                res.end_reason = EPISODE_STUCK;
                 res.reward = episode_reward;
                 res.time = ELAPSED_TIME_MS;
-                res.end_reason = EPISODE_STUCK;
+                res.steps = steps;
                 /* Give the inheriting policy a chance to collect inner data about the last episode */
                 this->eval_episode_info_update(&res);
                 return res;
@@ -102,9 +104,10 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
 
             /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
             if (is_collision) {
+                res.end_reason = EPISODE_COLLISION;
                 res.reward = episode_reward;
                 res.time = ELAPSED_TIME_MS;
-                res.end_reason = EPISODE_COLLISION;
+                res.steps = steps;
                 /* Give the inheriting policy a chance to collect inner data about the last episode */
                 this->eval_episode_info_update(&res);
                 return res;
@@ -112,9 +115,10 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
 
             /* The goal was reached, the episode is solved. Update its stats. */
             if (done) {
+                res.end_reason = EPISODE_SUCCESS;
                 res.reward = episode_reward;
                 res.time = ELAPSED_TIME_MS;
-                res.end_reason = EPISODE_SUCCESS;
+                res.steps = steps;
                 /* Give the inheriting policy a chance to collect inner data about the last episode */
                 this->eval_episode_info_update(&res);
                 return res;
@@ -123,6 +127,9 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         } while (steps < max_steps);
     } catch (std::bad_alloc const &) {
         res.end_reason = EPISODE_OUT_OF_MEMORY;
+        res.reward = episode_reward;
+        res.time = ELAPSED_TIME_MS;
+        res.steps = steps;
         /* Give the inheriting policy a chance to collect inner data about the last episode */
         this->eval_episode_info_update(&res);
         return res;

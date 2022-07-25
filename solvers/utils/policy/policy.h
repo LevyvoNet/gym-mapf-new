@@ -40,6 +40,7 @@ struct episode_info {
     episode_status_code end_reason;
     int reward;
     double time;
+    uint64_t steps;
 
     /* Concrete policy proprietary fields */
     int replans_max_size;
