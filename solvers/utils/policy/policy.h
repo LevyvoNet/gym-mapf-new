@@ -45,6 +45,10 @@ struct episode_info {
     /* Concrete policy proprietary fields */
     int replans_max_size;
     double replans_count;
+    int max_steps_window;
+    int max_reached_window;
+    int max_expanded_window;
+    int livelock_count;
 
 };
 

@@ -70,7 +70,8 @@ struct problem_instance_result solve(struct problem_instance problem,
     MEASURE_TIME;
     eval_info = policy->evaluate(episode_count,
                                  max_steps,
-                                 exec_timeout_ms - ELAPSED_TIME_MS, true);
+                                 exec_timeout_ms - ELAPSED_TIME_MS,
+                                 true);
 
     /* Set res fields */
 
@@ -233,6 +234,10 @@ void create_log_file(string log_file) {
     /* Solver specific */
     log_csv_file << "," << "replans_max_size";
     log_csv_file << "," << "replans_count";
+    log_csv_file << "," << "max_steps_window";
+    log_csv_file << "," << "max_reached_window";
+    log_csv_file << "," << "max_expanded_window";
+    log_csv_file << "," << "n_livelock";
     log_csv_file << "," << "n_conflicts";
     log_csv_file << "," << "eval_time";
     log_csv_file << "," << "init_time";
@@ -294,6 +299,10 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
         /* Solver specific */
         log_csv_file << "," << result.episodes_data[i].replans_max_size;
         log_csv_file << "," << result.episodes_data[i].replans_count;
+        log_csv_file << "," << result.episodes_data[i].max_steps_window;
+        log_csv_file << "," << result.episodes_data[i].max_reached_window;
+        log_csv_file << "," << result.episodes_data[i].max_expanded_window;
+        log_csv_file << "," << result.episodes_data[i].livelock_count;
         log_csv_file << "," << result.n_conflicts;
         log_csv_file << "," << result.eval_time;
         log_csv_file << "," << result.init_time;
