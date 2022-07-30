@@ -26,11 +26,11 @@
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (4000)
-#define WORKERS_LIMIT (1)
+#define WORKERS_LIMIT (10)
 
 /** Constants *******************************************************************************************************/
 #define MIN_SCEN_ID (1)
-#define MAX_SCEN_ID (2)
+#define MAX_SCEN_ID (25)
 #define MIN_AGENTS (2)
 #define MAX_AGENTS (2)
 #define AGENTS_INCREASE (2)
@@ -66,7 +66,7 @@ vector<SolverCreator *> SOLVERS{
 //        new id_rtdp("id_rtdp"),
 //        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
         new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
-//        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+        new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
 
 };
 
