@@ -287,9 +287,9 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
     /* For each episode, write its line */
     for (size_t i = 0; i < EPISODE_COUNT; ++i) {
         log_csv_file << result.map_name;
-        log_csv_file << "," << result.solver_name;
         log_csv_file << "," << result.scen_id;
         log_csv_file << "," << result.n_agents;
+        log_csv_file << "," << result.solver_name;
         log_csv_file << "," << result.episodes_data[i].reward;
         log_csv_file << "," << result.train_time + result.episodes_data[i].time;
         log_csv_file << "," << result.episodes_data[i].time;
