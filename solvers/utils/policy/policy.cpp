@@ -187,8 +187,8 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
         res.steps = steps;
         /* Measure memory usage */
         double vm, rss;
-        process_mem_usage(vm, rss);
-        res.memory_used = vm;
+//        process_mem_usage(vm, rss);
+        res.memory_used = MAX_RAM / 1000.0;
         /* Give the inheriting policy a chance to collect inner data about the last episode */
         this->eval_episode_info_update(&res);
         return res;

@@ -251,7 +251,7 @@ void create_log_file(string log_file) {
 string end_reason(struct problem_instance_result problem_result, struct episode_info info) {
     if (PROBLEM_RESULT_STATUS_FAILED(problem_result.status)) {
         if (problem_result.status == PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN) {
-            return "out_of_memory";
+            return "train_out_of_memory";
         }
         return "unknown_failure";
     }
@@ -266,7 +266,7 @@ string end_reason(struct problem_instance_result problem_result, struct episode_
         case EPISODE_STUCK:
             return "stuck";
         case EPISODE_OUT_OF_MEMORY:
-            return "out_of_memory";
+            return "exec_out_of_memory";
         default:
             return "unknown";
 

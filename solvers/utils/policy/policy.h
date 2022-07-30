@@ -20,6 +20,7 @@ using clk = std::chrono::steady_clock;
 #define ELAPSED_TIME_MS (((ms)(clk::now() - start_time)).count())
 #define MEASURE_TIME const auto start_time = clk::now()
 #define EPISODES_TIMEOUT_LIMIT (3)
+#define MAX_RAM (16000000000)
 
 //#define ELAPSED_TIME_SEC (((double) (clock() - start_time)) / CLOCKS_PER_SEC)
 //#define ELAPSED_TIME_MS (ELAPSED_TIME_SEC * 1000)
