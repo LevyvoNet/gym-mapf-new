@@ -41,6 +41,7 @@ struct episode_info {
     int reward;
     double time;
     uint64_t steps;
+    double memory_used;
 
     /* Concrete policy proprietary fields */
     int replans_max_size;

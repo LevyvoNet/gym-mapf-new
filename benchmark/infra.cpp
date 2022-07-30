@@ -4,7 +4,6 @@
 
 #include "infra.h"
 
-
 bool is_worker_active(struct worker_data worker) {
     int wstatus = 0;
 
@@ -229,8 +228,9 @@ void create_log_file(string log_file) {
     log_csv_file << "," << "total_time";
     log_csv_file << "," << "exec_time";
     log_csv_file << "," << "train_time";
-    log_csv_file << "," << "end_reason";
     log_csv_file << "," << "steps";
+    log_csv_file << "," << "memory";
+    log_csv_file << "," << "end_reason";
     /* Solver specific */
     log_csv_file << "," << "replans_max_size";
     log_csv_file << "," << "replans_count";
@@ -294,8 +294,9 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
         log_csv_file << "," << result.train_time + result.episodes_data[i].time;
         log_csv_file << "," << result.episodes_data[i].time;
         log_csv_file << "," << result.train_time;
-        log_csv_file << "," << end_reason(result, result.episodes_data[i]);
         log_csv_file << "," << result.episodes_data[i].steps;
+        log_csv_file << "," << result.episodes_data[i].memory_used;
+        log_csv_file << "," << end_reason(result, result.episodes_data[i]);
         /* Solver specific */
         log_csv_file << "," << result.episodes_data[i].replans_max_size;
         log_csv_file << "," << result.episodes_data[i].replans_count;
