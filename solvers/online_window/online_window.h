@@ -68,10 +68,6 @@ public:
     GridArea area;
     Policy *policy;
     AgentsGroup group;
-    int steps_count;
-    int max_steps;
-    int reached_count;
-    int expanded_count;
 
     Window(GridArea area, Policy *policy, AgentsGroup group);
 
@@ -107,6 +103,11 @@ private:
     int max_times_window_reached_episode;
     int max_times_window_expanded_episode;
     int livelocks_count_episode;
+    int steps_count;
+    int max_steps;
+    int reached_count;
+    int expanded_count;
+    int max_agents_replan_area_episode;
 
 
     /* Private Methods */

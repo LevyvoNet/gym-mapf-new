@@ -33,7 +33,7 @@ enum episode_status_code {
     EPISODE_STUCK = 2,
     EPISODE_COLLISION = 3,
     EPISODE_OUT_OF_MEMORY = 4,
-    EPISODE_UNKNOWN_FAILURE=5,
+    EPISODE_UNKNOWN_FAILURE = 5,
 };
 
 struct episode_info {
@@ -46,6 +46,7 @@ struct episode_info {
 
     /* Concrete policy proprietary fields */
     int replans_max_size;
+    int max_agents_replan_area;
     double replans_count;
     int max_steps_window;
     int max_reached_window;
