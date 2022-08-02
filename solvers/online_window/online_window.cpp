@@ -537,7 +537,7 @@ OnlineWindowPolicy::OnlineWindowPolicy(MapfEnv *env, float gamma, const string &
         d(d), low_level_planner_creator(low_level_planner_creator), window_planner_func(window_planner_func),
         replans_count(0), replans_sum(0), episodes_count(0), replans_max_size(0),
         max_steps_in_window_episode(0), max_times_window_reached_episode(0), max_times_window_expanded_episode(0),
-        livelocks_count_episode(0), max_agents_replan_area(0) {
+        livelocks_count_episode(0), max_agents_replan_area_episode(0) {
     this->curr_windows = new vector<Window *>();
     this->archived_windows = new vector<Window *>();
     this->singles_windows = new vector<Window *>();
@@ -590,7 +590,7 @@ void OnlineWindowPolicy::eval_episode_info_update(episode_info *episode_info) {
 
     episode_info->replans_count = this->replans_count;
     episode_info->replans_max_size = this->replans_max_size_episode;
-    episode_info->max_agents_replan_area_episode = this->max_agents_replan_area_episode;
+    episode_info->max_agents_replan_area = this->max_agents_replan_area_episode;
     episode_info->max_steps_window = this->max_steps_in_window_episode;
     episode_info->max_reached_window = this->max_times_window_reached_episode;
     episode_info->max_expanded_window = this->max_times_window_expanded_episode;

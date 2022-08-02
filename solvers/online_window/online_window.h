@@ -37,28 +37,30 @@ Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env,
                                                    float gamma,
                                                    double timeout_ms);
 
-class AllStayExceptFirstActionSpaceIterator: public MultiAgentActionIterator{
+class AllStayExceptFirstActionSpaceIterator : public MultiAgentActionIterator {
 public:
 
     AllStayExceptFirstActionSpaceIterator(size_t nAgents);
 
-    AllStayExceptFirstActionSpaceIterator& operator++();
+    AllStayExceptFirstActionSpaceIterator &operator++();
 };
 
 class AllStayExceptFirstActionSpace : public MultiAgentActionSpace {
 public:
     AllStayExceptFirstActionSpace(size_t nAgents);
 
-    MultiAgentActionIterator* begin();
+    MultiAgentActionIterator *begin();
 
-    MultiAgentActionIterator* end();
+    MultiAgentActionIterator *end();
 };
 
 typedef vector<size_t> AgentsGroup;
 
 /** Private functions ***************************************************************************************/
 tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, int k, double timeout_ms);
+
 GridArea pad_area(Grid *grid, GridArea area, int k);
+
 GridArea construct_conflict_area(Grid *grid, const AgentsGroup &group, const MultiAgentState &s);
 
 /** Classes **************************************************************************************************/
@@ -69,13 +71,18 @@ public:
     Policy *policy;
     AgentsGroup group;
 
+    int steps_count;
+    int max_steps;
+    int reached_count;
+    int expanded_count;
+
     Window(GridArea area, Policy *policy, AgentsGroup group);
 
     MultiAgentAction *act(const MultiAgentState &state, double timeout_ms);
 
     int calc_max_steps();
 
-    friend std::ostream& operator<<(std::ostream& os, const Window& w);
+    friend std::ostream &operator<<(std::ostream &os, const Window &w);
 
 };
 
@@ -87,7 +94,7 @@ private:
     int d;
 
     /* Consts */
-    vector<Window *>* singles_windows;
+    vector<Window *> *singles_windows;
 
     /* State */
     vector<Window *> *curr_windows;
@@ -103,10 +110,6 @@ private:
     int max_times_window_reached_episode;
     int max_times_window_expanded_episode;
     int livelocks_count_episode;
-    int steps_count;
-    int max_steps;
-    int reached_count;
-    int expanded_count;
     int max_agents_replan_area_episode;
 
 
@@ -123,11 +126,11 @@ private:
 
     void plan_window(Window *pWindow, const MultiAgentState &s, double d);
 
-    Window* try_fit_to_archive(AgentsGroup , const MultiAgentState &state);
+    Window *try_fit_to_archive(AgentsGroup, const MultiAgentState &state);
 
-    bool might_live_lock(Window* w);
+    bool might_live_lock(Window *w);
 
-    void expand_window(Window* w, const MultiAgentState &state, double timeout_ms);
+    void expand_window(Window *w, const MultiAgentState &state, double timeout_ms);
 
 public:
 
