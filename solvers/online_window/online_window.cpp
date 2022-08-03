@@ -463,7 +463,7 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
     /* Update statistics */
     ++this->replans_count;
     this->replans_max_size = max(w->group.size(), this->replans_max_size);
-    int curr_area = (w->area.bottom_row - w->area.top_row + 1) * (w->area.right_col - w->area.left_col + 1)
+    int curr_area = (w->area.bottom_row - w->area.top_row + 1) * (w->area.right_col - w->area.left_col + 1);
     if (w->group.size() > this->replans_max_size_episode) {
         this->max_agents_replan_area_episode = curr_area;
     } else if (w->group.size() == this->replans_max_size_episode) {
