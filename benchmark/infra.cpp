@@ -21,7 +21,8 @@ struct problem_instance_result solve(struct problem_instance problem,
                                      double train_timeout_ms,
                                      double exec_timeout_ms,
                                      int episode_count,
-                                     int max_steps) {
+                                     int max_steps,
+                                     bool forked) {
     struct problem_instance_result res;
     Policy *policy = nullptr;
     MapfEnv *env = nullptr;
@@ -70,7 +71,7 @@ struct problem_instance_result solve(struct problem_instance problem,
     eval_info = policy->evaluate(episode_count,
                                  max_steps,
                                  exec_timeout_ms - ELAPSED_TIME_MS,
-                                 true);
+                                 forked);
 
     /* Set res fields */
 
@@ -146,7 +147,8 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
                                 double train_timeout_ms,
                                 double exec_timeout_ms,
                                 int episode_count,
-                                int max_steps) {
+                                int max_steps,
+                                bool forked_eval) {
     int fds[2] = {0};
     pid_t pid = 0;
     ssize_t written_bytes = 0;
@@ -162,7 +164,7 @@ struct worker_data spawn_worker(list<struct worker_data> other_workers,
         close(fds[0]);
         close_all_fds(other_workers);
         struct problem_instance_result result = solve(problem, train_timeout_ms, exec_timeout_ms, episode_count,
-                                                      max_steps);
+                                                      max_steps, forked_eval);
         do {
             written_bytes += write(fds[1], &result, sizeof(result));
         } while (written_bytes < sizeof(result));
@@ -320,7 +322,7 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
 
 void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
                     double train_timeout_ms, double episode_exec_timeout_ms, int eval_episodes_count, int max_steps,
-                    string log_file) {
+                    string log_file, bool forked_eval) {
     list<struct worker_data> workers;
     size_t finished_count = 0;
     size_t problems_count = problems->size();
@@ -336,7 +338,8 @@ void solve_problems(list<struct problem_instance> *problems, size_t workers_limi
                                  train_timeout_ms,
                                  episode_exec_timeout_ms,
                                  eval_episodes_count,
-                                 max_steps));
+                                 max_steps,
+                                 forked_eval));
             problems->erase(problems->begin());
         }
 

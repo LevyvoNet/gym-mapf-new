@@ -61,7 +61,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("", "ost003d", 4, 4),
+//                        new GeneralEnv("", "ost003d", 4, 4),
 
                         /* Open */
 //                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
@@ -74,7 +74,7 @@ vector<vector<EnvCreator *>> env_creators(
 
                         /* Room */
                         new GeneralEnv("", "room-64-64-16", 1, 6),
-                        new GeneralEnv("", "room-64-64-16", 1, 8),
+//                        new GeneralEnv("", "room-64-64-16", 1, 8),
                 }
         }
 );
@@ -82,28 +82,28 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
                 /* lvl 1 */
                 {
-//                        new rtdp_dijkstra("rtdp_dijkstra"),
+                        new rtdp_dijkstra("rtdp_dijkstra"),
 
                 },
                 /* lvl 2 */
                 {
-//                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
+                        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
                 },
                 /* lvl 3 */
                 {
-//                        new id_rtdp_default("id_rtdp_default"),
-//                        new id_rtdp("id_rtdp"),
+                        new id_rtdp_default("id_rtdp_default"),
+                        new id_rtdp("id_rtdp"),
                 },
                 /* lvl 4 */
                 {
                         new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
-//                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
+                        new online_window("online_window_rtdp_2_vi", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
                         new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
                                           window_planner_vi),
                 }
@@ -167,7 +167,8 @@ int main(int argc, char **argv) {
                    EPISODE_EXEC_TIMEOUT_MS,
                    EPISODE_COUNT,
                    MAX_STEPS,
-                   "");
+                   "",
+                   false);
 
     /* Print every result */
     for (problem_instance_result result: db.results) {

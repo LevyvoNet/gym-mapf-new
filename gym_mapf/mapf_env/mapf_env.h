@@ -16,6 +16,7 @@
 #include <multiagent_action/multiagent_action.h>
 #include <multiagent_state/multiagent_state.h>
 #include <utils/state_storage/state_storage.h>
+#include <mapf_env/goal_predicator.h>
 
 using namespace std;
 
@@ -76,24 +77,12 @@ public:
 #define MOUNTAIN_NOISE_FACTOR (2)
 
 class MapfEnv {
-private:
-    void calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
-                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
-                                bool cache);
-
-    int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action, bool cache);
-
-    /* Caches */
-    /* TODO: add another hierarchical structure for multi agent actions as well */
-    MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
-    MultiAgentStateStorage<ActionToIntStorage *> *living_reward_cache;
-    MultiAgentStateStorage<bool *> *is_terminal_cache;
-
 public:
     /* Parameters */
     Grid *grid;
     size_t n_agents;
     MultiAgentState *start_state;
+    vector<GoalPredicator> goal_predicators;
     MultiAgentState *goal_state;
     float fail_prob;
     int reward_of_collision;
@@ -108,12 +97,21 @@ public:
 
     /* State */
     MultiAgentState *s;
-    vector<GridArea> * mountains;
+    vector<GridArea> *mountains;
 
     MapfEnv(Grid *grid,
             size_t n_agents,
             const vector<Location> &start_locations,
             const vector<Location> &goal_locations,
+            float fail_prob,
+            int collision_reward,
+            int goal_reward,
+            int living_reward);
+
+    MapfEnv(Grid *grid,
+            size_t n_agents,
+            const vector<Location> &start_locations,
+            const vector<GoalPredicator> &goal_predicators,
             float fail_prob,
             int collision_reward,
             int goal_reward,
@@ -143,7 +141,20 @@ public:
 
     void add_mountain(GridArea mountain_area);
 
-    bool is_in_mountain(const Location& l);
+    bool is_in_mountain(const Location &l);
+
+private:
+    void calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
+                                const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
+                                bool cache);
+
+    int calc_living_reward(const MultiAgentState *prev_state, const MultiAgentAction *action, bool cache);
+
+    /* Caches */
+    /* TODO: add another hierarchical structure for multi agent actions as well */
+    MultiAgentStateStorage<ActionToTransitionStorage *> *transition_cache;
+    MultiAgentStateStorage<ActionToIntStorage *> *living_reward_cache;
+    MultiAgentStateStorage<bool *> *is_terminal_cache;
 };
 
 MapfEnv *get_local_view(MapfEnv *, vector<size_t> agents);

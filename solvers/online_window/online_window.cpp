@@ -497,7 +497,9 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
     h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
 
-    /* Only a single one outside the area */
+    /* Set the values of the girth (=single agent on girth, the rest on the area).
+     * Add a bonus values if the location of the agent on the girth was intended by its original, self policy. */
+    // TODO: this is actually a minor bug, there might be multiple agents on the girth on the same time.
     GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, w->area, 1);
     GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
     AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();

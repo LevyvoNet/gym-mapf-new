@@ -61,6 +61,13 @@ Transition::~Transition() {
 
 
 /** MapfEnv *****************************************************************************************************/
+MapfEnv::MapfEnv(Grid *grid, size_t n_agents, const vector<Location> &start_locations,
+                 const vector<GoalPredicator> &goal_predicators, float fail_prob, int collision_reward, int goal_reward,
+                 int living_reward) {
+
+
+}
+
 
 MapfEnv::MapfEnv(Grid *grid,
                  size_t n_agents,
@@ -483,6 +490,8 @@ void MapfEnv::reset_cache() {
 //                                                                                                        NULL);
     this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
 }
+
+
 
 
 TransitionsList::TransitionsList() {

@@ -116,7 +116,8 @@ void solve_problems(list<struct problem_instance> *problems,
                     double episode_exec_timeout_ms,
                     int eval_episodes_count,
                     int max_steps,
-                    string log_file);
+                    string log_file,
+                    bool forked_eval=true);
 
 
 #endif //GYM_MAPF_INFRA_H
