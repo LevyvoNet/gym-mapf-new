@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
                    EPISODE_COUNT,
                    MAX_STEPS,
                    "sanity_temp",
-                   false);
+                   true);
 
     /* Print every result */
     for (problem_instance_result result: db.results) {
