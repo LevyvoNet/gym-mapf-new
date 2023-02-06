@@ -599,6 +599,7 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
 
 
     /* Plan for the window */
+    std::cout << "this->singles_windows->size()=" << this->singles_windows->size() << std::endl;
     vector<Policy *> single_policies(this->singles_windows->size());
     if (this->singles_windows->size() != this->env->n_agents){
         std::cout << "name: " << this->name << std::endl;
