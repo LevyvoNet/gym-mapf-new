@@ -17,25 +17,13 @@
 #include <solvers/utils/policy/crossed_policy.h>
 #include <solvers/utils/utils.h>
 #include <solvers/value_iteartion/value_iteration.h>
+#include <solvers/rtdp/rtdp.h>
 #include <solvers/heuristics/solution_sum_heuristic.h>
 
 
 /** Constants *****************************************************************************************/
 #define BONUS_VALUE (100)
 #define LIVE_LOCK_BUFFER (100)
-
-
-/** Utility Types ********************************************************************************************/
-typedef Policy *(*window_planner)(MapfEnv *, Dictionary *, float gamma, double timeout_ms);
-
-Policy *window_planner_vi(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms);
-
-Policy *window_planner_vi_king(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms);
-
-Policy *window_planner_vi_deterministic_relaxation(MapfEnv *env,
-                                                   Dictionary *girth_values,
-                                                   float gamma,
-                                                   double timeout_ms);
 
 class AllStayExceptFirstActionSpaceIterator : public MultiAgentActionIterator {
 public:
@@ -63,7 +51,7 @@ GridArea pad_area(Grid *grid, GridArea area, int k);
 
 GridArea construct_conflict_area(Grid *grid, const AgentsGroup &group, const MultiAgentState &s);
 
-/** Classes **************************************************************************************************/
+/** Utility Types ********************************************************************************************/
 
 class Window {
 public:
@@ -86,6 +74,15 @@ public:
 
 };
 
+typedef void (*window_planner)(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies,
+                               int d,
+                               double timeout_ms);
+//typedef Policy *(*window_planner)(MapfEnv *, Dictionary *, float gamma, double timeout_ms);
+
+void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies, int d,
+                          double timeout_ms);
+
+/** Policy ********************************************************************************************************/
 class OnlineWindowPolicy : public Policy {
 private:
     /* Parameters */
@@ -131,6 +128,8 @@ private:
     bool might_live_lock(Window *w);
 
     void expand_window(Window *w, const MultiAgentState &state, double timeout_ms);
+
+    std::unique_ptr<Dictionary> girth_values_heuristic(const Window *w, const MultiAgentState &s, double timeout_ms);
 
 public:
 
