@@ -180,7 +180,7 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
     }
 
     /* Solve the env by value iteration */
-    ValueIterationPolicy *policy = new ValueIterationPolicy(env, gamma, "", girth_values);
+    ValueIterationPolicy *policy = new ValueIterationPolicy(area_env, gamma, "", girth_values);
     policy->train(timeout_ms - ELAPSED_TIME_MS);
     delete girth_values;
 
@@ -599,13 +599,7 @@ void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double
 
 
     /* Plan for the window */
-    std::cout << "this->singles_windows->size()=" << this->singles_windows->size() << std::endl;
     vector<Policy *> single_policies;
-    if (this->singles_windows->size() != this->env->n_agents){
-        std::cout << "name: " << this->name << std::endl;
-        std::cout << "this->env->n_agents=" << this->env->n_agents << std::endl;
-        std::cout << "this->singles_windows->size()=" << this->singles_windows->size() << std::endl;
-    }
     for (int agent = 0; agent < this->env->n_agents; agent++) {
         single_policies.push_back((*this->singles_windows)[agent]->policy);
     }
