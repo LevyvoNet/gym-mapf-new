@@ -118,21 +118,16 @@ tsl::hopscotch_set<Location> get_intended_locations(Policy *p, Location start, i
     return res;
 }
 
-void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies, int d,
-                       double timeout_ms) {
+
+Dictionary *
+get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const vector<Policy *> &single_policies,
+                        int d, double timeout_ms) {
     MEASURE_TIME;
 
-    /* Generate state space from the conflict area */
-    AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(env->grid,
-                                                                                       w->area,
-                                                                                       w->group.size());
-
-    /* Create a local view of the agents in the window's group. */
-    MapfEnv *area_env = get_local_view(env, w->group);
-
-    /* Set the set space to be our subspace, this will cause value iteration to only iterate over the conflict
-     * area instead of the whole grid. */
-    area_env->observation_space = conflict_area_state_space;
+    /* Generate state space from the window area */
+    AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
+                                                                                     w->area,
+                                                                                     w->group.size());
 
     /* Set the girth of the area with a fixed value composed of the single agents values */
     vector<ValueFunctionPolicy *> policies;
@@ -145,7 +140,7 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
         intended_locations.push_back(
                 get_intended_locations(agent_policy, s.locations[agent], 2 * d, timeout_ms - ELAPSED_TIME_MS));
         if (ELAPSED_TIME_MS >= timeout_ms) {
-            return;
+            return nullptr;
         }
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
@@ -156,8 +151,8 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
     // TODO: this is actually a minor bug, there might be multiple agents on the girth at the same time.
     GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(env->grid, w->area, 1);
     GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
-    AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
-    AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
+    AreaMultiAgentStateIterator *area_iter = window_area_state_space->begin();
+    AreaMultiAgentStateIterator *area_end = window_area_state_space->end();
     Dictionary *girth_values = new Dictionary(0);
     for (; *area_iter != *area_end; ++*area_iter) {
         for (size_t agent_idx = 0; agent_idx < w->group.size(); ++agent_idx) {
@@ -177,6 +172,40 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
                 girth_values->set(temp_state.id, value);
             }
         }
+    }
+
+    return girth_values;
+
+}
+
+void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                         vector<Policy *> single_policies,
+                         int d,
+                         double timeout_ms) {
+
+}
+
+
+void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies,
+                       int d,
+                       double timeout_ms) {
+    MEASURE_TIME;
+
+    /* Generate state space from the window area */
+    AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
+                                                                                     w->area,
+                                                                                     w->group.size());
+
+    /* Create a local view of the agents in the window's group. */
+    MapfEnv *area_env = get_local_view(env, w->group);
+
+    /* Set the set space to be our subspace, this will cause value iteration to only iterate over the conflict
+     * area instead of the whole grid. */
+    area_env->observation_space = window_area_state_space;
+
+    Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return;
     }
 
     /* Solve the env by value iteration */

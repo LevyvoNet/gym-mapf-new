@@ -74,13 +74,20 @@ public:
 
 };
 
-typedef void (*window_planner)(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies,
+typedef void (*window_planner)(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                               vector<Policy *> single_policies,
                                int d,
                                double timeout_ms);
 //typedef Policy *(*window_planner)(MapfEnv *, Dictionary *, float gamma, double timeout_ms);
 
-void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies, int d,
-                          double timeout_ms);
+void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s, vector<Policy *> single_policies,
+                       int d,
+                       double timeout_ms);
+
+void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                         vector<Policy *> single_policies,
+                         int d,
+                         double timeout_ms);
 
 /** Policy ********************************************************************************************************/
 class OnlineWindowPolicy : public Policy {
