@@ -4,6 +4,8 @@
 
 #include "online_window.h"
 
+#define debug (false)
+
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
         area(area), policy(policy), group(group), steps_count(0), reached_count(0), expanded_count(0) {
@@ -479,8 +481,9 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
     w->expanded_count++;
 
     if (!(new_area == old_area)) {
-//        /* debug print */
-//        cout << "expanding window of " << w->group.size() << " agents" << endl;
+        if (debug) {
+            cout << "expanding window of " << w->group.size() << " agents" << endl;
+        }
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
     }
 
@@ -625,11 +628,13 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
-//    /* debug print */
-//    cout << "planning window with " << w->group.size() << " agents on area: ";
-//    cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << "," << w->area.right_col
-//         << ")";
-//    cout << endl;
+    if (debug) {
+        cout << "planning window with " << w->group.size() << " agents on area: ";
+        cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << ","
+             << w->area.right_col
+             << ")";
+        cout << endl;
+    }
 
     MEASURE_TIME;
 
