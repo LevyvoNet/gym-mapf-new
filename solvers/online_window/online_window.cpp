@@ -182,7 +182,25 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
                          vector<Policy *> single_policies,
                          int d,
                          double timeout_ms) {
+    MEASURE_TIME;
 
+    /* Calculate the area girth values, the best of these states will be the new goal state of the local env.  */
+    Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return;
+    }
+
+    /* Create a local view of the agents in the window's group. */
+    MapfEnv *local_group_env = get_local_view(env, w->group);
+    local_group_env->goal_state = local_group_env->id_to_state(girth_values->max_element());
+
+    /* Solve the new env with RTDP with a dijkstra heuristic to the new goal state */
+    RtdpPolicy *policy = new RtdpPolicy(local_group_env, gamma, "", new DijkstraHeuristic());
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    delete girth_values;
+
+    /* Transfer ownership */
+    w->policy = policy;
 }
 
 
@@ -191,18 +209,18 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
                        double timeout_ms) {
     MEASURE_TIME;
 
-    /* Generate state space from the window area */
-    AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
-                                                                                     w->area,
-                                                                                     w->group.size());
-
     /* Create a local view of the agents in the window's group. */
     MapfEnv *area_env = get_local_view(env, w->group);
 
     /* Set the set space to be our subspace, this will cause value iteration to only iterate over the conflict
      * area instead of the whole grid. */
+    AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
+                                                                                     w->area,
+                                                                                     w->group.size());
     area_env->observation_space = window_area_state_space;
 
+
+    /* Calculate the area girth values, these will be set during the run of value iteration */
     Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
     if (ELAPSED_TIME_MS >= timeout_ms) {
         return;

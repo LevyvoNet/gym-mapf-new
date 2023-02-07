@@ -28,6 +28,12 @@ bool Dictionary::contains(int64_t key) {
     return this->d->contains(key);
 }
 
+int64_t Dictionary::max_element() {
+    tsl::hopscotch_map<int64_t, double>::iterator best = std::max_element(this->d->begin(), this->d->end());
+
+    return best->first;
+}
+
 Dictionary *Dictionary::clone() {
     Dictionary *res = new Dictionary(this->default_value);
 

@@ -22,6 +22,9 @@ public:
 
     bool contains(int64_t key);
 
+    /* Return the key which have the highest value */
+    int64_t max_element();
+
     Dictionary* clone();
 };
 
