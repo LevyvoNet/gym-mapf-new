@@ -118,11 +118,9 @@ void RtdpPolicy::train(double timeout_ms) {
     double init_time_sec = ELAPSED_TIME_MS / 1000;
     (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(init_time_sec * 100) / 100);
     if (ELAPSED_TIME_MS >= timeout_ms){
-        cout << "elapsed during init" << endl;
         return;
     }
 
-    cout << "done init" <<  endl;
     bool converged = false;
     size_t iters_count = 0;
     EvaluationInfo *prev_eval_info = NULL;
@@ -139,7 +137,6 @@ void RtdpPolicy::train(double timeout_ms) {
             }
             iters_count++;
         }
-        cout << "done RTDP batch" << endl;
 
         /* Evaluate */
         if (nullptr != prev_eval_info) {
@@ -168,7 +165,6 @@ void RtdpPolicy::train(double timeout_ms) {
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
 
     /* Finish training */
-    cout << "done training" << endl;
     this->in_train = false;
 
 l_cleanup:
