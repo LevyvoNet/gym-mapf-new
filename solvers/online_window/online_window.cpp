@@ -195,7 +195,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
     local_group_env->goal_state = local_group_env->id_to_state(girth_values->max_element());
 
     /* Solve the new env with RTDP with a dijkstra heuristic to the new goal state */
-    RtdpPolicy *policy = new RtdpPolicy(local_group_env, gamma, "", new DijkstraHeuristic());
+    RtdpPolicy *policy = new RtdpPolicy(local_group_env, gamma, "", new RtdpDijkstraHeuristic());
     policy->train(timeout_ms - ELAPSED_TIME_MS);
     delete girth_values;
 
