@@ -22,8 +22,8 @@ bool MultiAgentState::operator!=(const MultiAgentState &other) const {
 
 std::ostream &operator<<(ostream &os, const MultiAgentState &s) {
     os << "[";
-    size_t i=0;
-    for (;i<s.locations.size()-1; ++i){
+    size_t i = 0;
+    for (; i < s.locations.size() - 1; ++i) {
         os << s.locations[i] << ", ";
     }
 
@@ -317,19 +317,24 @@ Location inc_grid_iterator_by_girth_aux(const Location *l, GridArea area, const 
 }
 
 Location girth_first_legal_location(const Grid *grid, GridArea area) {
-    Location first_location = Location(area.top_row - 1, area.left_col - 1, -1);
+    /* Init with potential first location. */
+    Location l = Location(area.top_row - 1, area.left_col - 1, -1);
+
+    /* Increment until a valid one is found */
     if (area.top_row - 1 < 0 || area.left_col - 1 < 0 || area.top_row - 1 > grid->max_row ||
-        area.left_col - 1 > grid->max_col) {
-        first_location = inc_grid_iterator_by_girth_aux(&first_location, area, grid);
+        area.left_col - 1 > grid->max_col || !grid->is_legal(l)) {
+        l = inc_grid_iterator_by_girth_aux(&l, area, grid);
     }
 
-    return first_location;
+    return l;
 
 }
 
 void GirthMultiAgentStateIterator::_reach_begin() {
     Location first_location = girth_first_legal_location(this->grid, this->area);
 
+    /* That means we've been in a circle and came back to the first location. If it isn't a legal one, no valid location
+     * found and there are no states to iterate, so we should return the end() */
     if ((first_location.row == this->area.top_row - 1) &&
         (first_location.col == this->area.left_col - 1) &&
         (!this->grid->is_legal(first_location))) {

@@ -8,6 +8,7 @@
 #include <list>
 #include <iterator>
 //#include <unordered_map>
+#include <unordered_set>
 #include <cmath>
 
 #include <tsl/hopscotch_map.h>
@@ -74,6 +75,7 @@ public:
 
 };
 
+
 #define MOUNTAIN_NOISE_FACTOR (2)
 
 class MapfEnv {
@@ -98,6 +100,9 @@ public:
     /* State */
     MultiAgentState *s;
     vector<GridArea> *mountains;
+
+    tsl::hopscotch_map<size_t, std::unordered_set<Location>*> *constraints;
+
 
     MapfEnv(Grid *grid,
             size_t n_agents,
@@ -143,7 +148,13 @@ public:
 
     bool is_in_mountain(const Location &l);
 
+    bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
+
+    void add_constraint(size_t agent, Location loc);
+
 private:
+
+
     void calc_transition_reward(const MultiAgentState *prev_state, const MultiAgentAction *action,
                                 const MultiAgentState *next_state, int *reward, bool *done, bool *is_collision,
                                 bool cache);
@@ -159,7 +170,6 @@ private:
 
 MapfEnv *get_local_view(MapfEnv *, vector<size_t> agents);
 
-bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
 
 MultiAgentAction *actions_to_action(const vector<Action> &actions);
 

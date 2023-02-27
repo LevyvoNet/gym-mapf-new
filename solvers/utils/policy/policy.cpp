@@ -87,7 +87,7 @@ void Policy::eval_episodes_info_process(EvaluationInfo *eval_info) {
 
 }
 
-episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeout_ms) {
+episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeout_ms, bool debug_print) {
     MEASURE_TIME;
     vector<Action> all_stay_vector(this->env->n_agents);
     for (size_t i = 0; i < this->env->n_agents; ++i) {
@@ -109,6 +109,10 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
 
     /* Reset policy */
     this->reset();
+
+    if (debug_print) {
+        cout << "current state is " << *this->env->s << endl;
+    }
 
     try {
         do {
@@ -148,6 +152,10 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
             this->env->step(*selected_action, &next_state, &reward, &done, &is_collision, false);
             episode_reward += reward;
             delete selected_action;
+
+            if (debug_print) {
+                cout << "current state is " << *this->env->s << endl;
+            }
 
             /* If collision happened, the episode considered non-solved. Mark that the policy is not sound (illegal solution) */
             if (is_collision) {
@@ -237,7 +245,8 @@ float calc_time_std(vector<episode_info> episodes, float mean_time) {
     return sqrt(squared_distance_sum / count);
 }
 
-EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked) {
+EvaluationInfo *
+Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked, bool debug_print) {
     EvaluationInfo *eval_info = new EvaluationInfo();
 
 
@@ -249,7 +258,7 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
     for (size_t episode = 1; episode <= n_episodes; ++episode) {
         struct episode_info episode_info;
         if (!forked) {
-            episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+            episode_info = this->evaluate_single_episode(max_steps, episode_timeout_ms, debug_print);
 
         } else {
             int fds[2] = {0};
@@ -262,7 +271,7 @@ EvaluationInfo *Policy::evaluate(size_t n_episodes, size_t max_steps, double epi
 
             if (pid == 0) {
                 close(fds[0]);
-                struct episode_info episode_info_child = this->evaluate_single_episode(max_steps, episode_timeout_ms);
+                struct episode_info episode_info_child = this->evaluate_single_episode(max_steps, episode_timeout_ms, debug_print);
                 do {
                     written_bytes += write(fds[1], &episode_info_child, sizeof(episode_info_child));
                 } while (written_bytes < sizeof(episode_info_child));

@@ -98,6 +98,10 @@ MapfEnv::MapfEnv(Grid *grid,
     /* State */
     this->s = new MultiAgentState(start_state->locations, start_state->id);
     this->mountains = new vector<GridArea>;
+    this->constraints = new tsl::hopscotch_map<size_t, std::unordered_set<Location> *>();
+    for (size_t agent = 0; agent < this->n_agents; ++agent) {
+        ((*this->constraints)[agent]) = new unordered_set<Location>();
+    }
 
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
@@ -111,14 +115,18 @@ MapfEnv::MapfEnv(Grid *grid,
 
 }
 
-bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state) {
+bool MapfEnv::is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state) {
     size_t i = 0;
     size_t j = 0;
-    size_t n_agents = prev_state->locations.size();
 
 
-    for (i = 0; i < n_agents; ++i) {
-        for (j = 0; j < n_agents; j++) {
+    for (i = 0; i < this->n_agents; ++i) {
+        if ((*(this->constraints))[i]->count(next_state->locations[i]) !=0 ){
+            return true;
+        }
+
+        for (j = 0; j < this->n_agents; j++) {
+            /* Same agent, no edge nor vertex collisions are possible here. */
             if (i == j) {
                 continue;
             }
@@ -186,7 +194,7 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
 
     living_reward = this->calc_living_reward(prev_state, action, cache);
 
-    if (is_collision_transition(prev_state, next_state)) {
+    if (this->is_collision_transition(prev_state, next_state)) {
         *reward = living_reward + this->reward_of_collision;
         *done = true;
         *is_collision = true;
@@ -328,7 +336,7 @@ TransitionsList *MapfEnv::get_transitions(const MultiAgentState &state,
             }
             double agent_normal_prob = 1.0 - agent_delay_prob - 2 * agent_slip_prob;
 
-            switch(disruptions[m]){
+            switch (disruptions[m]) {
                 case NO_DISRUPTION:
                     curr_prob *= agent_normal_prob;
                     break;
@@ -491,7 +499,9 @@ void MapfEnv::reset_cache() {
     this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
 }
 
-
+void MapfEnv::add_constraint(size_t agent, Location loc) {
+    ((*this->constraints)[agent])->insert(loc);
+}
 
 
 TransitionsList::TransitionsList() {

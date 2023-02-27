@@ -137,7 +137,6 @@ private:
 
     void expand_window(Window *w, const MultiAgentState &state, double timeout_ms);
 
-    std::unique_ptr<Dictionary> girth_values_heuristic(const Window *w, const MultiAgentState &s, double timeout_ms);
 
 public:
 

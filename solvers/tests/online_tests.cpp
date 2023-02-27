@@ -235,3 +235,50 @@ TEST(OnlineReplanTest, EmptyGirthWholeEnvConflictArea) {
 
 
 }
+
+TEST(OnlineReplanTest, DeterministicSymmetricalEnvGirthStatesBug) {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@...",
+                                          "..@..."
+                                  });
+
+    Grid *grid = new Grid(map_lines);
+
+    MapfEnv *env = new MapfEnv(grid,
+                               2,
+                               {grid->get_location(2, 0), grid->get_location(2, 5)},
+                               {grid->get_location(2, 5), grid->get_location(2, 0)},
+                               0,
+                               -1000,
+                               0,
+                               -1);
+
+    GridArea area = GridArea(1, 3, 3, 4);
+    GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(grid, area, 1);
+    list<MultiAgentState *> girth_states;
+    GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
+    for (; *girth_iter != *girth_space.end(); ++*girth_iter) {
+        MultiAgentState *s = new MultiAgentState((*girth_iter)->locations, (*girth_iter)->id);
+        girth_states.push_back(s);
+    }
+
+    list<MultiAgentState *> girth_expected_states{
+            env->locations_to_state({grid->get_location(0, 3)}),
+            env->locations_to_state({grid->get_location(0, 4)}),
+            env->locations_to_state({grid->get_location(0, 5)}),
+            env->locations_to_state({grid->get_location(1, 5)}),
+            env->locations_to_state({grid->get_location(2, 5)}),
+            env->locations_to_state({grid->get_location(3, 5)}),
+            env->locations_to_state({grid->get_location(4, 5)}),
+            env->locations_to_state({grid->get_location(4, 4)}),
+            env->locations_to_state({grid->get_location(4, 3)}),
+            env->locations_to_state({grid->get_location(2, 2)}),
+    };
+
+    ASSERT_TRUE(list_equal_no_order(girth_states, girth_expected_states));
+
+}

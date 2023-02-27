@@ -4,7 +4,7 @@
 
 #include "online_window.h"
 
-#define debug (false)
+#define DEBUG_PRINT (true)
 
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
@@ -126,6 +126,10 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
                         int d, double timeout_ms) {
     MEASURE_TIME;
 
+    if (DEBUG_PRINT) {
+        cout << "calculating girth values for " << w->group.size() << " agents on state" << s << endl;
+    }
+
     /* Generate state space from the window area */
     AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
                                                                                      w->area,
@@ -172,6 +176,9 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
                 }
 
                 girth_values->set(temp_state.id, value);
+//                if (DEBUG_PRINT) {
+//                    cout << "girth state " << temp_state << "got value of " << value << endl;
+//                }
             }
         }
     }
@@ -192,12 +199,34 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
         return;
     }
 
-    /* Create a local view of the agents in the window's group. */
+    /* Create a local view of the agents in the window's group.
+     * Allow the agents to only move in the window area. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
     local_group_env->goal_state = local_group_env->id_to_state(girth_values->max_element());
+    if (DEBUG_PRINT) {
+        cout << "best state is " << *local_group_env->goal_state << " with value "
+             << girth_values->get(local_group_env->goal_state->id) << endl;
+    }
+
+    /* Limit the agents not to go through the girth, meaning they should stay on the
+     * window area. The only exception for this is when an agent should reach its goal
+     * which is on the girth (the mid-term goal is the best state on the window's girth). */
+    GirthMultiAgentStateSpace *local_env_girth_space_single = new GirthMultiAgentStateSpace(env->grid, w->area, 1);
+    GirthMultiAgentStateIterator *local_env_girth_iter = local_env_girth_space_single->begin();
+    GirthMultiAgentStateIterator *local_env_girth_end = local_env_girth_space_single->end();
+    for (; *local_env_girth_iter != *local_env_girth_end; ++(*local_env_girth_iter)) {
+        Location curr_girth_location = local_env_girth_iter->ptr->locations[0];
+        for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
+            if (local_group_env->goal_state->locations[agent] == curr_girth_location) {
+                continue;
+            }
+
+            local_group_env->add_constraint(agent, curr_girth_location);
+        }
+    }
 
     /* Solve the new env with RTDP with a dijkstra heuristic to the new goal state */
-    RtdpPolicy *policy = new RtdpPolicy(local_group_env, gamma, "", new RtdpDijkstraHeuristic(gamma));
+    RtdpPolicy *policy = new RtdpPolicy(local_group_env, gamma, "", new DijkstraHeuristic());
     policy->train(timeout_ms - ELAPSED_TIME_MS);
     delete girth_values;
 
@@ -237,62 +266,7 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
     w->policy = policy;
 }
 
-std::unique_ptr<Dictionary>
-OnlineWindowPolicy::girth_values_heuristic(const Window *w, const MultiAgentState &s, double timeout_ms) {
-    MEASURE_TIME;
 
-    /* Generate state space from the conflict area */
-    AreaMultiAgentStateSpace *conflict_area_state_space = new AreaMultiAgentStateSpace(this->env->grid,
-                                                                                       w->area,
-                                                                                       w->group.size());
-
-    /* Set the girth of the area with a fixed value composed of the single agents values */
-    vector<ValueFunctionPolicy *> policies;
-    vector<vector<size_t>> agents_groups;
-    vector<tsl::hopscotch_set<Location>> intended_locations;
-    for (size_t agent: w->group) {
-        Policy *agent_policy = (*this->singles_windows)[agent]->policy;
-        policies.push_back((ValueFunctionPolicy *) agent_policy);
-        agents_groups.push_back({agent});
-        intended_locations.push_back(
-                get_intended_locations(agent_policy, s.locations[agent], 2 * this->d, timeout_ms - ELAPSED_TIME_MS));
-        if (ELAPSED_TIME_MS >= timeout_ms) {
-            return nullptr;
-        }
-    }
-    SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
-    h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
-
-    /* Set the values of the girth (=single agent on girth, the rest on the area).
-     * Add a bonus values if the location of the agent on the girth was intended by its original, self policy. */
-    // TODO: this is actually a minor bug, there might be multiple agents on the girth at the same time.
-    GirthMultiAgentStateSpace *girth_space_single = new GirthMultiAgentStateSpace(this->env->grid, w->area, 1);
-    GirthMultiAgentStateIterator *girth_space_single_end = girth_space_single->end();
-    AreaMultiAgentStateIterator *area_iter = conflict_area_state_space->begin();
-    AreaMultiAgentStateIterator *area_end = conflict_area_state_space->end();
-    std::unique_ptr<Dictionary> girth_values = std::make_unique<Dictionary>(0);
-    for (; *area_iter != *area_end; ++*area_iter) {
-        for (size_t agent_idx = 0; agent_idx < w->group.size(); ++agent_idx) {
-            GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
-            for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
-                MultiAgentState temp_state = **area_iter;
-                temp_state.locations[agent_idx] = girth_iter->ptr->locations[0];
-                temp_state.id = this->env->grid->calculate_multi_locations_id(temp_state.locations);
-
-                double value = (*h)(&temp_state);
-
-                if (intended_locations[agent_idx].find(temp_state.locations[agent_idx]) !=
-                    intended_locations[agent_idx].end()) {
-                    value += BONUS_VALUE;
-                }
-
-                girth_values->set(temp_state.id, value);
-            }
-        }
-    }
-
-    return std::move(girth_values);
-}
 
 //Policy *window_planner_rtdp(MapfEnv *env, Dictionary *girth_values, float gamma, double timeout_ms) {
 //    MEASURE_TIME;
@@ -481,7 +455,7 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
     w->expanded_count++;
 
     if (!(new_area == old_area)) {
-        if (debug) {
+        if (DEBUG_PRINT) {
             cout << "expanding window of " << w->group.size() << " agents" << endl;
         }
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
@@ -628,11 +602,12 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
-    if (debug) {
+    if (DEBUG_PRINT) {
         cout << "planning window with " << w->group.size() << " agents on area: ";
         cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << ","
              << w->area.right_col
-             << ")";
+             << ").";
+        cout << " Agents are in state: " << s;
         cout << endl;
     }
 

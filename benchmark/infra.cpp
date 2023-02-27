@@ -71,7 +71,8 @@ struct problem_instance_result solve(struct problem_instance problem,
     eval_info = policy->evaluate(episode_count,
                                  max_steps,
                                  exec_timeout_ms - ELAPSED_TIME_MS,
-                                 forked);
+                                 forked,
+                                 DEBUG_PRINT);
 
     /* Set res fields */
 

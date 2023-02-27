@@ -29,7 +29,13 @@ bool Dictionary::contains(int64_t key) {
 }
 
 int64_t Dictionary::max_element() {
-    tsl::hopscotch_map<int64_t, double>::iterator best = std::max_element(this->d->begin(), this->d->end());
+    tsl::hopscotch_map<int64_t, double>::iterator
+            best = std::max_element(this->d->begin(), this->d->end(),
+                                    [](
+                                            const tsl::hopscotch_map<int64_t, double>::value_type &p1,
+                                            const tsl::hopscotch_map<int64_t, double>::value_type &p2) {
+                                        return p1.second < p2.second;
+                                    });
 
     return best->first;
 }

@@ -90,7 +90,7 @@ protected:
 
     TrainInfo *train_info;
 
-    episode_info evaluate_single_episode(std::size_t max_steps, double timeout_ms);
+    episode_info evaluate_single_episode(std::size_t max_steps, double timeout_ms, bool debug_print);
 
     virtual void eval_episode_info_update(episode_info *episode_info);
 
@@ -108,7 +108,7 @@ public:
 
     TrainInfo *get_train_info();
 
-    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked);
+    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked, bool debug_print=false);
 
     virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) = 0;
 
