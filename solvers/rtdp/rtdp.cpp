@@ -8,11 +8,11 @@
 
 /** Constants ***************************************************************************************************/
 #define MAX_ITERATIONS (30000)
-#define BATCH_SIZE (500)
+#define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (0.1)
 #define MIN_SUCCESS_RATE (100)
-#define MIN_CONSECUTIVE_SUCCESS_COUNT (2)
+#define MIN_CONSECUTIVE_SUCCESS_COUNT (1)
 
 #define NON_EXISTING_DEFAULT_VALUE (99999999)
 
