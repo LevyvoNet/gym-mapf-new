@@ -19,6 +19,8 @@ add_library(gym_mapf_solvers SHARED
         heuristics/dijkstra_heuristic.cpp
         heuristics/rtdp_dijkstra_heuristic.h
         heuristics/rtdp_dijkstra_heuristic.cpp
+        heuristics/any_goal_heurisitc.h
+        heuristics/any_goal_heurisitc.cpp
         heuristics/solution_sum_heuristic.h
         heuristics/solution_sum_heuristic.cpp
         rtdp/rtdp.h

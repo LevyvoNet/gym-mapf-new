@@ -61,12 +61,12 @@ Transition::~Transition() {
 
 
 /** MapfEnv *****************************************************************************************************/
-MapfEnv::MapfEnv(Grid *grid, size_t n_agents, const vector<Location> &start_locations,
-                 const vector<GoalPredicator> &goal_predicators, float fail_prob, int collision_reward, int goal_reward,
-                 int living_reward) {
-
-
-}
+//MapfEnv::MapfEnv(Grid *grid, size_t n_agents, const vector<Location> &start_locations,
+//                 std::unique_ptr<GoalPredicator> goal_predicator, float fail_prob, int collision_reward, int goal_reward,
+//                 int living_reward) {
+//
+//
+//}
 
 
 MapfEnv::MapfEnv(Grid *grid,
@@ -98,10 +98,10 @@ MapfEnv::MapfEnv(Grid *grid,
     /* State */
     this->s = new MultiAgentState(start_state->locations, start_state->id);
     this->mountains = new vector<GridArea>;
-    this->constraints = new tsl::hopscotch_map<size_t, std::unordered_set<Location> *>();
-    for (size_t agent = 0; agent < this->n_agents; ++agent) {
-        ((*this->constraints)[agent]) = new unordered_set<Location>();
-    }
+//    this->constraints = new tsl::hopscotch_map<size_t, std::unordered_set<Location> *>();
+//    for (size_t agent = 0; agent < this->n_agents; ++agent) {
+//        ((*this->constraints)[agent]) = new unordered_set<Location>();
+//    }
 
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
@@ -119,12 +119,17 @@ bool MapfEnv::is_collision_transition(const MultiAgentState *prev_state, const M
     size_t i = 0;
     size_t j = 0;
 
-
-    for (i = 0; i < this->n_agents; ++i) {
-        if ((*(this->constraints))[i]->count(next_state->locations[i]) !=0 ){
+    for (Constraint *c: this->constraints) {
+        if (c->is_violated(prev_state, next_state)) {
             return true;
         }
+    }
 
+    for (i = 0; i < this->n_agents; ++i) {
+//        /* Violation of a constraint, agent i must not move to its new location. */
+//        if ((*(this->constraints))[i]->count(next_state->locations[i]) != 0) {
+//            return true;
+//        }
         for (j = 0; j < this->n_agents; j++) {
             /* Same agent, no edge nor vertex collisions are possible here. */
             if (i == j) {
@@ -499,8 +504,12 @@ void MapfEnv::reset_cache() {
     this->is_terminal_cache = new MultiAgentStateStorage<bool *>(this->n_agents, nullptr);
 }
 
-void MapfEnv::add_constraint(size_t agent, Location loc) {
-    ((*this->constraints)[agent])->insert(loc);
+//void MapfEnv::add_constraint(size_t agent, Location loc) {
+//    ((*this->constraints)[agent])->insert(loc);
+//}
+
+void MapfEnv::add_constraint(Constraint *constraint) {
+    this->constraints.push_back(constraint);
 }
 
 

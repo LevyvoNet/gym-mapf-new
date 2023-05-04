@@ -31,7 +31,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
 
     MultiAgentState *s = this->env->reset();
 
-    while (!done && steps < MAX_STEPS) {
+    while (!done && steps < MAX_STEPS && !this->custom_iteration_stop_condition_->should_stop(*s)) {
         ++steps;
 
         /* Add the current state to the path */
@@ -39,7 +39,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
 
         /* Select action */
         this->select_max_value_action(*s, &new_value, a, timeout_ms - ELAPSED_TIME_MS);
-        if (ELAPSED_TIME_MS >= timeout_ms){
+        if (ELAPSED_TIME_MS >= timeout_ms) {
             return;
         }
 
@@ -54,7 +54,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
     /* Backward update */
     for (int i = path.size() - 1; i >= 0; --i) {
         this->select_max_value_action(path[i], &new_value, nullptr, timeout_ms - ELAPSED_TIME_MS);
-        if (ELAPSED_TIME_MS >= timeout_ms){
+        if (ELAPSED_TIME_MS >= timeout_ms) {
             return;
         }
         this->v->set(path[i].id, new_value);
@@ -73,13 +73,13 @@ bool RtdpPolicy::should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *cur
         return false;
     }
 
-    if (curr_eval_info->success_rate >= MIN_SUCCESS_RATE){
+    if (curr_eval_info->success_rate >= MIN_SUCCESS_RATE) {
         this->consecutive_success++;
     } else {
         this->consecutive_success = 0;
     }
 
-    if (this->consecutive_success < MIN_CONSECUTIVE_SUCCESS_COUNT){
+    if (this->consecutive_success < MIN_CONSECUTIVE_SUCCESS_COUNT) {
         return false;
     }
 
@@ -102,12 +102,20 @@ void RtdpPolicy::clear_cache() {
 
 /** Public ****************************************************************************************************/
 RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
-                       const string &name, Heuristic *h) : ValueFunctionPolicy(env, gamma, name) {
+                       const string &name, Heuristic *h,
+                       std::unique_ptr<IterationStopCondition> custom_iteration_stop_condition) :
+        ValueFunctionPolicy(env, gamma, name) {
     this->h = h;
     this->v = new Dictionary(NON_EXISTING_DEFAULT_VALUE);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
     this->in_train = true;
     this->consecutive_success = 0;
+
+    this->custom_iteration_stop_condition_ = std::move(custom_iteration_stop_condition);
+
+    if (!this->custom_iteration_stop_condition_) {
+        this->custom_iteration_stop_condition_ = std::make_unique<NopStopCondition>(NopStopCondition());
+    }
 }
 
 
@@ -117,7 +125,7 @@ void RtdpPolicy::train(double timeout_ms) {
     this->h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
     double init_time_sec = ELAPSED_TIME_MS / 1000;
     (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(init_time_sec * 100) / 100);
-    if (ELAPSED_TIME_MS >= timeout_ms){
+    if (ELAPSED_TIME_MS >= timeout_ms) {
         return;
     }
 
@@ -132,7 +140,7 @@ void RtdpPolicy::train(double timeout_ms) {
     while (iters_count < MAX_ITERATIONS) {
         for (size_t i = 0; i < BATCH_SIZE; ++i) {
             this->single_iteration(timeout_ms - ELAPSED_TIME_MS);
-            if (ELAPSED_TIME_MS >= timeout_ms){
+            if (ELAPSED_TIME_MS >= timeout_ms) {
                 return;
             }
             iters_count++;
@@ -149,7 +157,7 @@ void RtdpPolicy::train(double timeout_ms) {
         eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
         this->in_train = true;
         const auto eval_end = clk::now();
-        total_eval_time += ((ms)(eval_end - eval_begin)).count();
+        total_eval_time += ((ms) (eval_end - eval_begin)).count();
 
         /* Check if there is no improvement since the last batch */
         if (should_stop(prev_eval_info, eval_info)) {
@@ -215,7 +223,7 @@ MultiAgentAction *RtdpPolicy::act(const MultiAgentState &state, double timeout_m
 //    }
 
     a = ValueFunctionPolicy::act(state, timeout_ms);
-    if (ELAPSED_TIME_MS >= timeout_ms){
+    if (ELAPSED_TIME_MS >= timeout_ms) {
         return nullptr;
     }
     this->cache->set(state, new MultiAgentAction(a->actions, a->id));
@@ -246,4 +254,22 @@ Policy *RtdpMerger::operator()(MapfEnv *env,
     policy->train(timeout_ms);
 
     return policy;
+}
+
+
+OneAgentInGoalStopCondition::OneAgentInGoalStopCondition(const vector<Location> &agent_goal_locations)
+        : agent_goal_locations_(agent_goal_locations) {}
+
+bool OneAgentInGoalStopCondition::should_stop(const MultiAgentState &s) {
+    for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
+        if (this->agent_goal_locations_[agent] == s.locations[agent]) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool NopStopCondition::should_stop(const MultiAgentState &s) {
+    return false;
 }

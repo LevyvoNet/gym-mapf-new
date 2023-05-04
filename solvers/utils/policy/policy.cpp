@@ -134,7 +134,9 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
             }
             /* Check if we are stuck */
             if (*selected_action == all_stay) {
-//            cout << "chosen all stay" << endl;
+                if (debug_print) {
+                    cout << "chosen all stay" << endl;
+                }
                 res.end_reason = EPISODE_STUCK;
                 res.reward = episode_reward;
                 res.time = ELAPSED_TIME_MS;
@@ -271,7 +273,8 @@ Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms,
 
             if (pid == 0) {
                 close(fds[0]);
-                struct episode_info episode_info_child = this->evaluate_single_episode(max_steps, episode_timeout_ms, debug_print);
+                struct episode_info episode_info_child = this->evaluate_single_episode(max_steps, episode_timeout_ms,
+                                                                                       debug_print);
                 do {
                     written_bytes += write(fds[1], &episode_info_child, sizeof(episode_info_child));
                 } while (written_bytes < sizeof(episode_info_child));

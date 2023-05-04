@@ -35,7 +35,7 @@ public:
 
     bool operator!=(const Location &other_loc) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Location& l);
+    friend std::ostream &operator<<(std::ostream &os, const Location &l);
 
 };
 
@@ -84,7 +84,7 @@ public:
 
     GridIterator end() const;
 
-    bool is_legal(const Location& l) const;
+    bool is_legal(const Location &l) const;
 
     uint64_t calculate_multi_locations_id(vector<Location> locations) const;
 };
@@ -127,7 +127,7 @@ public:
 
     bool operator==(const GridArea &other) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const GridArea& a);
+    friend std::ostream &operator<<(std::ostream &os, const GridArea &a);
 };
 
 template<>

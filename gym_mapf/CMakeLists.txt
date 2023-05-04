@@ -23,8 +23,6 @@ add_library(gym_mapf SHARED
         utils/state_storage/state_storage.cpp
         utils/dictionary/dictionary.h
         utils/dictionary/dictionary.cpp
-        mapf_env/goal_predicator.h
-        mapf_env/goal_predicator.cpp
         )
 
 target_include_directories(gym_mapf PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})

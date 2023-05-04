@@ -44,6 +44,15 @@ public:
 
 };
 
+class LongCorridorEnv : public EnvCreator {
+public:
+    int goal_reward;
+
+    LongCorridorEnv(string name, int goal_reward);
+
+    virtual MapfEnv *operator()();
+};
+
 class PossibleBug : public EnvCreator {
 public:
 

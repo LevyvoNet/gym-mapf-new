@@ -13,9 +13,33 @@
 #include "solvers/heuristics/solution_sum_heuristic.h"
 #include "solvers/id/id.h"
 
+class IterationStopCondition {
+public:
+    virtual bool should_stop(const MultiAgentState &s) = 0;
+};
+
+class OneAgentInGoalStopCondition : public IterationStopCondition {
+public:
+
+    OneAgentInGoalStopCondition(const vector<Location> &agent_goal_locations);
+
+    virtual bool should_stop(const MultiAgentState &s) override;
+
+private:
+    const vector<Location> &agent_goal_locations_;
+};
+
+
+class NopStopCondition : public IterationStopCondition {
+public:
+    virtual bool should_stop(const MultiAgentState &s) override;
+
+};
+
+
 class RtdpPolicy : public ValueFunctionPolicy {
 private:
-    Dictionary* v;
+    Dictionary *v;
     Heuristic *h;
     vector<int> train_rewards;
     MultiAgentStateStorage<MultiAgentAction *> *cache;
@@ -26,9 +50,12 @@ private:
 
     void clear_cache();
 
+    std::unique_ptr<IterationStopCondition> custom_iteration_stop_condition_;
+
 public:
 
-    RtdpPolicy(MapfEnv *env, float gamma, const string &name, Heuristic *h);
+    RtdpPolicy(MapfEnv *env, float gamma, const string &name, Heuristic *h,
+               std::unique_ptr<IterationStopCondition> custom_stop_condition=nullptr);
 
     bool should_stop(EvaluationInfo *prev_eval_info, EvaluationInfo *curr_eval_info);
 
@@ -52,5 +79,6 @@ public:
                                size_t group2,
                                CrossedPolicy *joint_policy);
 };
+
 
 #endif //GYM_MAPF_RTDP_H

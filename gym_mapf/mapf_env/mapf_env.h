@@ -17,7 +17,7 @@
 #include <multiagent_action/multiagent_action.h>
 #include <multiagent_state/multiagent_state.h>
 #include <utils/state_storage/state_storage.h>
-#include <mapf_env/goal_predicator.h>
+//#include <mapf_env/goal_predicator.h>
 
 using namespace std;
 
@@ -78,13 +78,18 @@ public:
 
 #define MOUNTAIN_NOISE_FACTOR (2)
 
+class Constraint {
+public:
+    virtual bool is_violated(const MultiAgentState *prev_state, const MultiAgentState *next_state) = 0;
+};
+
 class MapfEnv {
 public:
     /* Parameters */
     Grid *grid;
     size_t n_agents;
     MultiAgentState *start_state;
-    vector<GoalPredicator> goal_predicators;
+//    std::unique_ptr<GoalPredicator> goal_predicator;
     MultiAgentState *goal_state;
     float fail_prob;
     int reward_of_collision;
@@ -100,8 +105,8 @@ public:
     /* State */
     MultiAgentState *s;
     vector<GridArea> *mountains;
-
-    tsl::hopscotch_map<size_t, std::unordered_set<Location>*> *constraints;
+//    tsl::hopscotch_map<size_t, std::unordered_set<Location> *> *constraints;
+    vector<Constraint *> constraints;
 
 
     MapfEnv(Grid *grid,
@@ -112,15 +117,15 @@ public:
             int collision_reward,
             int goal_reward,
             int living_reward);
-
-    MapfEnv(Grid *grid,
-            size_t n_agents,
-            const vector<Location> &start_locations,
-            const vector<GoalPredicator> &goal_predicators,
-            float fail_prob,
-            int collision_reward,
-            int goal_reward,
-            int living_reward);
+//
+//    MapfEnv(Grid *grid,
+//            size_t n_agents,
+//            const vector<Location> &start_locations,
+//            std::unique_ptr<GoalPredicator> goal_predicator,
+//            float fail_prob,
+//            int collision_reward,
+//            int goal_reward,
+//            int living_reward);
 
     ~MapfEnv();
 
@@ -150,7 +155,9 @@ public:
 
     bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
 
-    void add_constraint(size_t agent, Location loc);
+//    void add_constraint(size_t agent, Location loc);
+    void add_constraint(Constraint *constraint);
+
 
 private:
 

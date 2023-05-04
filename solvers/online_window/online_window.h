@@ -18,7 +18,7 @@
 #include <solvers/utils/utils.h>
 #include <solvers/value_iteartion/value_iteration.h>
 #include <solvers/rtdp/rtdp.h>
-#include <solvers/heuristics/solution_sum_heuristic.h>
+#include <solvers/heuristics/any_goal_heurisitc.h>
 #include <solvers/heuristics/rtdp_dijkstra_heuristic.h>
 
 

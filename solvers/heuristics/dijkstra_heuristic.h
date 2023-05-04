@@ -10,13 +10,16 @@
 #include <gym_mapf/gym_mapf.h>
 #include "solvers/heuristics/heuristic.h"
 
+// Utility function for running dijkstra's algorithm on envs.
+// Should be exported to some heuristic_utils module in the future.
+int *dijkstra_single_agent(size_t agent_idx, const MapfEnv *env);
+
 class DijkstraHeuristic : public Heuristic {
 public:
     int **distance;
     size_t n_agents;
     MapfEnv *env;
 
-    void dijkstra_single_agent(size_t agent_idx);
 
     virtual ~DijkstraHeuristic() override;
 

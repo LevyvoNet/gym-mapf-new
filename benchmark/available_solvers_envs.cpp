@@ -143,6 +143,7 @@ ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : E
     this->n_agents = 2;
 }
 
+
 MapfEnv *ASymmetricalBottleneck::operator()() {
     vector<std::string> map_lines({
                                           "..@..",
@@ -163,6 +164,32 @@ MapfEnv *ASymmetricalBottleneck::operator()() {
                        goal_reward,
                        -1);
 
+}
+
+
+LongCorridorEnv::LongCorridorEnv(string name, int goal_reward) : EnvCreator(name), goal_reward(goal_reward) {
+    std::ostringstream map_name;
+    map_name << "Corridor-goal=" << goal_reward;
+    this->map_name = map_name.str();
+    this->n_agents = 2;
+}
+
+MapfEnv *LongCorridorEnv::operator()() {
+    vector<std::string> map_lines({
+                                          "@.@@.@",
+                                          "......"
+                                  });
+
+    Grid *g = new Grid(map_lines);
+
+    return new MapfEnv(g,
+                       2,
+                       {g->get_location(1, 0), g->get_location(1, 5)},
+                       {g->get_location(1, 5), g->get_location(1, 0)},
+                       FAIL_PROB,
+                       -1000,
+                       this->goal_reward,
+                       -1);
 }
 
 RoomEnv::RoomEnv(string name, size_t room_size, size_t n_rooms, size_t scen_id, size_t n_agents) : EnvCreator(name),
@@ -273,5 +300,8 @@ online_window::online_window(string name, int d, SolverCreator *low_level_planne
 Policy *online_window::operator()(MapfEnv *env, float gamma) {
     return new OnlineWindowPolicy(env, gamma, this->name, this->low_level_planner, this->d, this->window_planner_func);
 }
+
+
+
 
 
