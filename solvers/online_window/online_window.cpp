@@ -4,7 +4,7 @@
 
 #include "online_window.h"
 
-#define DEBUG_PRINT (true)
+#define DEBUG_PRINT (false)
 
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
@@ -299,7 +299,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
     }
     if (all_goals_in_window) {
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
-                                       new RtdpDijkstraHeuristic(gamma));
+                                       new DijkstraHeuristic());
     } else {
         /* Not all are in window, that means we need to get out one of the agents which its goal is outside the window.
          * We are going to do this by de-prioritizing the agents which them goal is inside the window */

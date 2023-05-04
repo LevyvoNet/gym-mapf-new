@@ -41,10 +41,10 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
@@ -104,8 +104,8 @@ vector<vector<SolverCreator *>> solver_creators(
                 /* lvl 4 */
                 {
                         new online_window("online_window_vi_2_vi", 2, new vi("vi"), window_planner_vi),
-                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
-                                          window_planner_vi),
+//                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
+//                                          window_planner_vi),
                         new online_window("online_window_vi_2_rtdp", 2, new vi("vi"), window_planner_rtdp),
                 }
         }
