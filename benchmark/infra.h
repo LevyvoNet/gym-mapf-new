@@ -17,7 +17,7 @@
 /** Constants *******************************************************************************************************/
 #define MAX_MAP_NAME (100)
 #define MAX_SOLVER_NAME (50)
-#define EPISODE_COUNT (1)
+#define EPISODE_COUNT (30)
 
 #define BGU_CLUSTER_WORKER_LIMIT (20)
 #define POLL_SLEEP_TIME_nS (200000)
