@@ -116,7 +116,7 @@ void RtdpPolicy::train(double timeout_ms) {
     /* Initialize the heuristic and measure the time for it */
     MEASURE_TIME;
     this->h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
-    cout << "h init took " << ELAPSED_TIME_MS / 1000 << " SECONDS" << endl;
+//    cout << "h init took " << ELAPSED_TIME_MS / 1000 << " SECONDS" << endl;
     double init_time_sec = ELAPSED_TIME_MS / 1000;
     (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(init_time_sec * 100) / 100);
     if (ELAPSED_TIME_MS >= timeout_ms) {
@@ -148,7 +148,7 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        eval_info = this->evaluate(30, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
+        eval_info = this->evaluate(10, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
         this->in_train = true;
         const auto eval_end = clk::now();
         total_eval_time += ((ms) (eval_end - eval_begin)).count();
@@ -159,7 +159,7 @@ void RtdpPolicy::train(double timeout_ms) {
         }
     }
 
-    cout << "RTDP took " << iters_count << " to converge" << endl;
+//    cout << "RTDP took " << iters_count << " to converge" << endl;
 
     /* Set the train info */
     float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
