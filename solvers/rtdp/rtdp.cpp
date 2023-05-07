@@ -8,11 +8,11 @@
 
 /** Constants ***************************************************************************************************/
 #define MAX_ITERATIONS (30000)
-#define BATCH_SIZE (500)
+#define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
-#define MDR_EPSILON (0.1)
+#define MDR_EPSILON (1)
 #define MIN_SUCCESS_RATE (100)
-#define MIN_CONSECUTIVE_SUCCESS_COUNT (2)
+#define MIN_CONSECUTIVE_SUCCESS_COUNT (1)
 
 #define NON_EXISTING_DEFAULT_VALUE (99999999)
 
@@ -148,11 +148,7 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        /* TODO: this is the bug causing RTDP on online window not to converge, evaluate never gets success rate more
-         * than 0 when there is actually a single agent reaching it's goal. Only when all of them reach it.
-         * We need some kind of a makespan mode for MapfEnv (What if the agent reaches a state near its goal but outside
-         * the window? It is possible not to consider it as a success during training... ) */
-        eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
+        eval_info = this->evaluate(30, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
         this->in_train = true;
         const auto eval_end = clk::now();
         total_eval_time += ((ms) (eval_end - eval_begin)).count();
