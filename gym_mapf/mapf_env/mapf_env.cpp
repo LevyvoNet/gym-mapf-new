@@ -255,7 +255,7 @@ bool MapfEnv::is_terminal_state(const MultiAgentState &state, bool cache) {
     /* None of the conditions satisfied, this state is not terminal */
     result = false;
 
-l_cleanup:
+    l_cleanup:
     if (cached) {
         *cached = result;
     }
@@ -510,6 +510,10 @@ void MapfEnv::reset_cache() {
 
 void MapfEnv::add_constraint(Constraint *constraint) {
     this->constraints.push_back(constraint);
+}
+
+void MapfEnv::set_goal_definition(std::unique_ptr<GoalDefinition> goal) {
+    this->goal = std::move(goal);
 }
 
 

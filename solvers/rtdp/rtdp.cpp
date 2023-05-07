@@ -31,7 +31,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
 
     MultiAgentState *s = this->env->reset();
 
-    while (!done && steps < MAX_STEPS && !this->custom_iteration_stop_condition_->should_stop(*s)) {
+    while (!done && steps < MAX_STEPS) {
         ++steps;
 
         /* Add the current state to the path */
@@ -64,7 +64,7 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
 
     this->train_rewards.push_back(total_reward);
 
-l_cleanup:
+    l_cleanup:
     delete a;
 }
 
@@ -102,20 +102,13 @@ void RtdpPolicy::clear_cache() {
 
 /** Public ****************************************************************************************************/
 RtdpPolicy::RtdpPolicy(MapfEnv *env, float gamma,
-                       const string &name, Heuristic *h,
-                       std::unique_ptr<IterationStopCondition> custom_iteration_stop_condition) :
+                       const string &name, Heuristic *h) :
         ValueFunctionPolicy(env, gamma, name) {
     this->h = h;
     this->v = new Dictionary(NON_EXISTING_DEFAULT_VALUE);
     this->cache = new MultiAgentStateStorage<MultiAgentAction *>(this->env->n_agents, nullptr);
     this->in_train = true;
     this->consecutive_success = 0;
-
-    this->custom_iteration_stop_condition_ = std::move(custom_iteration_stop_condition);
-
-    if (!this->custom_iteration_stop_condition_) {
-        this->custom_iteration_stop_condition_ = std::make_unique<NopStopCondition>(NopStopCondition());
-    }
 }
 
 
@@ -123,6 +116,7 @@ void RtdpPolicy::train(double timeout_ms) {
     /* Initialize the heuristic and measure the time for it */
     MEASURE_TIME;
     this->h->init(this->env, timeout_ms - ELAPSED_TIME_MS);
+    cout << "h init took " << ELAPSED_TIME_MS / 1000 << " SECONDS" << endl;
     double init_time_sec = ELAPSED_TIME_MS / 1000;
     (*(this->train_info->additional_data))["init_time"] = std::to_string((int) round(init_time_sec * 100) / 100);
     if (ELAPSED_TIME_MS >= timeout_ms) {
@@ -154,6 +148,10 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
+        /* TODO: this is the bug causing RTDP on online window not to converge, evaluate never gets success rate more
+         * than 0 when there is actually a single agent reaching it's goal. Only when all of them reach it.
+         * We need some kind of a makespan mode for MapfEnv (What if the agent reaches a state near its goal but outside
+         * the window? It is possible not to consider it as a success during training... ) */
         eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
         this->in_train = true;
         const auto eval_end = clk::now();
@@ -165,6 +163,8 @@ void RtdpPolicy::train(double timeout_ms) {
         }
     }
 
+    cout << "RTDP took " << iters_count << " to converge" << endl;
+
     /* Set the train info */
     float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
     total_eval_time = float(total_eval_time) / 1000;
@@ -175,7 +175,7 @@ void RtdpPolicy::train(double timeout_ms) {
     /* Finish training */
     this->in_train = false;
 
-l_cleanup:
+    l_cleanup:
     if (nullptr != eval_info) {
         delete eval_info;
     }
@@ -254,22 +254,4 @@ Policy *RtdpMerger::operator()(MapfEnv *env,
     policy->train(timeout_ms);
 
     return policy;
-}
-
-
-OneAgentInGoalStopCondition::OneAgentInGoalStopCondition(const vector<Location> &agent_goal_locations)
-        : agent_goal_locations_(agent_goal_locations) {}
-
-bool OneAgentInGoalStopCondition::should_stop(const MultiAgentState &s) {
-    for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
-        if (this->agent_goal_locations_[agent] == s.locations[agent]) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-bool NopStopCondition::should_stop(const MultiAgentState &s) {
-    return false;
 }

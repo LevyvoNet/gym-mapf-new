@@ -242,6 +242,24 @@ private:
 };
 
 
+class AnyAgentInGoal : public GoalDefinition {
+public:
+    AnyAgentInGoal(vector<Location> agent_goal_locations) : agent_goal_locations_(agent_goal_locations) {}
+
+    bool operator()(const MultiAgentState &s) override {
+        for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
+            if (this->agent_goal_locations_[agent] == s.locations[agent]) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+private:
+    vector<Location> agent_goal_locations_;
+};
+
 void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
                          vector<Policy *> single_policies,
                          int d,
@@ -258,6 +276,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
      * Allow the agents to only move in the window area. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
     local_group_env->start_state = local_group_env->locations_to_state(s.locations);
+
 //    local_group_env->goal_state = local_group_env->id_to_state(girth_values->max_element());
 //    if (DEBUG_PRINT) {
 //        cout << "best state is " << *local_group_env->goal_state << " with value "
@@ -277,15 +296,10 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
         local_goals_v.push_back(local_goal_v);
     }
 
+
     /* Set the goal state of the env to be the joint state of local goals, this is helpful for running dijkstra to find
      * the distance for each agent from its goal. */
     local_group_env->goal_state = local_group_env->locations_to_state(local_goals);
-    if (DEBUG_PRINT) {
-        cout << "local goal state is " << *local_group_env->goal_state << endl;
-        for (Location &l: local_goals) {
-            cout << "local goal inside window area: " << w->area.contains(l) << endl;
-        }
-    }
 
     /* Just in case - make sure the goal reward is zero. We don't want it here anyway */
     local_group_env->reward_of_goal = 0;
@@ -297,22 +311,26 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
     for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
         all_goals_in_window = all_goals_in_window && w->area.contains(local_goals[agent]);
     }
+
     if (all_goals_in_window) {
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
                                        new DijkstraHeuristic());
     } else {
+        /* Set the local env goal to any agent - the first agent reaches its goal means done */
+        local_group_env->set_goal_definition(std::move(std::make_unique<AnyAgentInGoal>(local_goals)));
+
         /* Not all are in window, that means we need to get out one of the agents which its goal is outside the window.
          * We are going to do this by de-prioritizing the agents which them goal is inside the window */
         for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
             if (w->area.contains(local_goals[agent])) {
-                local_goals_v[agent] = std::numeric_limits<double>::lowest();
+                local_goals_v[agent] = -std::numeric_limits<double>::infinity();
             }
         }
+
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
-                                       new AnyGoalHeuristic(local_goals_v),
-                                       std::move(std::make_unique<OneAgentInGoalStopCondition>(
-                                               OneAgentInGoalStopCondition(local_goals))));
+                                       new AnyGoalHeuristic(local_goals_v));
     }
+
 
     /* Limit the agents not to go through the girth, meaning they should stay on the
      * window area. The only exception for this is when an agent should reach its goal
@@ -323,6 +341,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
     /* Solve the selected policy */
     window_policy->train(timeout_ms - ELAPSED_TIME_MS);
+
 //    delete girth_values;
 
     /* Transfer ownership */

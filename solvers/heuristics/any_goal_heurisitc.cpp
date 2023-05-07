@@ -8,9 +8,10 @@ AnyGoalHeuristic::AnyGoalHeuristic(const vector<double> &values) :
         DijkstraHeuristic(), local_goals_v_(values) {}
 
 double AnyGoalHeuristic::operator()(MultiAgentState *s) {
-    double max_value = std::numeric_limits<double>::lowest();
+    double max_value = -std::numeric_limits<double>::infinity();;
     for (size_t agent = 0; agent < this->env->n_agents; ++agent) {
-        double curr_value = this->local_goals_v_[agent] - this->distance[agent][s->locations[agent].id];
+        double curr_value = this->local_goals_v_[agent] +
+                            this->env->reward_of_living * this->distance[agent][s->locations[agent].id];
         max_value = max(max_value, curr_value);
     }
 

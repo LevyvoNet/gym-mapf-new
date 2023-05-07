@@ -83,6 +83,11 @@ public:
     virtual bool is_violated(const MultiAgentState *prev_state, const MultiAgentState *next_state) = 0;
 };
 
+class GoalDefinition {
+public:
+    virtual bool operator()(const MultiAgentState & s) = 0;
+};
+
 class MapfEnv {
 public:
     /* Parameters */
@@ -107,6 +112,7 @@ public:
     vector<GridArea> *mountains;
 //    tsl::hopscotch_map<size_t, std::unordered_set<Location> *> *constraints;
     vector<Constraint *> constraints;
+    unique_ptr<GoalDefinition> goal;
 
 
     MapfEnv(Grid *grid,
@@ -155,8 +161,9 @@ public:
 
     bool is_collision_transition(const MultiAgentState *prev_state, const MultiAgentState *next_state);
 
-//    void add_constraint(size_t agent, Location loc);
     void add_constraint(Constraint *constraint);
+
+    void set_goal_definition(std::unique_ptr<GoalDefinition> goal);
 
 
 private:

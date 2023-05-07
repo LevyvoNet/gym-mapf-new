@@ -48,34 +48,34 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
 
                         /* City */
-                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
+//                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("", "ost003d", 4, 4),
+//                        new GeneralEnv("", "ost003d", 4, 4),
 
                         /* Open */
-                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
+//                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
-                        new GeneralEnv("", "random-64-64-10", 1, 4),
+//                        new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
-                       new MazeEnv("", 128, 10, 1, 5),
+//                       new MazeEnv("", 128, 10, 1, 5),
 
                         /* Room */
-                        new GeneralEnv("", "room-64-64-16", 1, 6),
-                        new GeneralEnv("", "room-64-64-16", 1, 8),
+//                        new GeneralEnv("", "room-64-64-16", 1, 6),
+//                        new GeneralEnv("", "room-64-64-16", 1, 8),
                 }
         }
 );
@@ -106,7 +106,7 @@ vector<vector<SolverCreator *>> solver_creators(
                         new online_window("online_window_vi_2_vi", 2, new vi("vi"), window_planner_vi),
 //                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
 //                                          window_planner_vi),
-//                        new online_window("online_window_vi_2_rtdp", 2, new vi("vi"), window_planner_rtdp),
+                        new online_window("online_window_vi_2_rtdp", 2, new vi("vi"), window_planner_rtdp),
                 }
         }
 );
