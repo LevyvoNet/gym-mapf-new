@@ -85,7 +85,19 @@ public:
 
 class GoalDefinition {
 public:
-    virtual bool operator()(const MultiAgentState & s) = 0;
+    virtual bool is_goal(const MultiAgentState &s) = 0;
+
+    virtual ~GoalDefinition();
+};
+
+class SingleStateGoalDefinition : public GoalDefinition {
+public:
+    SingleStateGoalDefinition(const MultiAgentState &goal_state);
+
+    virtual bool is_goal(const MultiAgentState &s) override;
+
+private:
+    const MultiAgentState goal_state_;
 };
 
 class MapfEnv {

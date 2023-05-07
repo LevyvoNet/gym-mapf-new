@@ -246,7 +246,7 @@ class AnyAgentInGoal : public GoalDefinition {
 public:
     AnyAgentInGoal(vector<Location> agent_goal_locations) : agent_goal_locations_(agent_goal_locations) {}
 
-    bool operator()(const MultiAgentState &s) override {
+    bool is_goal(const MultiAgentState &s) override {
         for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
             if (this->agent_goal_locations_[agent] == s.locations[agent]) {
                 return true;
