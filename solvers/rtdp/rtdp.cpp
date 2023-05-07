@@ -8,7 +8,7 @@
 
 /** Constants ***************************************************************************************************/
 #define MAX_ITERATIONS (30000)
-#define BATCH_SIZE (50)
+#define BATCH_SIZE (500)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (1)
 #define MIN_SUCCESS_RATE (100)
@@ -148,7 +148,7 @@ void RtdpPolicy::train(double timeout_ms) {
         const auto eval_begin = clk::now();
         this->clear_cache();
         this->in_train = false;
-        eval_info = this->evaluate(10, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
+        eval_info = this->evaluate(100, 1000, (timeout_ms - ELAPSED_TIME_MS) / 30, false);
         this->in_train = true;
         const auto eval_end = clk::now();
         total_eval_time += ((ms) (eval_end - eval_begin)).count();
