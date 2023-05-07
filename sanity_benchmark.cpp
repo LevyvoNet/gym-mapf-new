@@ -30,12 +30,12 @@ vector<vector<EnvCreator *>> env_creators(
         {   /* lvl 0 */
                 {
                         new EmptyGrid("empty_8X8_single_agent", 8, 1, 0),
-                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
+//                        new EmptyGrid("empty_8X8_2_agents_large_goal", 8, 2, 100),
                         new EmptyGrid("empty_8X8_2_agents", 8, 2, 0),
                         new SymmetricalBottleneck("symmetrical_bottleneck", 0),
-                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
+//                        new SymmetricalBottleneck("symmetrical_bottleneck_large_goal", 100),
                         new ASymmetricalBottleneck("asymmetrical_bottleneck", 0),
-                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
+//                        new ASymmetricalBottleneck("asymmetrical_bottleneck_large_goal", 100),
                         new LongCorridorEnv("corridor", 0)
 
                 },
