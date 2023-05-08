@@ -68,7 +68,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
 
                         /* Open + obstacles */
-                        new GeneralEnv("", "random-64-64-10", 1, 4),
+//                        new GeneralEnv("", "random-64-64-10", 1, 4),
 
                         /* Maze */
 //                       new MazeEnv("", 128, 10, 1, 5),

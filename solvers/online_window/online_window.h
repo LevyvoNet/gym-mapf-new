@@ -23,7 +23,7 @@
 
 
 /** Constants *****************************************************************************************/
-#define BONUS_VALUE (0)
+#define BONUS_VALUE (100)
 #define LIVE_LOCK_BUFFER (100)
 
 class AllStayExceptFirstActionSpaceIterator : public MultiAgentActionIterator {
