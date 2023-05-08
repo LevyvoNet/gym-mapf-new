@@ -65,8 +65,9 @@ vector<SolverCreator *> SOLVERS{
 //        new rtdp_dijkstra_rtdp("rtdp_dijkstra_rtdp"),
 //        new id_rtdp("id_rtdp"),
 //        new online_window("online_window_rtdp_2", 2, new rtdp_dijkstra_rtdp(""), window_planner_vi),
-        new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
+//        new online_window("online_window_dijkstra_2", 2, new dijkstra_baseline(""), window_planner_vi),
         new online_window("online_window_vi_2", 2, new vi("vi"), window_planner_vi),
+        new online_window("online_window_rtdp_2", 2, new vi("vi"), window_planner_rtdp),
 
 };
 
