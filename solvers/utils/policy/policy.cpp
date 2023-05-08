@@ -174,7 +174,7 @@ episode_info Policy::evaluate_single_episode(std::size_t max_steps, double timeo
                 return res;
             }
 
-            /* The goal was reached, the episode is solved. Update its stats. */
+            /* The goal_definition was reached, the episode is solved. Update its stats. */
             if (done) {
                 res.end_reason = EPISODE_SUCCESS;
                 res.reward = episode_reward;

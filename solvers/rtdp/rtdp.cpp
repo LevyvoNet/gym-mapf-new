@@ -159,8 +159,6 @@ void RtdpPolicy::train(double timeout_ms) {
         }
     }
 
-    cout << "RTDP took " << iters_count << " to converge" << endl;
-
     /* Set the train info */
     float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
     total_eval_time = float(total_eval_time) / 1000;

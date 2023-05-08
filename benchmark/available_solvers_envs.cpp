@@ -24,7 +24,7 @@ MapfEnv *EmptyGrid::operator()() {
 SymmetricalBottleneck::SymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
                                                                              goal_reward(goal_reward) {
     std::ostringstream map_name;
-    map_name << "SymmetricalBottleneck-goal=" << goal_reward;
+    map_name << "SymmetricalBottleneck-goal_definition=" << goal_reward;
     this->map_name = map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
@@ -137,7 +137,7 @@ MapfEnv *PaperExample::operator()() {
 ASymmetricalBottleneck::ASymmetricalBottleneck(string name, int goal_reward) : EnvCreator(name),
                                                                                goal_reward(goal_reward) {
     std::ostringstream map_name;
-    map_name << "AsymmetricalBottleneck-goal=" << goal_reward;
+    map_name << "AsymmetricalBottleneck-goal_definition=" << goal_reward;
     this->map_name = map_name.str();
     this->scen_id = 0;
     this->n_agents = 2;
@@ -169,7 +169,7 @@ MapfEnv *ASymmetricalBottleneck::operator()() {
 
 LongCorridorEnv::LongCorridorEnv(string name, int goal_reward) : EnvCreator(name), goal_reward(goal_reward) {
     std::ostringstream map_name;
-    map_name << "Corridor-goal=" << goal_reward;
+    map_name << "Corridor-goal_definition=" << goal_reward;
     this->map_name = map_name.str();
     this->n_agents = 2;
 }

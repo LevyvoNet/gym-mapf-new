@@ -41,7 +41,7 @@ int *dijkstra_single_agent(size_t agent_idx, const MapfEnv *env) {
     /* Initialize visited to false */
     std::fill(visited, visited + n_locs, false);
 
-    /* Start with the goal state */
+    /* Start with the goal_definition state */
     res[goal_location.id] = 0;
 
     for (size_t i = 1; i <= n_locs; ++i) {
@@ -92,7 +92,7 @@ double DijkstraHeuristic::operator()(MultiAgentState *s) {
         }
     }
 
-    /* If everyone is in goal, return 0 and don't add the goal reward in case there is one */
+    /* If everyone is in goal_definition, return 0 and don't add the goal_definition reward in case there is one */
     if (0 == count) {
         return 0;
     }

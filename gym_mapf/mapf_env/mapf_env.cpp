@@ -102,7 +102,7 @@ MapfEnv::MapfEnv(Grid *grid,
 //    for (size_t agent = 0; agent < this->n_agents; ++agent) {
 //        ((*this->constraints)[agent]) = new unordered_set<Location>();
 //    }
-    this->goal = std::make_unique<SingleStateGoalDefinition>(*this->goal_state);
+    this->goal_definition = std::make_unique<SingleStateGoalDefinition>(*this->goal_state);
 
     /* Caches */
     this->transition_cache = new MultiAgentStateStorage<ActionToTransitionStorage *>(this->n_agents, nullptr);
@@ -208,7 +208,7 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
     }
 
 
-    if (this->goal->is_goal(*next_state)) {
+    if (this->goal_definition->is_goal(*next_state)) {
         *reward = living_reward + this->reward_of_goal;
         *done = true;
         *is_collision = false;
@@ -515,7 +515,7 @@ void MapfEnv::add_constraint(Constraint *constraint) {
 }
 
 void MapfEnv::set_goal_definition(std::unique_ptr<GoalDefinition> goal) {
-    this->goal = std::move(goal);
+    this->goal_definition = std::move(goal);
 }
 
 

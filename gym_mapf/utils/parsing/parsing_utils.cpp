@@ -67,12 +67,12 @@ void parse_scen_file(std::string file_path, size_t n_agents, Grid *grid, vector<
         start_row_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
-        /* cut goal col */
+        /* cut goal_definition col */
         pos = line.find(delimiter);
         goal_col_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
 
-        /* cut goal row */
+        /* cut goal_definition row */
         pos = line.find(delimiter);
         goal_row_str = line.substr(0, pos);
         line.erase(0, pos + delimiter.length());
@@ -104,7 +104,7 @@ MapfEnv *create_mapf_env(std::string map_name,
     std::vector<std::string> map_lines = parse_map_file(map_file_string_stream.str());
     Grid *grid = new Grid(map_lines);
 
-    /* Create the start and goal states */
+    /* Create the start and goal_definition states */
     vector<Location> start_locations;
     vector<Location> goal_locations;
     std::ostringstream scen_file_string_stream;

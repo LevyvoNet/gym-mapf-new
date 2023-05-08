@@ -51,7 +51,7 @@ double RtdpDijkstraHeuristic::operator()(MultiAgentState *s) {
         }
     }
 
-    /* If everyone is in goal, return 0 and don't add the goal reward in case there is one */
+    /* If everyone is in goal_definition, return 0 and don't add the goal_definition reward in case there is one */
     if (0 == count) {
         return 0;
     }

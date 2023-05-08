@@ -181,7 +181,7 @@ TEST(MapfEnvTests, EmptyGridTransitionFunction) {
 
     ASSERT_TRUE(list_equal_no_order(*transitions, expected_transitions));
 
-    /* Test transitions from a state near the goal */
+    /* Test transitions from a state near the goal_definition */
     MultiAgentState *wish_state = env->locations_to_state({g.get_location(0, 1), g.get_location(6, 7)});
     /* Set the expected transitions */
     list<Transition *> expected_transitions_from_wish_state(
@@ -280,7 +280,7 @@ TEST(MapfEnvTests, ActionFromTerminalStateHasNoEffect) {
     ASSERT_EQ(done, false);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(0, 1)}));
 
-    /* Execute the second step - this one reaches the goal */
+    /* Execute the second step - this one reaches the goal_definition */
     env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, REWARD_OF_LIVING + REWARD_OF_GOAL);
     ASSERT_EQ(done, true);
@@ -292,7 +292,7 @@ TEST(MapfEnvTests, ActionFromTerminalStateHasNoEffect) {
     ASSERT_EQ(done, true);
     ASSERT_EQ(*next_state, *env.locations_to_state({g.get_location(1, 1)}));
 
-    /* Another time like I'm trying to reach the goal */
+    /* Another time like I'm trying to reach the goal_definition */
     env.step(*actions_to_action({DOWN}), next_state, &reward, &done, &collision);
     ASSERT_EQ(reward, 0);
     ASSERT_EQ(done, true);
@@ -1329,7 +1329,7 @@ TEST(MapfEnvTests, MountainsEmptyGrid) {
                                REWARD_OF_GOAL,
                                REWARD_OF_LIVING);
 
-    /* Add a mountain on the path of the agents to the goal */
+    /* Add a mountain on the path of the agents to the goal_definition */
     GridArea mountain_area = GridArea(3, 5, 1, 6);
 
     env->add_mountain(mountain_area);

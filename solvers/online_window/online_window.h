@@ -71,6 +71,8 @@ public:
 
     int calc_max_steps();
 
+    MultiAgentState * cast_to_window_local_state(const MultiAgentState &s);
+
     friend std::ostream &operator<<(std::ostream &os, const Window &w);
 
 };
@@ -132,6 +134,8 @@ private:
     void plan_window(Window *pWindow, const MultiAgentState &s, double d);
 
     Window *try_fit_to_archive(AgentsGroup, const MultiAgentState &state);
+
+    bool in_deadlock(Window *w, const MultiAgentState &state, double timeout_ms);
 
     bool might_live_lock(Window *w);
 

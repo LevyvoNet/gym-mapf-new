@@ -4,7 +4,7 @@
 
 #include "online_window.h"
 
-#define DEBUG_PRINT (false)
+#define DEBUG_PRINT (true)
 
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
@@ -22,9 +22,7 @@ int Window::calc_max_steps() {
     return max_steps;
 }
 
-MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
-    MEASURE_TIME;
-
+MultiAgentState *Window::cast_to_window_local_state(const MultiAgentState &s) {
     vector<Location> casted_locations;
     MultiAgentState *group_state = nullptr;
     MultiAgentAction *a = nullptr;
@@ -33,7 +31,14 @@ MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
         casted_locations.push_back(s.locations[agent]);
     }
     group_state = this->policy->env->locations_to_state(casted_locations);
-    a = this->policy->act(*group_state, timeout_ms - ELAPSED_TIME_MS);
+
+    return group_state;
+}
+
+MultiAgentAction *Window::act(const MultiAgentState &s, double timeout_ms) {
+    MEASURE_TIME;
+    MultiAgentState *group_state = this->cast_to_window_local_state(s);
+    MultiAgentAction *a = this->policy->act(*group_state, timeout_ms - ELAPSED_TIME_MS);
 
     ++this->steps_count;
 
@@ -191,7 +196,7 @@ Location get_girth_goal_state_for_agent(MapfEnv *env, Window *w, const MultiAgen
                                         const vector<Policy *> &single_policies, size_t agent, double timeout_ms) {
     MEASURE_TIME;
 
-    /* If this agents goal location in on the window area, return it. */
+    /* If this agents goal_definition location in on the window area, return it. */
     if (w->area.contains(env->goal_state->locations[agent])) {
         return env->goal_state->locations[agent];
     }
@@ -225,7 +230,7 @@ public:
             return false;
         }
 
-        /* If one of the agents exits the allow area it is a violation since the final state is not the permitted goal
+        /* If one of the agents exits the allow area it is a violation since the final state is not the permitted goal_definition
          * state */
         for (size_t agent_idx = 0; agent_idx < next_state->locations.size(); agent_idx++) {
             if (!this->allowed_area.contains(next_state->locations[agent_idx])) {
@@ -268,7 +273,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
                          double timeout_ms) {
     MEASURE_TIME;
 
-//    /* Calculate the area girth values, the best of these states will be the new goal state of the local env.  */
+//    /* Calculate the area girth values, the best of these states will be the new goal_definition state of the local env.  */
 //    Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
 //    if (ELAPSED_TIME_MS >= timeout_ms) {
 //        return;
@@ -294,15 +299,15 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
     }
 
 
-    /* Set the goal state of the env to be the joint state of local goals, this is helpful for running dijkstra to find
-     * the distance for each agent from its goal. */
+    /* Set the goal_definition state of the env to be the joint state of local goals, this is helpful for running dijkstra to find
+     * the distance for each agent from its goal_definition. */
     local_group_env->goal_state = local_group_env->locations_to_state(local_goals);
 
-    /* Just in case - make sure the goal reward is zero. We don't want it here anyway */
+    /* Just in case - make sure the goal_definition reward is zero. We don't want it here anyway */
     local_group_env->reward_of_goal = 0;
 
     /* Decide on the policy we are going to use to solve this window, that depends on edge cases where some/all of the
-     * local env agents (original) goal state is inside the current window area */
+     * local env agents (original) goal_definition state is inside the current window area */
     RtdpPolicy *window_policy = nullptr;
     bool all_goals_in_window = true;
     for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
@@ -313,14 +318,14 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
                                        new DijkstraHeuristic());
     } else {
-        /* Not all are in window, that means we need to get out one of the agents which its goal is outside the window.
-         * We are going to do this by de-prioritizing the agents which them goal is inside the window */
+        /* Not all are in window, that means we need to get out one of the agents which its goal_definition is outside the window.
+         * We are going to do this by de-prioritizing the agents which them goal_definition is inside the window */
         vector<bool> is_important;
         for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
             is_important.push_back(!w->area.contains(local_goals[agent]));
         }
 
-        /* Set the local env goal to any agent - the first agent reaches its goal means done */
+        /* Set the local env goal_definition to any agent - the first agent reaches its goal_definition means done */
         local_group_env->set_goal_definition(
                 std::move(std::make_unique<SelectedAgentsInGoal>(local_goals, is_important)));
 
@@ -331,8 +336,8 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
 
     /* Limit the agents not to go through the girth, meaning they should stay on the
-     * window area. The only exception for this is when an agent should reach its goal
-     * which is on the girth (the midterm goal is the best state on the window's girth). */
+     * window area. The only exception for this is when an agent should reach its goal_definition
+     * which is on the girth (the midterm goal_definition is the best state on the window's girth). */
 //    local_group_env->add_constraint(new AllowedAreaWithGoalException(w->area, *local_group_env->goal_state));
 
 
@@ -527,8 +532,9 @@ Window *OnlineWindowPolicy::try_fit_to_archive(AgentsGroup group, const MultiAge
     return nullptr;
 }
 
+
 bool OnlineWindowPolicy::might_live_lock(Window *w) {
-    return w->steps_count >= w->max_steps;
+    return w->steps_count >= w->max_steps /* too many steps, means that we might be in a livelock */ ;
 }
 
 
@@ -557,7 +563,7 @@ void OnlineWindowPolicy::expand_window(Window *w, const MultiAgentState &state, 
 
     if (!(new_area == old_area)) {
         if (DEBUG_PRINT) {
-            cout << "expanding window of " << w->group.size() << " agents" << endl;
+            cout << "expanding window  " << *w << endl;
         }
         this->plan_window(w, state, timeout_ms - ELAPSED_TIME_MS);
     }
@@ -620,9 +626,9 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     while (merge_possible) {
         merge_possible = this->merge_current_windows(state);
 
-        /* Expand windows which might be in live lock */
+        /* Expand windows which might be in live or dead lock */
         for (Window *w: *this->curr_windows) {
-            if (this->might_live_lock(w)) {
+            if (this->might_live_lock(w) || this->in_deadlock(w, state, timeout_ms - ELAPSED_TIME_MS)) {
 //                cout << "expanding " << *w;
                 this->expand_window(w, state, timeout_ms - ELAPSED_TIME_MS);
                 this->max_times_window_expanded_episode = max(w->expanded_count,
@@ -837,6 +843,31 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
     }
 
     return actions_to_action(selected_actions);
+}
+
+bool OnlineWindowPolicy::in_deadlock(Window *w, const MultiAgentState &state, double timeout_ms) {
+    MEASURE_TIME;
+
+    /* No policy, this is a new window which cannot be in a deadlock */
+    if (w->policy == nullptr) {
+        return false;
+    }
+
+    /* No chance for a deadlock if the action is not all stay */
+    if (w->act(*this->env->s, timeout_ms - ELAPSED_TIME_MS)->id != 0) {
+        return false;
+    }
+
+    /* All stay action was chosen, we are in a deadlock unless every agent is in its goal_definition */
+    bool all_in_goal = true;
+    for (size_t agent: w->group) {
+        all_in_goal = all_in_goal && this->env->goal_state->locations[agent] == state.locations[agent];
+    }
+    if (!all_in_goal && DEBUG_PRINT) {
+        cout << *w << " was in a deadlock" << endl;
+    }
+
+    return !all_in_goal;
 }
 
 

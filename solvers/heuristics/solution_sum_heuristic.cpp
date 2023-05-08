@@ -35,7 +35,7 @@ double SolutionSumHeuristic::operator()(MultiAgentState *s) {
         }
     }
 
-    /* Add each value to the sum if it is not the local goal state */
+    /* Add each value to the sum if it is not the local goal_definition state */
     for (size_t i = 0; i < this->groups.size(); ++i) {
         local_state = this->policies[i]->env->locations_to_state(local_locations[i]);
         if (*local_state != *this->policies[i]->env->goal_state) {

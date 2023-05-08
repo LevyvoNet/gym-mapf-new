@@ -124,7 +124,7 @@ public:
     vector<GridArea> *mountains;
 //    tsl::hopscotch_map<size_t, std::unordered_set<Location> *> *constraints;
     vector<Constraint *> constraints;
-    unique_ptr<GoalDefinition> goal;
+    unique_ptr<GoalDefinition> goal_definition;
 
 
     MapfEnv(Grid *grid,
