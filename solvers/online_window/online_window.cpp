@@ -252,19 +252,87 @@ public:
     SelectedAgentsInGoal(vector<Location> agent_goal_locations, vector<bool> is_important) :
             agent_goal_locations_(agent_goal_locations), is_important_(is_important) {}
 
-    bool is_goal(const MultiAgentState &s) override {
+    GoalDecision is_goal(const MapfEnv *env, const MultiAgentState &s) override {
         for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
             if (this->is_important_[agent] && this->agent_goal_locations_[agent] == s.locations[agent]) {
-                return true;
+                return GoalDecision{true, env->reward_of_goal};
             }
         }
 
-        return false;
+        return GoalDecision{false, 0};
     }
 
 private:
     vector<bool> is_important_;
     vector<Location> agent_goal_locations_;
+};
+
+class GirthBonusInGoal : public GoalDefinition {
+public:
+    GirthBonusInGoal(vector<Location> agent_goal_locations, vector<bool> is_important, GridArea window_area,
+                     int bonus) :
+            window_area_(window_area), bonus_(bonus) {
+        this->selected_in_goal_ = std::make_unique<SelectedAgentsInGoal>(agent_goal_locations, is_important);
+    }
+
+    GoalDecision is_goal(const MapfEnv *env, const MultiAgentState &s) override {
+        GoalDecision bonus_goal_decision = this->selected_in_goal_->is_goal(env, s);
+        if (bonus_goal_decision.is_goal) {
+            return GoalDecision{true, this->bonus_};
+        }
+
+        for (size_t agent = 0; agent < env->n_agents; ++agent) {
+            if (!this->window_area_.contains(s.locations[agent])) {
+                return GoalDecision{true, 0}; /* TODO: should it be reward_of_goal? */
+            }
+        }
+
+        return GoalDecision{false, 0};
+    }
+
+private:
+    std::unique_ptr<SelectedAgentsInGoal> selected_in_goal_;
+    int bonus_;
+    GridArea window_area_;
+};
+
+class GirthBonusInGoalHeuristic : public Heuristic {
+public:
+    GirthBonusInGoalHeuristic(vector<bool> is_important, int bonus, GridArea window_area) :
+            window_area_(window_area),
+            bonus_(bonus),
+            any_goal_heuristic_(std::make_unique<AnyGoalHeuristic>(is_important)) {}
+
+    void init(MapfEnv *env, double timeout_milliseconds) override {
+        this->any_goal_heuristic_->init(env, timeout_milliseconds);
+    }
+
+    virtual double operator()(MultiAgentState *s) override {
+        double best_distance_to_bonus_state = (*this->any_goal_heuristic_)(s);
+        double bonus_heurisitc_val = (double) this->bonus_ + best_distance_to_bonus_state;
+
+        int min_distance_from_girth = std::numeric_limits<int>::infinity();
+
+        for (size_t agent = 0; agent < this->any_goal_heuristic_->env->n_agents; ++agent) {
+            Location &agent_location = s->locations[agent];
+            int distance_from_top = agent_location.row - this->window_area_.top_row;
+            int distance_from_bottom = this->window_area_.bottom_row - agent_location.row;
+            int distance_from_left = agent_location.col - this->window_area_.left_col;
+            int distance_from_right = this->window_area_.right_col - agent_location.col;
+            vector<int> distances = {distance_from_top, distance_from_bottom, distance_from_left, distance_from_right};
+
+            int distance_from_girth = *std::min_element(distances.begin(), distances.end());
+
+            min_distance_from_girth = min(min_distance_from_girth, distance_from_girth);
+        }
+
+        return max((double) min_distance_from_girth, bonus_heurisitc_val);
+    }
+
+private:
+    unique_ptr<AnyGoalHeuristic> any_goal_heuristic_;
+    int bonus_;
+    GridArea window_area_;
 };
 
 void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
@@ -273,22 +341,12 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
                          double timeout_ms) {
     MEASURE_TIME;
 
-//    /* Calculate the area girth values, the best of these states will be the new goal_definition state of the local env.  */
-//    Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
-//    if (ELAPSED_TIME_MS >= timeout_ms) {
-//        return;
-//    }
 
     /* Create a local view of the agents in the window's group.
      * Allow the agents to only move in the window area. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
     local_group_env->start_state = local_group_env->locations_to_state(s.locations);
 
-//    local_group_env->goal_state = local_group_env->id_to_state(girth_values->max_element());
-//    if (DEBUG_PRINT) {
-//        cout << "best state is " << *local_group_env->goal_state << " with value "
-//             << girth_values->get(local_group_env->goal_state->id) << endl;
-//    }
 
     /* Find goals for each agent in the local env */
     vector<Location> local_goals;
@@ -327,11 +385,11 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
         /* Set the local env goal_definition to any agent - the first agent reaches its goal_definition means done */
         local_group_env->set_goal_definition(
-                std::move(std::make_unique<SelectedAgentsInGoal>(local_goals, is_important)));
+                std::move(std::make_unique<GirthBonusInGoal>(local_goals, is_important, w->area, BONUS_VALUE)));
 
         /* Solve the new env */
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
-                                       new AnyGoalHeuristic(is_important));
+                                       new GirthBonusInGoalHeuristic(is_important, BONUS_VALUE, w->area));
     }
 
 
@@ -344,8 +402,6 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
     /* Solve the selected policy */
     window_policy->train(timeout_ms - ELAPSED_TIME_MS);
-
-//    delete girth_values;
 
     /* Transfer ownership */
     w->policy = window_policy;

@@ -78,14 +78,22 @@ public:
 
 #define MOUNTAIN_NOISE_FACTOR (2)
 
+/* Forward decleration of MapfEnv */
+class MapfEnv;
+
 class Constraint {
 public:
     virtual bool is_violated(const MultiAgentState *prev_state, const MultiAgentState *next_state) = 0;
 };
 
+struct GoalDecision {
+    bool is_goal;
+    int reward;
+};
+
 class GoalDefinition {
 public:
-    virtual bool is_goal(const MultiAgentState &s) = 0;
+    virtual GoalDecision is_goal(const MapfEnv *env, const MultiAgentState &s) = 0;
 
     virtual ~GoalDefinition();
 };
@@ -94,7 +102,7 @@ class SingleStateGoalDefinition : public GoalDefinition {
 public:
     SingleStateGoalDefinition(const MultiAgentState &goal_state);
 
-    virtual bool is_goal(const MultiAgentState &s) override;
+    virtual GoalDecision is_goal(const MapfEnv *env, const MultiAgentState &s) override;
 
 private:
     const MultiAgentState goal_state_;

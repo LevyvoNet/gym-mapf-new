@@ -207,9 +207,9 @@ void MapfEnv::calc_transition_reward(const MultiAgentState *prev_state, const Mu
         return;
     }
 
-
-    if (this->goal_definition->is_goal(*next_state)) {
-        *reward = living_reward + this->reward_of_goal;
+    GoalDecision goal_decision = this->goal_definition->is_goal(this, *next_state);
+    if (goal_decision.is_goal) {
+        *reward = living_reward + goal_decision.reward;
         *done = true;
         *is_collision = false;
         return;
@@ -595,6 +595,6 @@ SingleStateGoalDefinition::SingleStateGoalDefinition(const MultiAgentState &goal
 
 }
 
-bool SingleStateGoalDefinition::is_goal(const MultiAgentState &s) {
-    return this->goal_state_ == s;
+GoalDecision SingleStateGoalDefinition::is_goal(const MapfEnv *env, const MultiAgentState &s) {
+    return GoalDecision{this->goal_state_ == s, env->reward_of_goal};
 }
