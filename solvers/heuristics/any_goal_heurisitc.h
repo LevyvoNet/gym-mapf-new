@@ -11,12 +11,12 @@
 
 class AnyGoalHeuristic : public DijkstraHeuristic {
 public:
-    AnyGoalHeuristic(const vector<double> &values);
+    AnyGoalHeuristic(vector<bool> is_important);
 
     virtual double operator()(MultiAgentState *s) override;
 
 private:
-    const vector<double> local_goals_v_;
+    const vector<bool> is_important_;
 };
 
 

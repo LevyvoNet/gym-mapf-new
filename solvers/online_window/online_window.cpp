@@ -242,13 +242,14 @@ private:
 };
 
 
-class AnyAgentInGoal : public GoalDefinition {
+class SelectedAgentsInGoal : public GoalDefinition {
 public:
-    AnyAgentInGoal(vector<Location> agent_goal_locations) : agent_goal_locations_(agent_goal_locations) {}
+    SelectedAgentsInGoal(vector<Location> agent_goal_locations, vector<bool> is_important) :
+            agent_goal_locations_(agent_goal_locations), is_important_(is_important) {}
 
     bool is_goal(const MultiAgentState &s) override {
         for (size_t agent = 0; agent < this->agent_goal_locations_.size(); ++agent) {
-            if (this->agent_goal_locations_[agent] == s.locations[agent]) {
+            if (this->is_important_[agent] && this->agent_goal_locations_[agent] == s.locations[agent]) {
                 return true;
             }
         }
@@ -257,6 +258,7 @@ public:
     }
 
 private:
+    vector<bool> is_important_;
     vector<Location> agent_goal_locations_;
 };
 
@@ -285,15 +287,10 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
     /* Find goals for each agent in the local env */
     vector<Location> local_goals;
-    vector<double> local_goals_v;
     for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
         Location local_goal = get_girth_goal_state_for_agent(env, w, s, single_policies, agent,
                                                              timeout_ms - ELAPSED_TIME_MS);
-        ValueFunctionPolicy *agent_policy = (ValueFunctionPolicy *) single_policies[agent];
-        double local_goal_v = agent_policy->get_value(agent_policy->env->locations_to_state({local_goal}));
-
         local_goals.push_back(local_goal);
-        local_goals_v.push_back(local_goal_v);
     }
 
 
@@ -316,19 +313,20 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
                                        new DijkstraHeuristic());
     } else {
-        /* Set the local env goal to any agent - the first agent reaches its goal means done */
-        local_group_env->set_goal_definition(std::move(std::make_unique<AnyAgentInGoal>(local_goals)));
-
         /* Not all are in window, that means we need to get out one of the agents which its goal is outside the window.
          * We are going to do this by de-prioritizing the agents which them goal is inside the window */
+        vector<bool> is_important;
         for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
-            if (w->area.contains(local_goals[agent])) {
-                local_goals_v[agent] = -std::numeric_limits<double>::infinity();
-            }
+            is_important.push_back(!w->area.contains(local_goals[agent]));
         }
 
+        /* Set the local env goal to any agent - the first agent reaches its goal means done */
+        local_group_env->set_goal_definition(
+                std::move(std::make_unique<SelectedAgentsInGoal>(local_goals, is_important)));
+
+        /* Solve the new env */
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
-                                       new AnyGoalHeuristic(local_goals_v));
+                                       new AnyGoalHeuristic(is_important));
     }
 
 
