@@ -4,7 +4,7 @@
 
 #include "online_window.h"
 
-#define DEBUG_PRINT (true)
+#define DEBUG_PRINT (false)
 
 /** Window ************************************************************************************************/
 Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
