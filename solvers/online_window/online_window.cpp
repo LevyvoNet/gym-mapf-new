@@ -374,7 +374,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
     if (all_goals_in_window) {
         window_policy = new RtdpPolicy(local_group_env, gamma, "",
-                                       new DijkstraHeuristic());
+                                       new RtdpDijkstraHeuristic(gamma));
     } else {
         /* Not all are in window, that means we need to get out one of the agents which its goal_definition is outside the window.
          * We are going to do this by de-prioritizing the agents which them goal_definition is inside the window */
