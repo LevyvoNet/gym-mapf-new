@@ -335,6 +335,78 @@ private:
     GridArea window_area_;
 };
 
+void window_planner_rtdp_only_bonus(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                                    vector<Policy *> single_policies,
+                                    int d,
+                                    double timeout_ms) {
+    MEASURE_TIME;
+
+
+    /* Create a local view of the agents in the window's group.
+     * Allow the agents to only move in the window area. */
+    MapfEnv *local_group_env = get_local_view(env, w->group);
+    local_group_env->start_state = local_group_env->locations_to_state(s.locations);
+
+
+    /* Find goals for each agent in the local env */
+    vector<Location> local_goals;
+    for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
+        Location local_goal = get_girth_goal_state_for_agent(env, w, s, single_policies, agent,
+                                                             timeout_ms - ELAPSED_TIME_MS);
+        local_goals.push_back(local_goal);
+    }
+
+
+    /* Set the goal_definition state of the env to be the joint state of local goals, this is helpful for running dijkstra to find
+     * the distance for each agent from its goal_definition. */
+    local_group_env->goal_state = local_group_env->locations_to_state(local_goals);
+
+    /* Just in case - make sure the goal_definition reward is zero. We don't want it here anyway */
+    local_group_env->reward_of_goal = 0;
+
+    /* Decide on the policy we are going to use to solve this window, that depends on edge cases where some/all of the
+     * local env agents (original) goal_definition state is inside the current window area */
+    RtdpPolicy *window_policy = nullptr;
+    bool all_goals_in_window = true;
+    for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
+        all_goals_in_window = all_goals_in_window && w->area.contains(local_goals[agent]);
+    }
+
+    if (all_goals_in_window) {
+        window_policy = new RtdpPolicy(local_group_env, gamma, "",
+                                       new RtdpDijkstraHeuristic(gamma));
+    } else {
+        /* Not all are in window, that means we need to get out one of the agents which its goal_definition is outside the window.
+         * We are going to do this by de-prioritizing the agents which them goal_definition is inside the window */
+        vector<bool> is_important;
+        for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
+            is_important.push_back(!w->area.contains(local_goals[agent]));
+        }
+
+        /* Set the local env goal_definition to any agent - the first agent reaches its goal_definition means done */
+        local_group_env->set_goal_definition(
+                std::move(std::make_unique<SelectedAgentsInGoal>(local_goals, is_important)));
+
+        /* Solve the new env */
+        window_policy = new RtdpPolicy(local_group_env, gamma, "",
+                                       new AnyGoalHeuristic(is_important));
+    }
+
+
+    /* Limit the agents not to go through the girth, meaning they should stay on the
+     * window area. The only exception for this is when an agent should reach its goal_definition
+     * which is on the girth (the midterm goal_definition is the best state on the window's girth). */
+//    local_group_env->add_constraint(new AllowedAreaWithGoalException(w->area, *local_group_env->goal_state));
+
+
+
+    /* Solve the selected policy */
+    window_policy->train(timeout_ms - ELAPSED_TIME_MS);
+
+    /* Transfer ownership */
+    w->policy = window_policy;
+}
+
 void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
                          vector<Policy *> single_policies,
                          int d,

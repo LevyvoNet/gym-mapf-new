@@ -71,7 +71,7 @@ public:
 
     int calc_max_steps();
 
-    MultiAgentState * cast_to_window_local_state(const MultiAgentState &s);
+    MultiAgentState *cast_to_window_local_state(const MultiAgentState &s);
 
     friend std::ostream &operator<<(std::ostream &os, const Window &w);
 
@@ -91,6 +91,11 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
                          vector<Policy *> single_policies,
                          int d,
                          double timeout_ms);
+
+void window_planner_rtdp_only_bonus(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                                    vector<Policy *> single_policies,
+                                    int d,
+                                    double timeout_ms);
 
 /** Policy ********************************************************************************************************/
 class OnlineWindowPolicy : public Policy {
