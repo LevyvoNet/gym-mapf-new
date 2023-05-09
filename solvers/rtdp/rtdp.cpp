@@ -7,8 +7,8 @@
 #include <iostream>
 
 /** Constants ***************************************************************************************************/
-#define MAX_ITERATIONS (30000)
-#define BATCH_SIZE (500)
+#define MAX_ITERATIONS (10000)
+#define BATCH_SIZE (100)
 #define MAX_STEPS (1000)
 #define MDR_EPSILON (1)
 #define MIN_SUCCESS_RATE (100)
@@ -43,8 +43,8 @@ void RtdpPolicy::single_iteration(double timeout_ms) {
             return;
         }
 
-//        /* Bellman update the current state */
-//        this->v->set(s->id, new_value);
+        /* Bellman update the current state */
+        this->v->set(s->id, new_value);
 
         /* Sample the next state from the transition function */
         this->env->step(*a, s, &reward, &done, &is_collision);
