@@ -148,7 +148,7 @@ public:
     }
 };
 
-int main(int argc, char **argv) {
+int sanity_benchmark() {
     list<problem_instance> *problems = nullptr;
     bool sanity_test_failed = false;
     std::string last_name = "";
@@ -225,5 +225,40 @@ int main(int argc, char **argv) {
         return 1;
     }
     return 0;
+}
 
+/** TOOD: delete all of this */
+
+int restore_online_window_rtdp_crash() {
+    SolverCreator *online_window_rtdp = new online_window("online_window_vi_2_rtdp", 2, new vi("vi"),
+                                                          window_planner_rtdp);
+    EnvCreator *maze_creator = new GeneralEnv("", "maze-32-32-4", 25, 6);
+
+    MapfEnv *env = (*maze_creator)();
+    Policy *policy = (*online_window_rtdp)(env, 1.0);
+
+
+    policy->train(EPISODE_TRAIN_TIMEOUT_MS);
+//
+//    /* Reach to the point of failure */
+//    policy->env->start_state = policy->env->locations_to_state({env->grid->get_location(1, 3),
+//                                                                env->grid->get_location(26, 6),
+//                                                                env->grid->get_location(4, 14),
+//                                                                env->grid->get_location(20, 4),
+//                                                                env->grid->get_location(6, 14),
+//                                                                env->grid->get_location(7, 15)});
+    policy->evaluate(1,
+                     MAX_STEPS,
+                     EPISODE_EXEC_TIMEOUT_MS,
+                     false,
+                     true);
+
+    return 0;
+
+}
+
+int main(int argc, char **argv) {
+    return sanity_benchmark();
+
+//    return restore_online_window_rtdp_crash();
 }

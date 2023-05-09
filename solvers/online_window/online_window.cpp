@@ -892,6 +892,10 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
 
     for (Window *w: *this->curr_windows) {
         window_action = w->act(state, timeout_ms - ELAPSED_TIME_MS);
+        if (!window_action) {
+            /* timeout, propagate the null action all the way to evaluate() */
+            return nullptr;
+        }
         this->max_steps_in_window_episode = max(this->max_steps_in_window_episode, w->steps_count);
         for (size_t i = 0; i < w->group.size(); ++i) {
             selected_actions[w->group[i]] = window_action->actions[i];
