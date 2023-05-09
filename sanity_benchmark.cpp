@@ -107,7 +107,7 @@ vector<vector<SolverCreator *>> solver_creators(
 //                        new online_window("online_window_dijkstra_2_vi", 2, new dijkstra_baseline(""),
 //                                          window_planner_vi),
                         new online_window("online_window_vi_2_rtdp", 2, new vi("vi"), window_planner_rtdp),
-                        new online_window("online_window_vi_2_rtdp_only_bonus", 2, new vi("vi"), window_planner_rtdp_only_bonus),
+//                        new online_window("online_window_vi_2_rtdp_only_bonus", 2, new vi("vi"), window_planner_rtdp_only_bonus),
                 }
         }
 );
