@@ -233,21 +233,21 @@ int sanity_benchmark() {
 int restore_online_window_rtdp_crash() {
     SolverCreator *online_window_rtdp = new online_window("online_window_vi_2_rtdp", 2, new vi("vi"),
                                                           window_planner_rtdp);
-    EnvCreator *maze_creator = new GeneralEnv("", "maze-32-32-4", 25, 6);
+    EnvCreator *maze_creator = new GeneralEnv("", "maze-32-32-4", 12, 4);
 
     MapfEnv *env = (*maze_creator)();
+
+    env->start_state = env->locations_to_state({
+                                                       env->grid->get_location(6, 5),
+                                                       env->grid->get_location(17, 18),
+                                                       env->grid->get_location(19, 16),
+                                                       env->grid->get_location(17, 19),
+                                               });
+
     Policy *policy = (*online_window_rtdp)(env, 1.0);
 
-
     policy->train(EPISODE_TRAIN_TIMEOUT_MS);
-//
-//    /* Reach to the point of failure */
-//    policy->env->start_state = policy->env->locations_to_state({env->grid->get_location(1, 3),
-//                                                                env->grid->get_location(26, 6),
-//                                                                env->grid->get_location(4, 14),
-//                                                                env->grid->get_location(20, 4),
-//                                                                env->grid->get_location(6, 14),
-//                                                                env->grid->get_location(7, 15)});
+
     policy->evaluate(1,
                      MAX_STEPS,
                      EPISODE_EXEC_TIMEOUT_MS,

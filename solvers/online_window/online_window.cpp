@@ -156,6 +156,9 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
     }
     SolutionSumHeuristic *h = new SolutionSumHeuristic(policies, agents_groups);
     h->init(env, timeout_ms - ELAPSED_TIME_MS);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return nullptr;
+    }
 
     /* Set the values of the girth (=single agent on girth, the rest on the area).
      * Add a bonus values if the location of the agent on the girth was intended by its original, self policy. */
@@ -422,7 +425,8 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
     /* Find goals for each agent in the local env */
     vector<Location> local_goals;
-    for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
+    for (size_t agent_idx = 0; agent_idx < local_group_env->n_agents; ++agent_idx) {
+        size_t agent = w->group[agent_idx];
         Location local_goal = get_girth_goal_state_for_agent(env, w, s, single_policies, agent,
                                                              timeout_ms - ELAPSED_TIME_MS);
         local_goals.push_back(local_goal);
@@ -440,8 +444,8 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
      * local env agents (original) goal_definition state is inside the current window area */
     RtdpPolicy *window_policy = nullptr;
     bool all_goals_in_window = true;
-    for (size_t agent = 0; agent < local_group_env->n_agents; ++agent) {
-        all_goals_in_window = all_goals_in_window && w->area.contains(local_goals[agent]);
+    for (size_t agent_idx = 0; agent_idx < local_group_env->n_agents; ++agent_idx) {
+        all_goals_in_window = all_goals_in_window && w->area.contains(local_goals[agent_idx]);
     }
 
     if (all_goals_in_window) {
@@ -619,11 +623,35 @@ void OnlineWindowPolicy::clear_windows() {
     this->archived_windows = new vector<Window *>();
 }
 
+bool should_merge(Window *w1, Window *w2, const MultiAgentState &state, int d) {
+    if (distance(w1, w2, state) <= d) {
+        return true;
+    }
+
+    /* Check also for agents contained in the other window, might happen after expansions (after livelock or deadlock). */
+    for (size_t agent: w1->group) {
+        if (w2->area.contains(state.locations[agent])) {
+            return true;
+        }
+    }
+    for (size_t agent: w2->group) {
+        if (w1->area.contains(state.locations[agent])) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 bool OnlineWindowPolicy::merge_current_windows(const MultiAgentState &state) {
     for (Window *w1: *this->curr_windows) {
         for (Window *w2: *this->curr_windows) {
+            // TODO: FIX THIS BUG. This condition is required but not enough, An agent from window
+            // w1 might be in the area of w2, even tough its distance from all of the agents in w2
+            // is more than d. This is because of expansions. w2 might got expanded multiple times
+            // because being in a deadlock/livelock.
             if (w1 != w2) {
-                if (distance(w1, w2, state) <= this->d) {
+                if (should_merge(w1, w2, state, this->d)) {
                     Window *new_window = this->merge_windows(w1, w2, state);
                     if (nullptr != w1->policy) {
                         this->archived_windows->push_back(w1);
@@ -754,10 +782,13 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
     while (merge_possible) {
         merge_possible = this->merge_current_windows(state);
 
-        /* Expand windows which might be in live or dead lock */
+        /* Expand windows which might be in live or deadlock */
         for (Window *w: *this->curr_windows) {
             if (this->might_live_lock(w) || this->in_deadlock(w, state, timeout_ms - ELAPSED_TIME_MS)) {
 //                cout << "expanding " << *w;
+                if (ELAPSED_TIME_MS >= timeout_ms) {
+                    return;
+                }
                 this->expand_window(w, state, timeout_ms - ELAPSED_TIME_MS);
                 this->max_times_window_expanded_episode = max(w->expanded_count,
                                                               this->max_times_window_expanded_episode);
@@ -838,10 +869,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
 
 void OnlineWindowPolicy::plan_window(Window *w, const MultiAgentState &s, double timeout_ms) {
     if (DEBUG_PRINT) {
-        cout << "planning window with " << w->group.size() << " agents on area: ";
-        cout << "(" << w->area.top_row << "," << w->area.bottom_row << "," << w->area.left_col << ","
-             << w->area.right_col
-             << ").";
+        cout << "planning window " << *w << ". ";
         cout << " Agents are in state: " << s;
         cout << endl;
     }
@@ -960,6 +988,9 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
     vector<Action> selected_actions(this->env->n_agents);
 
     this->update_current_windows(state, timeout_ms - ELAPSED_TIME_MS);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return nullptr;
+    }
 
 
     for (Window *w: *this->curr_windows) {
@@ -985,8 +1016,14 @@ bool OnlineWindowPolicy::in_deadlock(Window *w, const MultiAgentState &state, do
         return false;
     }
 
+    MultiAgentAction *a = w->act(*this->env->s, timeout_ms - ELAPSED_TIME_MS);
+
+    if (!a) {
+        return false;
+    }
+
     /* No chance for a deadlock if the action is not all stay */
-    if (w->act(*this->env->s, timeout_ms - ELAPSED_TIME_MS)->id != 0) {
+    if (a->id != 0) {
         return false;
     }
 
