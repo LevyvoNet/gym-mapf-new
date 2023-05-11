@@ -628,17 +628,17 @@ bool should_merge(Window *w1, Window *w2, const MultiAgentState &state, int d) {
         return true;
     }
 
-    /* Check also for agents contained in the other window, might happen after expansions (after livelock or deadlock). */
-    for (size_t agent: w1->group) {
-        if (w2->area.contains(state.locations[agent])) {
-            return true;
-        }
-    }
-    for (size_t agent: w2->group) {
-        if (w1->area.contains(state.locations[agent])) {
-            return true;
-        }
-    }
+//    /* Check also for agents contained in the other window, might happen after expansions (after livelock or deadlock). */
+//    for (size_t agent: w1->group) {
+//        if (w2->area.contains(state.locations[agent])) {
+//            return true;
+//        }
+//    }
+//    for (size_t agent: w2->group) {
+//        if (w1->area.contains(state.locations[agent])) {
+//            return true;
+//        }
+//    }
 
     return false;
 }
