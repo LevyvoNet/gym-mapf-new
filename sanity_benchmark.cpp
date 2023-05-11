@@ -41,19 +41,19 @@ vector<vector<EnvCreator *>> env_creators(
                 },
                 /* lvl 1 */
                 {
-                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
-                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
-                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
-                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
+//                        new RoomEnv("room-32-32-4_scen-12_2-agents", 32, 4, 12, 2),
+//                        new SanityEnv("independent_8X8_3-agents", 3, 8, 3),
+//                        new EmptyGrid("empty_16X16_2-agents", 16, 2, 0),
+//                        new EmptyGrid("empty_16X16_2-agents_large_goal", 16, 2, 100)
                 },
                 /* lvl 2 */
                 {
-                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
+//                        new RoomEnv("room-32-32-4_scen_1_2-agents", 32, 4, 1, 2),
                 },
                 /* lvl 3 */
                 {
-                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
-                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
+//                        new RoomEnv("room-64-64-16_scen_1_2-agents", 64, 16, 1, 2),
+//                        new RoomEnv("room-64-64-8-scen_1_2-agents", 64, 8, 1, 2),
                 },
                 /* lvl 4 */
                 {
@@ -62,7 +62,7 @@ vector<vector<EnvCreator *>> env_creators(
 //                        new BerlinEnv("paris_1_256_scen_2_4-agents", 2, 4),
 
                         /* Dragon Age */
-                        new GeneralEnv("", "ost003d", 4, 4),
+//                        new GeneralEnv("", "ost003d", 4, 4),
 
                         /* Open */
 //                        new GeneralEnv("empty-48-48_scen_1_4-agents", "empty-48-48", 1, 4),
