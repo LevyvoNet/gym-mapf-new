@@ -348,7 +348,7 @@ void window_planner_rtdp_only_bonus(MapfEnv *env, float gamma, Window *w, const 
     /* Create a local view of the agents in the window's group.
      * Allow the agents to only move in the window area. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
-    local_group_env->start_state = local_group_env->locations_to_state(s.locations);
+    local_group_env->start_state = w->cast_to_window_local_state(s);
 
 
     /* Find goals for each agent in the local env */
@@ -420,7 +420,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
     /* Create a local view of the agents in the window's group.
      * Allow the agents to only move in the window area. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
-    local_group_env->start_state = local_group_env->locations_to_state(s.locations);
+    local_group_env->start_state = w->cast_to_window_local_state(s);
 
 
     /* Find goals for each agent in the local env */
