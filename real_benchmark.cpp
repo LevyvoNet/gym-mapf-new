@@ -22,7 +22,7 @@
 
 /** Experiment Settings ********************************************************************************************/
 #define EPISODE_TRAIN_TIMEOUT_SEC (120)
-#define EPISODE_EXEC_TIMEOUT_SEC (300)
+#define EPISODE_EXEC_TIMEOUT_SEC (180)
 #define EPISODE_TRAIN_TIMEOUT_MS (EPISODE_TRAIN_TIMEOUT_SEC * 1000)
 #define EPISODE_EXEC_TIMEOUT_MS (EPISODE_EXEC_TIMEOUT_SEC * 1000)
 #define MAX_STEPS (4000)
