@@ -237,12 +237,12 @@ int restore_online_window_rtdp_crash() {
 
     MapfEnv *env = (*maze_creator)();
 
-    env->start_state = env->locations_to_state({
-                                                       env->grid->get_location(6, 5),
-                                                       env->grid->get_location(17, 18),
-                                                       env->grid->get_location(19, 16),
-                                                       env->grid->get_location(17, 19),
-                                               });
+//    env->start_state = env->locations_to_state({
+//                                                       env->grid->get_location(6, 5),
+//                                                       env->grid->get_location(17, 18),
+//                                                       env->grid->get_location(19, 16),
+//                                                       env->grid->get_location(17, 19),
+//                                               });
 
     Policy *policy = (*online_window_rtdp)(env, 1.0);
 

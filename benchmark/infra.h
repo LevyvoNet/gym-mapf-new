@@ -22,7 +22,7 @@
 #define BGU_CLUSTER_WORKER_LIMIT (20)
 #define POLL_SLEEP_TIME_nS (200000)
 
-#define DEBUG_PRINT (false)
+#define DEBUG_PRINT (true)
 /** Structs *********************************************************************************************************/
 
 struct worker_data {

@@ -65,7 +65,7 @@ public:
     int reached_count;
     int expanded_count;
 
-    Window(GridArea area, Policy *policy, AgentsGroup group);
+    Window(GridArea area, Policy *policy, AgentsGroup group, const MapfEnv* full_env);
 
     MultiAgentAction *act(const MultiAgentState &state, double timeout_ms);
 
@@ -75,6 +75,8 @@ public:
 
     friend std::ostream &operator<<(std::ostream &os, const Window &w);
 
+private:
+    const MapfEnv* full_env_;
 };
 
 typedef void (*window_planner)(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,

@@ -202,7 +202,7 @@ private:
     MultiAgentStateStorage<bool *> *is_terminal_cache;
 };
 
-MapfEnv *get_local_view(MapfEnv *, vector<size_t> agents);
+MapfEnv *get_local_view(const MapfEnv *, vector<size_t> agents);
 
 
 MultiAgentAction *actions_to_action(const vector<Action> &actions);

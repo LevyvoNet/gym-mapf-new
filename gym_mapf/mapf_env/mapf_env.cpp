@@ -555,7 +555,7 @@ ActionToIntStorage::~ActionToIntStorage() {
 }
 
 
-MapfEnv *get_local_view(MapfEnv *env, vector<size_t> agents) {
+MapfEnv *get_local_view(const MapfEnv *env, vector<size_t> agents) {
     vector<Location> start_locations;
     vector<Location> goal_locations;
 

@@ -4,11 +4,12 @@
 
 #include "online_window.h"
 
-#define DEBUG_PRINT (false)
+#define DEBUG_PRINT (true)
 
 /** Window ************************************************************************************************/
-Window::Window(GridArea area, Policy *policy, AgentsGroup group) :
-        area(area), policy(policy), group(group), steps_count(0), reached_count(0), expanded_count(0) {
+Window::Window(GridArea area, Policy *policy, AgentsGroup group, const MapfEnv *full_env) :
+        area(area), policy(policy), group(group), steps_count(0), reached_count(0), expanded_count(0),
+        full_env_(full_env) {
     this->max_steps = calc_max_steps();
 }
 
@@ -30,7 +31,8 @@ MultiAgentState *Window::cast_to_window_local_state(const MultiAgentState &s) {
     for (size_t agent: this->group) {
         casted_locations.push_back(s.locations[agent]);
     }
-    group_state = this->policy->env->locations_to_state(casted_locations);
+    MapfEnv *local_group_env = get_local_view(this->full_env_, this->group);
+    group_state = local_group_env->locations_to_state(casted_locations);
 
     return group_state;
 }
@@ -567,7 +569,7 @@ Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAge
     }
 
     sort(new_group.begin(), new_group.end());
-    return new Window(new_area_padded, nullptr, new_group);
+    return new Window(new_area_padded, nullptr, new_group, this->env);
 }
 
 
@@ -598,7 +600,7 @@ vector<Window *> OnlineWindowPolicy::destruct_window(Window *w, const MultiAgent
     /* Push the remaining agents in old window */
     if (!remain_agents.empty()) {
         sort(remain_agents.begin(), remain_agents.end());
-        new_windows.push_back(new Window(w->area, nullptr, remain_agents));
+        new_windows.push_back(new Window(w->area, nullptr, remain_agents, this->env));
     }
 
     return new_windows;
@@ -628,17 +630,17 @@ bool should_merge(Window *w1, Window *w2, const MultiAgentState &state, int d) {
         return true;
     }
 
-    /* Check also for agents contained in the other window, might happen after expansions (after livelock or deadlock). */
-    for (size_t agent: w1->group) {
-        if (w2->area.contains(state.locations[agent])) {
-            return true;
-        }
-    }
-    for (size_t agent: w2->group) {
-        if (w1->area.contains(state.locations[agent])) {
-            return true;
-        }
-    }
+//    /* Check also for agents contained in the other window, might happen after expansions (after livelock or deadlock). */
+//    for (size_t agent: w1->group) {
+//        if (w2->area.contains(state.locations[agent])) {
+//            return true;
+//        }
+//    }
+//    for (size_t agent: w2->group) {
+//        if (w1->area.contains(state.locations[agent])) {
+//            return true;
+//        }
+//    }
 
     return false;
 }
@@ -932,8 +934,8 @@ void OnlineWindowPolicy::train(double timeout_ms) {
     /* Initialize the current windows where each agent is in its own window which spans an all of the grid */
     GridArea all_grid = GridArea(0, this->env->grid->max_row, 0, this->env->grid->max_col);
     for (AgentsGroup group: groups) {
-        this->curr_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
-        this->singles_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group));
+        this->curr_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group, this->env));
+        this->singles_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group, this->env));
     }
 
 
@@ -978,7 +980,7 @@ void OnlineWindowPolicy::reset() {
     this->clear_windows();
 
     for (Window *w: *this->singles_windows) {
-        this->curr_windows->push_back(new Window(w->area, w->policy, w->group));
+        this->curr_windows->push_back(new Window(w->area, w->policy, w->group, this->env));
     }
 }
 
