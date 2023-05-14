@@ -39,7 +39,7 @@ vector<string> MAPS{
 //        "berlin_1_256",
 
         /* Dragon Age */
-//        "ost003d"
+//        "ost003d",
 
         /* Open */
 //        "empty-8-8",
