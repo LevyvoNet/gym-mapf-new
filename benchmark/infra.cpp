@@ -58,8 +58,13 @@ struct problem_instance_result solve(struct problem_instance problem,
     strncpy(res.solver_name, policy->name.c_str(), MAX_SOLVER_NAME);
 
     /* Train */
+    MEASURE_TIME;
     try {
         policy->train(train_timeout_ms);
+        if (ELAPSED_TIME_MS >= train_timeout_ms) {
+            res.status = PROBLEM_FAIL_TIMEOUT_TRAIN;
+            return res;
+        }
         train_info = policy->get_train_info();
     } catch (std::bad_alloc const &) {
         res.status = PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN;
@@ -67,10 +72,9 @@ struct problem_instance_result solve(struct problem_instance problem,
     }
 
     /* Evaluate */
-    MEASURE_TIME;
     eval_info = policy->evaluate(episode_count,
                                  max_steps,
-                                 exec_timeout_ms - ELAPSED_TIME_MS,
+                                 exec_timeout_ms,
                                  forked,
                                  DEBUG_PRINT);
 
@@ -256,6 +260,9 @@ string end_reason(struct problem_instance_result problem_result, struct episode_
     if (PROBLEM_RESULT_STATUS_FAILED(problem_result.status)) {
         if (problem_result.status == PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN) {
             return "train_out_of_memory";
+        }
+        if (problem_result.status == PROBLEM_FAIL_TIMEOUT_TRAIN) {
+            return "train_timeout";
         }
         return "unknown_failure";
     }

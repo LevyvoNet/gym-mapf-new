@@ -47,7 +47,8 @@ struct problem_instance {
 enum problem_status_code {
     PROBLEM_SUCCESS = 0,
     PROBLEM_FAIL_OUT_OF_MEMORY_TRAIN = 1,
-    PROBLEM_FAIL_UNKNOWN = 2,
+    PROBLEM_FAIL_TIMEOUT_TRAIN = 2,
+    PROBLEM_FAIL_UNKNOWN = 3,
 };
 
 #define PROBLEM_RESULT_STATUS_FAILED(status) (status != PROBLEM_SUCCESS)
