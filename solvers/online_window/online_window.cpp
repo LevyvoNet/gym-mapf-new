@@ -931,7 +931,7 @@ void OnlineWindowPolicy::train(double timeout_ms) {
 
 
 
-    /* Initialize the current windows where each agent is in its own window which spans an all of the grid */
+    /* Initialize the current windows where each agent is in its own window which spans on all of the grid */
     GridArea all_grid = GridArea(0, this->env->grid->max_row, 0, this->env->grid->max_col);
     for (AgentsGroup group: groups) {
         this->curr_windows->push_back(new Window(all_grid, singles_policy->policies[group[0]], group, this->env));
