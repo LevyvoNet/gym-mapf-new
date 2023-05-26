@@ -939,8 +939,7 @@ void OnlineWindowPolicy::train(double timeout_ms) {
     }
 
 
-    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
-    this->train_info->time = round(elapsed_time_seconds * 100) / 100;
+    this->train_info->time = ELAPSED_TIME_MS;
 }
 
 OnlineWindowPolicy::~OnlineWindowPolicy() {

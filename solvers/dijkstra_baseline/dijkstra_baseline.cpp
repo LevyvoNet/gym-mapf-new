@@ -20,7 +20,7 @@ void DijkstraBaselinePolicy::train(double timeout_ms) {
 
     this->h->init(this->env, timeout_ms);
 
-    this->train_info->time = round((ELAPSED_TIME_MS / 1000) * 100) / 100;
+    this->train_info->time = ELAPSED_TIME_MS;
 }
 
 double DijkstraBaselinePolicy::get_value(MultiAgentState *s) {

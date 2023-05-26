@@ -134,8 +134,7 @@ void IdPolicy::train(double timeout_ms) {
     } while (groups.size() != 1 && nullptr != conflict);
 
     /* Update train time measurement */
-    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
-    this->train_info->time = round(elapsed_time_seconds * 100) / 100;
+    this->train_info->time = ELAPSED_TIME_MS;
 
     /* Set additional training info */
     (*(this->train_info->additional_data))["n_conflicts"] = std::to_string(conflicts_count);

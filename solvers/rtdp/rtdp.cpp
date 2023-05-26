@@ -160,10 +160,8 @@ void RtdpPolicy::train(double timeout_ms) {
     }
 
     /* Set the train info */
-    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
-    total_eval_time = float(total_eval_time) / 1000;
-    this->train_info->time = round(elapsed_time_seconds * 100) / 100;
-    (*(this->train_info->additional_data))["eval_time"] = std::to_string((int) round(total_eval_time * 100) / 100);
+    this->train_info->time = ELAPSED_TIME_MS;
+    (*(this->train_info->additional_data))["eval_time"] = std::to_string((int) total_eval_time);
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(iters_count + 1);
 
     /* Finish training */

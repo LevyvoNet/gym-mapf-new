@@ -84,8 +84,7 @@ void ValueIterationPolicy::train(double timeout_milliseconds) {
 
     /* Update the training time in train_info */
     (*(this->train_info->additional_data))["n_iterations"] = std::to_string(i + 1);
-    float elapsed_time_seconds = float(ELAPSED_TIME_MS) / 1000;
-    this->train_info->time = round(elapsed_time_seconds * 100) / 100;
+    this->train_info->time = ELAPSED_TIME_MS;
 
     /* NOTE: there are two pointers which are leaking at the end (s_ptr and state_end_ptr) */
 }
