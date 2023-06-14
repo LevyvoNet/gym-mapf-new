@@ -83,7 +83,7 @@ vector<vector<EnvCreator *>> env_creators(
 vector<vector<SolverCreator *>> solver_creators(
         {   /* lvl 0 */
                 {
-//                        new vi("vi"),
+                        new vi("vi"),
 
                 },
 
@@ -136,95 +136,23 @@ list<problem_instance> *generate_problems() {
 }
 
 
-class SanityBenchmarksResultDatabase : public ResultDatabase {
-public:
-    vector<struct problem_instance_result> results;
-
-    SanityBenchmarksResultDatabase(int problems_count) {
-        this->results = vector<struct problem_instance_result>(problems_count);
-    }
-
-    virtual void insert(struct problem_instance_result result) {
-        this->results[result.id] = result;
-    }
-};
-
 int sanity_benchmark() {
     list<problem_instance> *problems = nullptr;
     bool sanity_test_failed = false;
     std::string last_name = "";
-    int last_scen_id = -1;
-    int last_n_agents = -1;
 
     /* Generate the problems to solve */
     problems = generate_problems();
 
-    /* Create the sanity benchmark db */
-    SanityBenchmarksResultDatabase db(problems->size());
-
     solve_problems(problems,
                    WORKERS_LIMIT,
-                   &db,
                    EPISODE_TRAIN_TIMEOUT_MS,
                    EPISODE_EXEC_TIMEOUT_MS,
                    EPISODE_COUNT,
                    MAX_STEPS,
                    "sanity_temp",
-                   false);
+                   true);
 
-    /* Print every result */
-    for (problem_instance_result result: db.results) {
-        if (PROBLEM_STATUS_FAILED(result) || result.timeout_rate > 0) {
-            sanity_test_failed = true;
-        }
-        if (std::string(result.map_name) != last_name || result.scen_id != last_scen_id ||
-            result.n_agents != last_n_agents) {
-            cout << endl << std::string(result.map_name) << " scen:" << result.scen_id << " n_agents:"
-                 << result.n_agents << endl;
-            last_name = std::string(result.map_name);
-            last_scen_id = result.scen_id;
-            last_n_agents = result.n_agents;
-        }
-
-        std::cout << "ADR:" << result.adr;
-        std::cout << " rate:" << result.rate << "%";
-        std::cout << " total_time:" << result.total_time;
-        std::cout << " exec_time:" << result.exec_time;
-        std::cout << " train_time:" << result.train_time;
-        std::cout << " timeout_rate:" << result.timeout_rate << "%";
-        std::cout << " stuck_rate:" << result.stuck_rate << "%";
-        std::cout << " collision_rate:" << result.collision_rate << "%";
-//        std::cout << " ADR_STDERR:" << result.adr_stderr;
-//        std::cout << " exec_time_STDERR:" << result.exec_time_stderr;
-        std::cout << " solver:" << std::string(result.solver_name);
-
-        if (strcmp(result.init_time, "-")) {
-            std::cout << " init_time: " << result.init_time;
-        }
-        if (strcmp(result.eval_time, "-")) {
-            std::cout << " eval_time: " << result.eval_time;
-        }
-        if (strcmp(result.replans_max_size, "-")) {
-            std::cout << " replans_max_size: " << result.replans_max_size;
-        }
-        if (strcmp(result.replans_mean, "-")) {
-            std::cout << " replans_mean: " << result.replans_mean;
-        }
-        if (strcmp(result.n_conflicts, "-")) {
-            std::cout << " n_conflicts: " << result.n_conflicts;
-        }
-        if (strcmp(result.conflicts_time, "-")) {
-            std::cout << " conflicts_time: " << result.conflicts_time;
-        }
-        if (strcmp(result.n_iterations, "-")) {
-            std::cout << " n_iterations: " << result.n_iterations;
-        }
-        cout << endl;
-    }
-
-    if (sanity_test_failed) {
-        return 1;
-    }
     return 0;
 }
 

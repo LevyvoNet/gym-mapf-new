@@ -16,8 +16,6 @@ EmptyGrid::EmptyGrid(string name, size_t grid_size, size_t n_agents, int goal_re
 }
 
 MapfEnv *EmptyGrid::operator()() {
-
-
     return create_mapf_env(this->map_name, 3, this->n_agents, FAIL_PROB, -1000, this->goal_reward, -1);
 }
 

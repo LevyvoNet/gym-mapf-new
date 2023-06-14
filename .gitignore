@@ -25,5 +25,4 @@ solvers/tests/solvers_ut
 CMakeCache.txt
 sanity_benchmark
 real_benchmark
-results/*
 sanity_temp.log.csv

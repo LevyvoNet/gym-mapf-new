@@ -65,17 +65,8 @@ struct problem_instance_result {
     char solver_name[MAX_SOLVER_NAME];
 
     /* Aggregated data */
-    double adr;
-    int rate;
-    double total_time;
-    double exec_time;
     double train_time;
-    float timeout_rate;
-    float oom_rate;
-    float stuck_rate;
-    float collision_rate;
-    float adr_stderr;
-    float exec_time_stderr;
+
 
 
     /* Raw episode data */
@@ -93,11 +84,6 @@ struct problem_instance_result {
 
 };
 
-class ResultDatabase {
-public:
-
-    virtual void insert(struct problem_instance_result) = 0;
-};
 
 
 //class CsvResultDatabase: public ResultDatabase{
@@ -113,7 +99,6 @@ solve(struct problem_instance problem, double timeout_ms, int episode_count, int
 
 void solve_problems(list<struct problem_instance> *problems,
                     size_t workers_limit,
-                    ResultDatabase *db,
                     double train_timeout_ms,
                     double episode_exec_timeout_ms,
                     int eval_episodes_count,

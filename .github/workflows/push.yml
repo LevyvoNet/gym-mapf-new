@@ -32,4 +32,9 @@ jobs:
         with:
           build-dir: ${{ runner.workspace }}/build
           build-type: Release
-      - run: ${{ runner.workspace }}/build/sanity_benchmark
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.9 # Install the python version needed
+      - run: python -m pip install --upgrade pip pandas==1.4.2
+      - run: python -m pip install --upgrade pip tabulate==0.8.9
+      - run: python results/sanity_benchmark.py ${{ runner.workspace }}/build/sanity_benchmark

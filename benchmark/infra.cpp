@@ -78,19 +78,8 @@ struct problem_instance_result solve(struct problem_instance problem,
                                  forked,
                                  DEBUG_PRINT);
 
-    /* Set res fields */
-
-    res.adr = eval_info->mdr;
-    res.rate = eval_info->success_rate;
-    res.total_time = eval_info->mean_episode_time + train_info->time;
-    res.exec_time = eval_info->mean_episode_time;
+    /* Set general aggregated res fields */
     res.train_time = train_info->time;
-    res.timeout_rate = eval_info->timeout_rate;
-    res.stuck_rate = eval_info->stuck_rate;
-    res.oom_rate = eval_info->oom_rate;
-    res.collision_rate = eval_info->collision_rate;
-    res.adr_stderr = eval_info->mdr_stderr;
-    res.exec_time_stderr = eval_info->mean_episode_time_stderr;
 
     /* Set solvers train additional data */
     field_value = "-";
@@ -264,7 +253,7 @@ string end_reason(struct problem_instance_result problem_result, struct episode_
         if (problem_result.status == PROBLEM_FAIL_TIMEOUT_TRAIN) {
             return "train_timeout";
         }
-        return "unknown_failure";
+        return "unknown_failure_across_episodes";
     }
 
     switch (info.end_reason) {
@@ -328,7 +317,7 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
 }
 
 
-void solve_problems(list<struct problem_instance> *problems, size_t workers_limit, ResultDatabase *db,
+void solve_problems(list<struct problem_instance> *problems, size_t workers_limit,
                     double train_timeout_ms, double episode_exec_timeout_ms, int eval_episodes_count, int max_steps,
                     string log_file, bool forked_eval) {
     list<struct worker_data> workers;
@@ -361,7 +350,6 @@ void solve_problems(list<struct problem_instance> *problems, size_t workers_limi
                 /* The worker is not active anymore, get its result and erase it */
                 worker_to_delete = worker_iter;
                 struct problem_instance_result problem_result = read_result(*worker_iter);
-                db->insert(problem_result);
                 log_if_needed(log_file, problem_result);
                 ++finished_count;
                 cout << "finished " << finished_count << "/" << problems_count << endl;
