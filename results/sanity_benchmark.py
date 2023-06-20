@@ -21,7 +21,6 @@ def run_sanity_benchmark(sanity_benchmark_path: str):
         "map_name",
         "n_agents",
         "solver_name",
-        "scen_id",
         "ADR",
         "rate",
         "offline_time",
