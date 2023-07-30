@@ -257,6 +257,8 @@ string end_reason(struct problem_instance_result problem_result, struct episode_
     }
 
     switch (info.end_reason) {
+        case EPISODE_INVALID:
+            return "invalid";
         case EPISODE_SUCCESS:
             return "success";
         case EPISODE_COLLISION:

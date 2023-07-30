@@ -16,13 +16,13 @@ def run_sanity_benchmark(sanity_benchmark_path: str):
     popen.wait()
 
     episodes = pd.read_csv(os.path.join(os.getcwd(), SANITY_BENCHMARK_OUTPUT_FILE_NAME), index_col=False)
-    episodes_agg = analysis.aggregate_results(episodes)
+    episodes_agg = analysis.aggregate(episodes)
     episodes_agg = episodes_agg[[
         "map_name",
         "n_agents",
         "solver_name",
-        "ADR",
-        "rate",
+        "adr",
+        "success_rate",
         "offline_time",
         "online_time",
         "max_memory",

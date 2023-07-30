@@ -28,12 +28,13 @@ using clk = std::chrono::steady_clock;
 //#define EPISODES_TIMEOUT_LIMIT (3)
 
 enum episode_status_code {
-    EPISODE_SUCCESS = 0,
-    EPISODE_TIMEOUT = 1,
-    EPISODE_STUCK = 2,
-    EPISODE_COLLISION = 3,
-    EPISODE_OUT_OF_MEMORY = 4,
-    EPISODE_UNKNOWN_FAILURE = 5,
+    EPISODE_INVALID = 0,
+    EPISODE_SUCCESS = 1,
+    EPISODE_TIMEOUT = 2,
+    EPISODE_STUCK = 3,
+    EPISODE_COLLISION = 4,
+    EPISODE_OUT_OF_MEMORY = 5,
+    EPISODE_UNKNOWN_FAILURE = 6,
 };
 
 struct episode_info {
@@ -108,7 +109,8 @@ public:
 
     TrainInfo *get_train_info();
 
-    EvaluationInfo *evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked, bool debug_print=false);
+    EvaluationInfo *
+    evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms, bool forked, bool debug_print = false);
 
     virtual MultiAgentAction *act(const MultiAgentState &state, double timeout_ms) = 0;
 
