@@ -65,7 +65,7 @@ def clean_data(episodes_df: pd.DataFrame):
                 [
                     row["train_time"] < 0,
                     row["exec_time"] < 0,
-                    row["reward"] > 0,
+                    row["steps"] > 10000,
                     row["replans_max_size"] > row["n_agents"],
                     row["end_reason"] == "unknown_accross_episodes_rate",
                     row["end_reason"] == "unknown",
@@ -100,12 +100,12 @@ def aggregate(episodes_df: pd.DataFrame):
         res["train_oom_rate"] = len(instance_df[instance_df["end_reason"] == "train_out_of_memory"]) / len(instance_df)
         res["train_timeout_rate"] = len(instance_df[instance_df["end_reason"] == "train_timeout"]) / len(instance_df)
         res["max_memory"] = np.max(instance_df["memory"])
-        res["replans_count_mean"] = np.mean(instance_df["replans_count"])
+        res["replans_count_mean"] = round(np.mean(instance_df["replans_count"]), 1)
         res["replans_max_agents"] = np.max(instance_df["replans_max_size"])
         res["max_steps_window"] = np.max(instance_df["max_steps_window"])
         res["max_reached_window"] = np.max(instance_df["max_reached_window"])
         res["max_expanded_window"] = np.max(instance_df["max_expanded_window"])
-        res["n_livelock"] = np.mean(instance_df["n_livelock"])
+        res["n_livelock"] = round(np.mean(instance_df["n_livelock"]), 1)
         res["error_rate"] = len(instance_df[instance_df["end_reason"].str.startswith("cleaned")]) / len(instance_df)
 
         # Rate Formatting
