@@ -133,4 +133,7 @@ PROBLEM_FAIL_STATUSES = [
 
 
 def any_failed(episodes):
-    return not episodes[episodes["end_reason"].isin(PROBLEM_FAIL_STATUSES)].empty
+    return all([
+        episodes[episodes["end_reason"].isin(PROBLEM_FAIL_STATUSES)].empty,
+        episodes[episodes["end_reason"].str.startswith("cleaned")].empty
+    ])

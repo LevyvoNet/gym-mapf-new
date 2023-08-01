@@ -420,7 +420,7 @@ void window_planner_rtdp(MapfEnv *env, float gamma, Window *w, const MultiAgentS
 
 
     /* Create a local view of the agents in the window's group.
-     * Allow the agents to only move in the window area. */
+     * Set its start state to the current one. */
     MapfEnv *local_group_env = get_local_view(env, w->group);
     local_group_env->start_state = w->cast_to_window_local_state(s);
 
