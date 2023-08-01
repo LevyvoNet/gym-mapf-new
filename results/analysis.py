@@ -123,17 +123,3 @@ def aggregate(episodes_df: pd.DataFrame):
         all_res.append(ProblemResult(**res))
 
     return pd.DataFrame(data=all_res)
-
-
-PROBLEM_FAIL_STATUSES = [
-    "train_out_of_memory",
-    "train_timeout",
-    "unknown_failure_across_episodes"
-]
-
-
-def any_failed(episodes):
-    return all([
-        episodes[episodes["end_reason"].isin(PROBLEM_FAIL_STATUSES)].empty,
-        episodes[episodes["end_reason"].str.startswith("cleaned")].empty
-    ])

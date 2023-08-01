@@ -8,6 +8,11 @@ import analysis
 # SANITY_BENCHMARK_BINARY_PATH = f"{os.path.dirname(__file__)}/../sanity_benchmark"
 # EPISODES_PATH = f"{os.path.dirname(__file__)}/../sanity_temp.log.csv"
 SANITY_BENCHMARK_OUTPUT_FILE_NAME = "sanity_temp.log.csv"
+PROBLEM_FAIL_STATUSES = [
+    "train_out_of_memory",
+    "train_timeout",
+    "unknown_failure_across_episodes"
+]
 
 
 def run_sanity_benchmark(sanity_benchmark_path: str):
@@ -32,7 +37,12 @@ def run_sanity_benchmark(sanity_benchmark_path: str):
 
     print(episodes_agg.to_markdown())
 
-    if analysis.any_failed(episodes):
+    if not all([
+        episodes[episodes["end_reason"].isin(PROBLEM_FAIL_STATUSES)].empty,
+        episodes[episodes["end_reason"].str.startswith("cleaned")].empty
+    ]):
+        print(episodes[episodes["end_reason"].isin(PROBLEM_FAIL_STATUSES)].to_markdown())
+        print(episodes[episodes["end_reason"].str.startswith("cleaned")].to_markdown())
         return 1
 
     return 0
