@@ -56,7 +56,7 @@ class ProblemResult:
     max_reached_window: int
     max_expanded_window: int
     n_livelock: int
-    # scen_succeed: int
+    scen_succeed_count: int
 
 
 def clean_data(episodes_df: pd.DataFrame):
@@ -107,6 +107,10 @@ def aggregate(episodes_df: pd.DataFrame):
         res["max_expanded_window"] = np.max(instance_df["max_expanded_window"])
         res["n_livelock"] = round(np.mean(instance_df["n_livelock"]), 1)
         res["error_rate"] = len(instance_df[instance_df["end_reason"].str.startswith("cleaned")]) / len(instance_df)
+
+        scen_succeed_df = instance_df.groupby("scen_id").agg(
+            succeed=pd.NamedAgg(column="end_reason", aggfunc=lambda reasons: np.isin("success", reasons)))
+        res["scen_succeed_count"] = len(scen_succeed_df[scen_succeed_df["succeed"] == True])
 
         # Rate Formatting
         rate_cols = [key for key in res.keys() if "rate" in key]
