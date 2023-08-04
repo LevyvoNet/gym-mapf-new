@@ -851,7 +851,7 @@ void OnlineWindowPolicy::update_current_windows(const MultiAgentState &state, do
                 reached_window = false;
             }
         }
-        if (reached_window) {
+        if (reached_window && w->group.size() > 1) {
             w->reached_count++;
             this->max_times_window_reached_episode = max(this->max_times_window_reached_episode, w->reached_count);
         }
@@ -1000,7 +1000,9 @@ MultiAgentAction *OnlineWindowPolicy::act(const MultiAgentState &state, double t
             /* timeout, propagate the null action all the way to evaluate() */
             return nullptr;
         }
-        this->max_steps_in_window_episode = max(this->max_steps_in_window_episode, w->steps_count);
+        if (w->group.size() > 1) {
+            this->max_steps_in_window_episode = max(this->max_steps_in_window_episode, w->steps_count);
+        }
         for (size_t i = 0; i < w->group.size(); ++i) {
             selected_actions[w->group[i]] = window_action->actions[i];
         }

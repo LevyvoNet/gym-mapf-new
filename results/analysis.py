@@ -50,6 +50,7 @@ class ProblemResult:
     train_timeout_rate: str
     error_rate: str
     max_memory: str
+    mean_memory: str
     replans_count_mean: float
     replans_max_agents: int
     max_steps_window: int
@@ -86,6 +87,7 @@ def aggregate(episodes_df: pd.DataFrame):
     for group in grouped_df.groups:
         instance_df = grouped_df.get_group(group)
         success_df = instance_df[instance_df["end_reason"] == "success"]
+        valid_df = instance_df[~instance_df["end_reason"].str.startswith("cleaned")]
 
         res = {}
         res["map_name"], res["n_agents"], res["solver_name"] = group
@@ -99,14 +101,15 @@ def aggregate(episodes_df: pd.DataFrame):
         res["exec_oom_rate"] = len(instance_df[instance_df["end_reason"] == "exec_out_of_memory"]) / len(instance_df)
         res["train_oom_rate"] = len(instance_df[instance_df["end_reason"] == "train_out_of_memory"]) / len(instance_df)
         res["train_timeout_rate"] = len(instance_df[instance_df["end_reason"] == "train_timeout"]) / len(instance_df)
-        res["max_memory"] = np.max(instance_df["memory"])
-        res["replans_count_mean"] = round(np.mean(instance_df["replans_count"]), 1)
-        res["replans_max_agents"] = np.max(instance_df["replans_max_size"])
-        res["max_steps_window"] = np.max(instance_df["max_steps_window"])
-        res["max_reached_window"] = np.max(instance_df["max_reached_window"])
-        res["max_expanded_window"] = np.max(instance_df["max_expanded_window"])
-        res["n_livelock"] = round(np.mean(instance_df["n_livelock"]), 1)
         res["error_rate"] = len(instance_df[instance_df["end_reason"].str.startswith("cleaned")]) / len(instance_df)
+        res["max_memory"] = np.max(valid_df["memory"])
+        res["mean_memory"] = np.mean(valid_df["memory"])
+        res["replans_count_mean"] = round(np.mean(valid_df["replans_count"]), 1)
+        res["replans_max_agents"] = np.max(valid_df["replans_max_size"])
+        res["max_steps_window"] = np.max(valid_df["max_steps_window"])
+        res["max_reached_window"] = np.max(valid_df["max_reached_window"])
+        res["max_expanded_window"] = np.max(valid_df["max_expanded_window"])
+        res["n_livelock"] = round(np.mean(valid_df["n_livelock"]), 1)
 
         scen_succeed_df = instance_df.groupby("scen_id").agg(
             succeed=pd.NamedAgg(column="end_reason", aggfunc=lambda reasons: np.isin("success", reasons)))
@@ -123,6 +126,7 @@ def aggregate(episodes_df: pd.DataFrame):
 
         # Memory Formatting
         res["max_memory"] = pretty_memory(res["max_memory"])
+        res["mean_memory"] = pretty_memory(res["mean_memory"])
 
         all_res.append(ProblemResult(**res))
 
