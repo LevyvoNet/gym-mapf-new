@@ -70,6 +70,7 @@ def clean_data(episodes_df: pd.DataFrame):
                     row["replans_max_size"] > row["n_agents"],
                     row["end_reason"] == "unknown_accross_episodes_rate",
                     row["end_reason"] == "unknown",
+                    row["memory"] < 0,
                 ]):
             row["end_reason"] = f"cleaned ({row['end_reason']})"
 
