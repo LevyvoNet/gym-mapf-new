@@ -71,6 +71,8 @@ def clean_data(episodes_df: pd.DataFrame):
                     row["end_reason"] == "unknown_accross_episodes_rate",
                     row["end_reason"] == "unknown",
                     row["memory"] < 0,
+                    row["end_reason"] == "success" and row["reward"] == 0,  # Had to do some steps for success.
+                    row["reward"] > 0,  # Reward is always 0 during experiments.
                 ]):
             row["end_reason"] = f"cleaned ({row['end_reason']})"
 
