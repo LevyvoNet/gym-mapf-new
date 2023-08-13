@@ -41,10 +41,10 @@ struct episode_info {
     /* Metadata */
     bool child_exited_normally;
     bool child_exited_by_signal;
-    int child_exit_status;
-    int read_syscall_result;
-    int signal;
-    int waitpid_result;
+    size_t child_exit_status;
+    ssize_t read_syscall_result;
+    size_t signal;
+    pid_t waitpid_result;
 
     /* General fields */
     episode_status_code end_reason;

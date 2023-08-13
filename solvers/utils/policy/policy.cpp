@@ -292,22 +292,9 @@ Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms,
 
                 /* Wait for child process to finish evaluating its episode. This call should be blocking until evaluation
                  * is finished. */
-                int waitpid_result = waitpid(pid, &wstatus, 0);
+                pid_t waitpid_result = waitpid(pid, &wstatus, 0);
 
-                /* Fill metadata values */
-                episode_info.waitpid_result = waitpid_result;
-                episode_info.child_exited_normally = WIFEXITED(wstatus);
-                episode_info.child_exited_by_signal = WIFSIGNALED(wstatus);
-                if (episode_info.child_exited_normally) {
-                    episode_info.child_exit_status = WEXITSTATUS(wstatus);
-                } else {
-                    episode_info.child_exit_status = -1;
-                }
-                if (episode_info.child_exited_by_signal) {
-                    episode_info.signal = WTERMSIG(wstatus);
-                }
-
-                if (waitpid_result == 0) {
+                if (waitpid_result > 0) {
                     do {
                         read_result = read(fds[0], &episode_info, sizeof(episode_info));
                         episode_info.read_syscall_result = read_result;
@@ -317,6 +304,20 @@ Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms,
                         }
                         read_bytes += read_result;
                     } while (read_bytes < sizeof(episode_info));
+                }
+
+                /* Fill metadata values */
+                episode_info.waitpid_result = waitpid_result;
+                episode_info.child_exited_normally = WIFEXITED(wstatus);
+                episode_info.child_exited_by_signal = WIFSIGNALED(wstatus);
+                if (episode_info.child_exited_normally) {
+                    cout << "exited normally" << " waitpid result: " << waitpid_result << endl;
+                    episode_info.child_exit_status = WEXITSTATUS(wstatus);
+                } else {
+                    episode_info.child_exit_status = -1;
+                }
+                if (episode_info.child_exited_by_signal) {
+                    episode_info.signal = WTERMSIG(wstatus);
                 }
             }
         }
