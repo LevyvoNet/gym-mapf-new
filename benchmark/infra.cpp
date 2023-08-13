@@ -63,6 +63,7 @@ struct problem_instance_result solve(struct problem_instance problem,
         policy->train(train_timeout_ms);
         if (ELAPSED_TIME_MS >= train_timeout_ms) {
             res.status = PROBLEM_FAIL_TIMEOUT_TRAIN;
+            res.train_time = ELAPSED_TIME_MS;
             return res;
         }
         train_info = policy->get_train_info();
