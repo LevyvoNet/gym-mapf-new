@@ -270,8 +270,10 @@ string end_reason(struct problem_instance_result problem_result, struct episode_
             return "stuck";
         case EPISODE_OUT_OF_MEMORY:
             return "exec_out_of_memory";
-        default:
+        case EPISODE_UNKNOWN_FAILURE:
             return "unknown";
+        default:
+            return "default";
 
     }
 }
