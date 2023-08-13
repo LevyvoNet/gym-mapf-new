@@ -217,6 +217,8 @@ void create_log_file(string log_file) {
     log_csv_file.open(file_name.str(), ios::out);
 
     /* Write columns */
+
+    /* General */
     log_csv_file << "map_name";
     log_csv_file << "," << "scen_id";
     log_csv_file << "," << "n_agents";
@@ -228,7 +230,16 @@ void create_log_file(string log_file) {
     log_csv_file << "," << "steps";
     log_csv_file << "," << "memory";
     log_csv_file << "," << "end_reason";
-    /* Solver specific */
+
+    /* Metadata */
+    log_csv_file << "," << "waitpid_result";
+    log_csv_file << "," << "child_exited_normally";
+    log_csv_file << "," << "child_exit_status";
+    log_csv_file << "," << "child_exited_by_signal";
+    log_csv_file << "," << "signal";
+    log_csv_file << "," << "read_syscall_result";
+
+    /* Solver specific - online window */
     log_csv_file << "," << "replans_max_size";
     log_csv_file << "," << "max_agents_replan_area";
     log_csv_file << "," << "replans_count";
@@ -236,6 +247,8 @@ void create_log_file(string log_file) {
     log_csv_file << "," << "max_reached_window";
     log_csv_file << "," << "max_expanded_window";
     log_csv_file << "," << "n_livelock";
+
+    /* Solver specific - other solves */
     log_csv_file << "," << "n_conflicts";
     log_csv_file << "," << "eval_time";
     log_csv_file << "," << "init_time";
@@ -291,6 +304,7 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
 
     /* For each episode, write its line */
     for (size_t i = 0; i < EPISODE_COUNT; ++i) {
+        /* General */
         log_csv_file << result.map_name;
         log_csv_file << "," << result.scen_id;
         log_csv_file << "," << result.n_agents;
@@ -302,7 +316,16 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
         log_csv_file << "," << result.episodes_data[i].steps;
         log_csv_file << "," << result.episodes_data[i].memory_used;
         log_csv_file << "," << end_reason(result, result.episodes_data[i]);
-        /* Solver specific */
+
+        /* Metadata */
+        log_csv_file << "," << result.episodes_data[i].waitpid_result;
+        log_csv_file << "," << result.episodes_data[i].child_exited_normally;
+        log_csv_file << "," << result.episodes_data[i].child_exit_status;
+        log_csv_file << "," << result.episodes_data[i].child_exited_by_signal;
+        log_csv_file << "," << result.episodes_data[i].signal;
+        log_csv_file << "," << result.episodes_data[i].read_syscall_result;
+
+        /* Solver specific - online window */
         log_csv_file << "," << result.episodes_data[i].replans_max_size;
         log_csv_file << "," << result.episodes_data[i].max_agents_replan_area;
         log_csv_file << "," << result.episodes_data[i].replans_count;
@@ -310,6 +333,8 @@ void log_if_needed(string log_file, struct problem_instance_result result) {
         log_csv_file << "," << result.episodes_data[i].max_reached_window;
         log_csv_file << "," << result.episodes_data[i].max_expanded_window;
         log_csv_file << "," << result.episodes_data[i].livelock_count;
+
+        /* Solver specific - other solves */
         log_csv_file << "," << result.n_conflicts;
         log_csv_file << "," << result.eval_time;
         log_csv_file << "," << result.init_time;

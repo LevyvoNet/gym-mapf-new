@@ -2,6 +2,7 @@
 // Created by levyvonet on 26/10/2021.
 //
 
+#include <sys/wait.h>
 #include "policy.h"
 
 /** Utils *****************************************************************************************************/
@@ -287,14 +288,36 @@ Policy::evaluate(size_t n_episodes, size_t max_steps, double episode_timeout_ms,
                 ssize_t read_bytes = 0;
                 memset(&episode_info, 0, sizeof(episode_info));
 
-                do {
-                    read_result = read(fds[0], &episode_info, sizeof(episode_info));
-                    if (0 >= read_result) {
-                        episode_info.end_reason = EPISODE_UNKNOWN_FAILURE;
-                        break;
-                    }
-                    read_bytes += read_result;
-                } while (read_bytes < sizeof(episode_info));
+                int wstatus = 0;
+
+                /* Wait for child process to finish evaluating its episode. This call should be blocking until evaluation
+                 * is finished. */
+                int waitpid_result = waitpid(pid, &wstatus, 0);
+
+                /* Fill metadata values */
+                episode_info.waitpid_result = waitpid_result;
+                episode_info.child_exited_normally = WIFEXITED(wstatus);
+                episode_info.child_exited_by_signal = WIFSIGNALED(wstatus);
+                if (episode_info.child_exited_normally) {
+                    episode_info.child_exit_status = WEXITSTATUS(wstatus);
+                } else {
+                    episode_info.child_exit_status = -1;
+                }
+                if (episode_info.child_exited_by_signal) {
+                    episode_info.signal = WTERMSIG(wstatus);
+                }
+
+                if (waitpid_result == 0) {
+                    do {
+                        read_result = read(fds[0], &episode_info, sizeof(episode_info));
+                        episode_info.read_syscall_result = read_result;
+                        if (0 >= read_result) {
+                            episode_info.end_reason = EPISODE_UNKNOWN_FAILURE;
+                            break;
+                        }
+                        read_bytes += read_result;
+                    } while (read_bytes < sizeof(episode_info));
+                }
             }
         }
 
