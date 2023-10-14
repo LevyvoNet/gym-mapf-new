@@ -11,6 +11,9 @@ Window::Window(GridArea area, Policy *policy, AgentsGroup group, const MapfEnv *
         area(area), policy(policy), group(group), steps_count(0), reached_count(0), expanded_count(0),
         full_env_(full_env) {
     this->max_steps = calc_max_steps();
+    for (size_t i = 0; i < this->group.size(); ++i) {
+        this->is_effective_agent.push_back(true);
+    }
 }
 
 int Window::calc_max_steps() {
@@ -175,7 +178,7 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
     for (; *area_iter != *area_end; ++*area_iter) {
         for (size_t agent_idx = 0; agent_idx < w->group.size(); ++agent_idx) {
             /* Skip the girth states for this agent if it is not an effective one. */
-            if (!w->is_effective_agent[agent_idx]){
+            if (!w->is_effective_agent[agent_idx]) {
                 continue;
             }
             GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
@@ -530,7 +533,7 @@ void window_planner_vi_effective_agents(MapfEnv *env, float gamma, Window *w, co
     MEASURE_TIME;
 
     /* Set the effective agents for the window. */
-    
+
 
     /* Create a local view of the agents in the window's group. */
     MapfEnv *area_effective_agents_env = get_local_view(env, w->group);
@@ -538,10 +541,10 @@ void window_planner_vi_effective_agents(MapfEnv *env, float gamma, Window *w, co
     /* Set the set space to be our subspace, this will cause value iteration to only iterate over the conflict
      * area instead of the whole grid. Consider only effective agents for switching states (while iterating). */
     AreaMultiAgentStateSpace *window_area_effective_agents_state_space = new AreaMultiAgentStateSpace(env->grid,
-                                                                                                 w->area,
-                                                                                                 w->group.size(),
-                                                                                                 w->is_effective_agent,
-                                                                                                 s);
+                                                                                                      w->area,
+                                                                                                      w->group.size(),
+                                                                                                      w->is_effective_agent,
+                                                                                                      s);
     area_effective_agents_env->observation_space = window_area_effective_agents_state_space;
 
 

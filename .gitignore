@@ -26,3 +26,4 @@ CMakeCache.txt
 sanity_benchmark
 real_benchmark
 sanity_temp.log.csv
+*.pyc
