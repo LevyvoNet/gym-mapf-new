@@ -59,6 +59,7 @@ public:
     GridArea area;
     Policy *policy;
     AgentsGroup group;
+    vector<bool> is_effective_agent;
 
     int steps_count;
     int max_steps;

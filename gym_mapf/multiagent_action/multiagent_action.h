@@ -29,7 +29,7 @@ public:
     MultiAgentAction *ptr;
     size_t n_agents;
 
-    MultiAgentActionIterator(size_t n_agents);
+    MultiAgentActionIterator(size_t n_agents, vector<bool> is_effective_agent);
 
     ~MultiAgentActionIterator();
 
@@ -47,6 +47,8 @@ public:
 
     bool operator!=(const MultiAgentActionIterator &other) const;
 
+private:
+    vector<bool> is_effective_agent;
 
 };
 
@@ -55,10 +57,14 @@ public:
     size_t n_agents;
 
     MultiAgentActionSpace(size_t n_agents);
+    MultiAgentActionSpace(size_t n_agents, vector<bool> is_effective_agent);
 
     virtual MultiAgentActionIterator* begin();
 
     virtual MultiAgentActionIterator* end();
+
+private:
+    vector<bool> is_effective_agent;
 };
 
 #endif //GYM_MAPF_MULTIAGENT_STATE_H

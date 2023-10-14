@@ -140,7 +140,9 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
     /* Generate state space from the window area */
     AreaMultiAgentStateSpace *window_area_state_space = new AreaMultiAgentStateSpace(env->grid,
                                                                                      w->area,
-                                                                                     w->group.size());
+                                                                                     w->group.size(),
+                                                                                     w->is_effective_agent,
+                                                                                     s);
 
     /* Set the girth of the area with a fixed value composed of the single agents values */
     vector<ValueFunctionPolicy *> policies;
@@ -172,6 +174,10 @@ get_window_girth_values(MapfEnv *env, Window *w, const MultiAgentState &s, const
     Dictionary *girth_values = new Dictionary(0);
     for (; *area_iter != *area_end; ++*area_iter) {
         for (size_t agent_idx = 0; agent_idx < w->group.size(); ++agent_idx) {
+            /* Skip the girth states for this agent if it is not an effective one. */
+            if (!w->is_effective_agent[agent_idx]){
+                continue;
+            }
             GirthMultiAgentStateIterator *girth_iter = girth_space_single->begin();
             for (; *girth_iter != *girth_space_single_end; ++(*girth_iter)) {
                 MultiAgentState temp_state = **area_iter;
@@ -517,33 +523,77 @@ void window_planner_vi(MapfEnv *env, float gamma, Window *w, const MultiAgentSta
     w->policy = policy;
 }
 
-AllStayExceptFirstActionSpaceIterator &AllStayExceptFirstActionSpaceIterator::operator++() {
-    this->ptr->actions[0] = (Action) (int(this->ptr->actions[0]) + 1);
-    if (this->ptr->actions[0] == LAST_INVALID_ACTION) {
-        this->reach_end();
+void window_planner_vi_effective_agents(MapfEnv *env, float gamma, Window *w, const MultiAgentState &s,
+                                        vector<Policy *> single_policies,
+                                        int d,
+                                        double timeout_ms) {
+    MEASURE_TIME;
+
+    /* Set the effective agents for the window. */
+    
+
+    /* Create a local view of the agents in the window's group. */
+    MapfEnv *area_effective_agents_env = get_local_view(env, w->group);
+
+    /* Set the set space to be our subspace, this will cause value iteration to only iterate over the conflict
+     * area instead of the whole grid. Consider only effective agents for switching states (while iterating). */
+    AreaMultiAgentStateSpace *window_area_effective_agents_state_space = new AreaMultiAgentStateSpace(env->grid,
+                                                                                                 w->area,
+                                                                                                 w->group.size(),
+                                                                                                 w->is_effective_agent,
+                                                                                                 s);
+    area_effective_agents_env->observation_space = window_area_effective_agents_state_space;
+
+
+    /* Set the action space of area env, only effective agents can move. */
+    MultiAgentActionSpace *effective_agents_action_space = new MultiAgentActionSpace(w->group.size(),
+                                                                                     w->is_effective_agent);
+    area_effective_agents_env->action_space = effective_agents_action_space;
+
+    /* Calculate the area girth values, these will be set during the run of value iteration */
+    Dictionary *girth_values = get_window_girth_values(env, w, s, single_policies, d, timeout_ms - ELAPSED_TIME_MS);
+    if (ELAPSED_TIME_MS >= timeout_ms) {
+        return;
     }
-    this->ptr->id++;
-    return *this;
+
+
+    /* Solve the env by value iteration */
+    ValueIterationPolicy *policy = new ValueIterationPolicy(area_effective_agents_env, gamma, "", girth_values);
+    policy->train(timeout_ms - ELAPSED_TIME_MS);
+    delete girth_values;
+
+    /* Transfer ownership */
+    w->policy = policy;
+
 }
 
-AllStayExceptFirstActionSpaceIterator::AllStayExceptFirstActionSpaceIterator(size_t n_agents)
-        : MultiAgentActionIterator(n_agents) {}
-
-AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t n_agents)
-        : MultiAgentActionSpace(n_agents) {
-
-}
-
-MultiAgentActionIterator *AllStayExceptFirstActionSpace::begin() {
-    return new AllStayExceptFirstActionSpaceIterator(this->n_agents);
-}
-
-MultiAgentActionIterator *AllStayExceptFirstActionSpace::end() {
-    AllStayExceptFirstActionSpaceIterator *iter = new AllStayExceptFirstActionSpaceIterator(this->n_agents);
-    iter->reach_end();
-
-    return iter;
-}
+//AllStayExceptFirstActionSpaceIterator &AllStayExceptFirstActionSpaceIterator::operator++() {
+//    this->ptr->actions[0] = (Action) (int(this->ptr->actions[0]) + 1);
+//    if (this->ptr->actions[0] == LAST_INVALID_ACTION) {
+//        this->reach_end();
+//    }
+//    this->ptr->id++;
+//    return *this;
+//}
+//
+//AllStayExceptFirstActionSpaceIterator::AllStayExceptFirstActionSpaceIterator(size_t n_agents)
+//        : MultiAgentActionIterator(n_agents) {}
+//
+//AllStayExceptFirstActionSpace::AllStayExceptFirstActionSpace(size_t n_agents)
+//        : MultiAgentActionSpace(n_agents) {
+//
+//}
+//
+//MultiAgentActionIterator *AllStayExceptFirstActionSpace::begin() {
+//    return new AllStayExceptFirstActionSpaceIterator(this->n_agents);
+//}
+//
+//MultiAgentActionIterator *AllStayExceptFirstActionSpace::end() {
+//    AllStayExceptFirstActionSpaceIterator *iter = new AllStayExceptFirstActionSpaceIterator(this->n_agents);
+//    iter->reach_end();
+//
+//    return iter;
+//}
 
 /** private **********************************************************************************************/
 Window *OnlineWindowPolicy::merge_windows(Window *w1, Window *w2, const MultiAgentState &s) {

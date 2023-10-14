@@ -531,6 +531,7 @@ TEST(MafpEnvTests, StateSpaceIteration) {
 
 }
 
+
 TEST(MafpEnvTests, ActionSpaceIteration) {
     std::vector<std::string> small_grid_with_obstacles{{'.', '@', '.'},
                                                        {'.', '@', '.'},
@@ -588,6 +589,64 @@ TEST(MafpEnvTests, ActionSpaceIteration) {
 
 }
 
+TEST(MafpEnvTests, EffectiveAgentsActionSpaceIteration) {
+    std::vector<std::string> small_grid_with_obstacles{{'.', '@', '.'},
+                                                       {'.', '@', '.'},
+                                                       {'.', '.', '.'}};
+    Grid g(small_grid_with_obstacles);
+
+    MapfEnv env(&g, 3,
+                {g.get_location(0, 0), g.get_location(2, 1), g.get_location(0, 2)},
+                {g.get_location(0, 2), g.get_location(2, 1), g.get_location(0, 0)},
+                0, REWARD_OF_COLLISION, REWARD_OF_GOAL, REWARD_OF_LIVING);
+
+    list<MultiAgentAction *> actions;
+    vector<bool> is_effective_agent{true, false, true};
+    MultiAgentActionSpace effective_action_space(is_effective_agent.size(), is_effective_agent);
+    MultiAgentActionIterator *iter = effective_action_space.begin();
+    MultiAgentActionIterator *end = effective_action_space.end();
+
+    for (iter->reach_begin(); *iter != *end; ++*iter) {
+        actions.push_back(new MultiAgentAction((*iter)->actions, (*iter)->id));
+    }
+
+
+    list<MultiAgentAction *> expected_actions{
+            new MultiAgentAction({STAY, STAY, STAY}, 0),
+            new MultiAgentAction({UP, STAY, STAY}, 1),
+            new MultiAgentAction({RIGHT, STAY, STAY}, 2),
+            new MultiAgentAction({DOWN, STAY, STAY}, 3),
+            new MultiAgentAction({LEFT, STAY, STAY}, 4),
+
+            new MultiAgentAction({STAY, STAY, UP}, 5),
+            new MultiAgentAction({UP, STAY, UP}, 6),
+            new MultiAgentAction({RIGHT, STAY, UP}, 7),
+            new MultiAgentAction({DOWN, STAY, UP}, 8),
+            new MultiAgentAction({LEFT, STAY, UP}, 9),
+
+            new MultiAgentAction({STAY, STAY, RIGHT}, 10),
+            new MultiAgentAction({UP, STAY, RIGHT}, 11),
+            new MultiAgentAction({RIGHT, STAY, RIGHT}, 12),
+            new MultiAgentAction({DOWN, STAY, RIGHT}, 13),
+            new MultiAgentAction({LEFT, STAY, RIGHT}, 14),
+
+            new MultiAgentAction({STAY, STAY, DOWN}, 15),
+            new MultiAgentAction({UP, STAY, DOWN}, 16),
+            new MultiAgentAction({RIGHT, DOWN}, 17),
+            new MultiAgentAction({DOWN, STAY, DOWN}, 18),
+            new MultiAgentAction({LEFT, STAY, DOWN}, 19),
+
+            new MultiAgentAction({STAY, STAY, LEFT}, 20),
+            new MultiAgentAction({UP, STAY, LEFT}, 21),
+            new MultiAgentAction({RIGHT, STAY, LEFT}, 22),
+            new MultiAgentAction({DOWN, STAY, LEFT}, 23),
+            new MultiAgentAction({LEFT, STAY, LEFT}, 24),
+
+    };
+
+    ASSERT_TRUE(list_equal_no_order(actions, expected_actions));
+
+}
 
 TEST(MapfEnvTests, GirthStatesNormalIteration) {
     std::vector<std::string> lines{{'.', '.', '.', '.'},
@@ -837,7 +896,7 @@ TEST(MapfEnvTests, GirthStatesNormalIteration) {
 
 }
 
-TEST(MapfEnvTests, SymmetricalBottleneckAreaGirth) {
+TEST(MapfEnvTests, SymmetricalBottleneckSingleRowAreaGirthIteration) {
     vector<std::string> map_lines({
                                           "..@...",
                                           "..@...",
@@ -1031,7 +1090,7 @@ TEST(MapfEnvTests, SymmetricalBottleneckAreaGirth) {
     ASSERT_TRUE(list_equal_no_order(girth_states, expected_girth_states)
     );
 
-/* Calculate area states */
+    /* Calculate area states */
     AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2);
     list<MultiAgentState *> area_states;
     AreaMultiAgentStateIterator *area_iter = area_space.begin();
@@ -1067,7 +1126,7 @@ TEST(MapfEnvTests, SymmetricalBottleneckAreaGirth) {
     );
 }
 
-TEST(MapfEnvTests, SymmetricalBottleneckAreaGirthDifferentRows) {
+TEST(MapfEnvTests, SymmetricalBottleneckEffectiveAgentsMultipleRowsAreaGirthIteration) {
     vector<std::string> map_lines({
                                           "..@...",
                                           "..@...",
@@ -1088,8 +1147,149 @@ TEST(MapfEnvTests, SymmetricalBottleneckAreaGirthDifferentRows) {
                           -1);
 
     GridArea conflict_area = GridArea(2, 3, 2, 4);
+    MultiAgentState *current_state = env.locations_to_state({g.get_location(2, 2), g.get_location(2, 4)});
 
-/* Calculate girth states */
+    /* Calculate area states, agent 0 is the effective one. */
+    vector<bool> is_effective_agent{true, false};
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2, is_effective_agent,
+                                                                   *current_state);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_area_states{
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 4)}),
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, expected_area_states));
+
+
+    /* Now agent 1 is the effective one */
+    vector<bool> is_effective_agent2{false, true};
+    AreaMultiAgentStateSpace area_space2 = AreaMultiAgentStateSpace(&g, conflict_area, 2, is_effective_agent2,
+                                                                    *current_state);
+    list<MultiAgentState *> area_states2;
+    AreaMultiAgentStateIterator *area_iter2 = area_space2.begin();
+    for (; *area_iter2 != *area_space2.end(); ++*area_iter2) {
+        MultiAgentState *s = new MultiAgentState((*area_iter2)->locations, (*area_iter2)->id);
+        area_states2.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_area_states2{
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 2), g.get_location(3, 4)}),
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states2, expected_area_states2));
+}
+
+TEST(MapfEnvTests, SymmetricalBottleneck2OutOf3EffectiveAgentsAreaGirthIteration) {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@..."
+                                  });
+
+    Grid g = Grid(map_lines);
+
+    MapfEnv env = MapfEnv(&g,
+                          3,
+                          {g.get_location(2, 0), g.get_location(2, 1), g.get_location(2, 5)},
+                          {g.get_location(2, 5), g.get_location(2, 1), g.get_location(2, 0)},
+                          0.21,
+                          -1000,
+                          100,
+                          -1);
+
+    GridArea conflict_area = GridArea(2, 3, 2, 4);
+    MultiAgentState *current_state = env.locations_to_state(
+            {g.get_location(2, 2), g.get_location(2, 3), g.get_location(2, 4)});
+
+    /* Calculate area states, agent 0 is the effective one. */
+    vector<bool> is_effective_agent{true, false, true};
+    AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, is_effective_agent.size(),
+                                                                   is_effective_agent,
+                                                                   *current_state);
+    list<MultiAgentState *> area_states;
+    AreaMultiAgentStateIterator *area_iter = area_space.begin();
+    for (; *area_iter != *area_space.end(); ++*area_iter) {
+        MultiAgentState *s = new MultiAgentState((*area_iter)->locations, (*area_iter)->id);
+        area_states.push_back(s);
+    }
+
+    list<MultiAgentState *> expected_area_states{
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3), g.get_location(2, 2)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3), g.get_location(2, 2)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3), g.get_location(2, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3), g.get_location(2, 3)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3), g.get_location(2, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3), g.get_location(2, 4)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3), g.get_location(3, 3)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3), g.get_location(3, 3)}),
+
+            env.locations_to_state({g.get_location(2, 2), g.get_location(2, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 3), g.get_location(2, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(2, 4), g.get_location(2, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 3), g.get_location(2, 3), g.get_location(3, 4)}),
+            env.locations_to_state({g.get_location(3, 4), g.get_location(2, 3), g.get_location(3, 4)}),
+
+
+    };
+
+    ASSERT_TRUE(list_equal_no_order(area_states, expected_area_states));
+}
+
+TEST(MapfEnvTests, SymmetricalBottleneckMultipleRowsAreaIteration) {
+    vector<std::string> map_lines({
+                                          "..@...",
+                                          "..@...",
+                                          "......",
+                                          "..@...",
+                                          "..@..."
+                                  });
+
+    Grid g = Grid(map_lines);
+
+    MapfEnv env = MapfEnv(&g,
+                          2,
+                          {g.get_location(2, 0), g.get_location(2, 5)},
+                          {g.get_location(2, 5), g.get_location(2, 0)},
+                          0.21,
+                          -1000,
+                          100,
+                          -1);
+
+
+    GridArea conflict_area = GridArea(2, 3, 2, 4);
+
+    /* Calculate girth states */
     GirthMultiAgentStateSpace girth_space = GirthMultiAgentStateSpace(&g, conflict_area, 2);
     list<MultiAgentState *> girth_states;
     GirthMultiAgentStateIterator *girth_iter = girth_space.begin();
@@ -1261,7 +1461,7 @@ TEST(MapfEnvTests, SymmetricalBottleneckAreaGirthDifferentRows) {
 
     ASSERT_TRUE(list_equal_no_order(girth_states, expected_girth_states));
 
-/* Calculate area states */
+    /* Calculate area states */
     AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&g, conflict_area, 2);
     list<MultiAgentState *> area_states;
     AreaMultiAgentStateIterator *area_iter = area_space.begin();
@@ -1344,8 +1544,8 @@ TEST(MapfEnvTests, MountainsEmptyGrid) {
     }
 
     /* Set the expected transitions */
-    double agent_in_mountain_success_prob = 1.0- (2+MOUNTAIN_NOISE_FACTOR)*(env->fail_prob/3);
-    double agent_in_mountain_stay_prob = MOUNTAIN_NOISE_FACTOR * (env->fail_prob/3);
+    double agent_in_mountain_success_prob = 1.0 - (2 + MOUNTAIN_NOISE_FACTOR) * (env->fail_prob / 3);
+    double agent_in_mountain_stay_prob = MOUNTAIN_NOISE_FACTOR * (env->fail_prob / 3);
     list<Transition *> expected_transitions(
             {
                     // (RIGHT, UP)

@@ -157,10 +157,14 @@ MultiAgentStateSpace::MultiAgentStateSpace(const Grid *grid, size_t n_agents) {
 
 AreaMultiAgentStateIterator::AreaMultiAgentStateIterator(const Grid *grid,
                                                          GridArea area,
-                                                         size_t n_agents) :
-        MultiAgentStateIterator(grid, n_agents), area(area) {
+                                                         size_t n_agents,
+                                                         vector<bool> is_effective_agent,
+                                                         const MultiAgentState &current_state) :
+        MultiAgentStateIterator(grid, n_agents), area(area), is_effective_agent(is_effective_agent),
+        current_state(current_state) {
     this->_reach_begin();
 }
+
 
 Location inc_area_iterator(const Location *l, GridArea area, const Grid *grid) {
     int row = l->row;
@@ -201,6 +205,10 @@ void AreaMultiAgentStateIterator::_reach_begin() {
 
     vector<Location> locations;
     for (size_t i = 0; i < this->n_agents; ++i) {
+        if (!this->is_effective_agent[i]) {
+            locations.push_back(this->current_state.locations[i]);
+            continue;
+        }
         locations.push_back(first_location);
         this->iters[i] = GridIterator(this->grid, first_location.id);
     }
@@ -217,18 +225,24 @@ MultiAgentStateIterator &AreaMultiAgentStateIterator::operator++() {
 
     /* Increment the first agent, then handle the "carry" */
     do {
-        Location new_location = inc_area_iterator(this->iters[agent_idx].ptr, this->area, this->grid);
-        if IS_END_OF_AREA(new_location) {
-            Location first_location = area_first_legal_location(this->grid, this->area);
-            new_location = first_location;
+        if (!this->is_effective_agent[agent_idx]) {
+            this->ptr->locations[agent_idx] = this->current_state.locations[agent_idx];
+            agent_idx++;
             carry = true;
         } else {
-            carry = false;
-        }
-        this->iters[agent_idx] = GridIterator(this->grid, new_location.id);
+            Location new_location = inc_area_iterator(this->iters[agent_idx].ptr, this->area, this->grid);
+            if IS_END_OF_AREA(new_location) {
+                Location first_location = area_first_legal_location(this->grid, this->area);
+                new_location = first_location;
+                carry = true;
+            } else {
+                carry = false;
+            }
+            this->iters[agent_idx] = GridIterator(this->grid, new_location.id);
 
-        this->ptr->locations[agent_idx] = *(this->iters[agent_idx]);
-        agent_idx++;
+            this->ptr->locations[agent_idx] = *(this->iters[agent_idx]);
+            agent_idx++;
+        }
 
     } while ((agent_idx < this->n_agents) && carry);
 
@@ -244,18 +258,30 @@ MultiAgentStateIterator &AreaMultiAgentStateIterator::operator++() {
 
 
 AreaMultiAgentStateSpace::AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents) :
-        MultiAgentStateSpace(grid, n_agents), area(area) {}
+        MultiAgentStateSpace(grid, n_agents), area(area), current_state(this->dummy_state) {
+    for (size_t i = 1; i <= this->n_agents; ++i) {
+        this->is_effective_agent.push_back(true);
+    }
+}
 
 AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::begin() {
-    return new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+    return new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents, this->is_effective_agent,
+                                           this->current_state);
 }
 
 AreaMultiAgentStateIterator *AreaMultiAgentStateSpace::end() {
-    AreaMultiAgentStateIterator *iter = new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents);
+    AreaMultiAgentStateIterator *iter = new AreaMultiAgentStateIterator(this->grid, this->area, this->n_agents,
+                                                                        this->is_effective_agent, this->current_state);
     iter->reach_end();
 
     return iter;
 }
+
+AreaMultiAgentStateSpace::AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents,
+                                                   vector<bool> is_effective_agent,
+                                                   const MultiAgentState &current_state) :
+        MultiAgentStateSpace(grid, n_agents), area(area), is_effective_agent(is_effective_agent),
+        current_state(current_state) {}
 
 /** Girth state iterator *****************************************************************************************/
 

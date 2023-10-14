@@ -22,7 +22,7 @@ public:
 
     bool operator!=(const MultiAgentState &other) const;
 
-    friend std::ostream& operator<<(std::ostream& os, const MultiAgentState& s);
+    friend std::ostream &operator<<(std::ostream &os, const MultiAgentState &s);
 };
 
 class MultiAgentStateIterator {
@@ -64,9 +64,9 @@ protected:
 public:
     MultiAgentStateSpace(const Grid *grid, size_t n_agents);
 
-    virtual MultiAgentStateIterator* begin();
+    virtual MultiAgentStateIterator *begin();
 
-    virtual MultiAgentStateIterator* end();
+    virtual MultiAgentStateIterator *end();
 };
 
 
@@ -76,22 +76,38 @@ public:
 
     void _reach_begin();
 
-    AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents);
+    AreaMultiAgentStateIterator(const Grid *grid, GridArea area, size_t n_agents, vector<bool> is_effective_agent,
+                                const MultiAgentState &current_state);
 
     virtual void reach_begin() override;
 
     virtual MultiAgentStateIterator &operator++() override;
+
+private:
+    size_t next_effective_agent(size_t curr_agent);
+    vector<bool> is_effective_agent;
+    const MultiAgentState& current_state;
+    MultiAgentState dummy_state = MultiAgentState({}, -1);
 };
 
 class AreaMultiAgentStateSpace : public MultiAgentStateSpace {
-protected:
-    GridArea area;
 public:
     AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents);
+
+    AreaMultiAgentStateSpace(const Grid *grid, GridArea area, size_t n_agents, vector<bool> is_effective_agent,
+                             const MultiAgentState &current_state);
 
     virtual AreaMultiAgentStateIterator *begin() override;
 
     virtual AreaMultiAgentStateIterator *end() override;
+
+protected:
+    GridArea area;
+    vector<bool> is_effective_agent;
+    const MultiAgentState &current_state;
+    MultiAgentState dummy_state = MultiAgentState({}, -1);
+
+
 };
 
 
@@ -107,6 +123,7 @@ public:
     void _reach_begin();
 
     virtual void reach_begin() override;
+
 };
 
 class GirthMultiAgentStateSpace : public MultiAgentStateSpace {

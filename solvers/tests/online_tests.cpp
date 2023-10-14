@@ -73,8 +73,7 @@ TEST(OnlineReplanTest, ConflictAreaConstructionIteration) {
     GridArea area = construct_conflict_area(&grid, group, s);
 
     GridArea expected_area = GridArea(1, 5, 1, 2);
-    ASSERT_EQ(area, expected_area
-    );
+    ASSERT_EQ(area, expected_area);
 
     AreaMultiAgentStateSpace area_space = AreaMultiAgentStateSpace(&grid, area, group.size());
     AreaMultiAgentStateIterator *area_iter = area_space.begin();
@@ -85,8 +84,7 @@ TEST(OnlineReplanTest, ConflictAreaConstructionIteration) {
                                              grid.get_location(1, 2)};
     area_iter->set_locations(expected_init_locations);
     MultiAgentState expected_init_state = **area_iter;
-    ASSERT_EQ(init_state, expected_init_state
-    );
+    ASSERT_EQ(init_state, expected_init_state);
 
 }
 
@@ -282,3 +280,4 @@ TEST(OnlineReplanTest, DeterministicSymmetricalEnvGirthStatesBug) {
     ASSERT_TRUE(list_equal_no_order(girth_states, girth_expected_states));
 
 }
+

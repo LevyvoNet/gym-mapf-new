@@ -37,8 +37,10 @@ MultiAgentAction::MultiAgentAction(size_t n_agents) {
 }
 
 /** MultiAgentActionIterator *************************************************************************************/
-MultiAgentActionIterator::MultiAgentActionIterator(size_t n_agents) {
+MultiAgentActionIterator::MultiAgentActionIterator(size_t n_agents, vector<bool> is_effective_agent) {
     this->n_agents = n_agents;
+    this->is_effective_agent = is_effective_agent;
+
     vector<Action> all_stay(n_agents);
 
     for (size_t i = 0; i < n_agents; ++i) {
@@ -77,7 +79,7 @@ MultiAgentAction MultiAgentActionIterator::operator*() const {
     return *(this->ptr);
 }
 
-MultiAgentActionIterator& MultiAgentActionIterator::operator++() {
+MultiAgentActionIterator &MultiAgentActionIterator::operator++() {
     size_t agent_idx = 0;
     bool carry = false;
 
@@ -85,7 +87,13 @@ MultiAgentActionIterator& MultiAgentActionIterator::operator++() {
     do {
         carry = false;
 
-        this->ptr->actions[agent_idx] = (Action) (int(this->ptr->actions[agent_idx]) + 1);
+        /* Inc if this agent is effective, else "fake" it */
+        if (!is_effective_agent[agent_idx]) {
+            this->ptr->actions[agent_idx] = LAST_INVALID_ACTION;
+        } else {
+            this->ptr->actions[agent_idx] = (Action) (int(this->ptr->actions[agent_idx]) + 1);
+        }
+
         if (this->ptr->actions[agent_idx] == LAST_INVALID_ACTION) {
             this->ptr->actions[agent_idx] = STAY;
             carry = true;
@@ -128,15 +136,23 @@ bool MultiAgentActionIterator::operator!=(const MultiAgentActionIterator &other)
 /** MultiAgentActionSpace ****************************************************************************************/
 MultiAgentActionSpace::MultiAgentActionSpace(size_t n_agents) {
     this->n_agents = n_agents;
+    for (size_t i = 0; i < this->n_agents; ++i) {
+        this->is_effective_agent.push_back(true);
+    }
 }
 
-MultiAgentActionIterator* MultiAgentActionSpace::begin() {
-    return new MultiAgentActionIterator(this->n_agents);
+MultiAgentActionIterator *MultiAgentActionSpace::begin() {
+    return new MultiAgentActionIterator(this->n_agents, this->is_effective_agent);
 }
 
-MultiAgentActionIterator* MultiAgentActionSpace::end() {
-    MultiAgentActionIterator *iter = new MultiAgentActionIterator(this->n_agents);
+MultiAgentActionIterator *MultiAgentActionSpace::end() {
+    MultiAgentActionIterator *iter = new MultiAgentActionIterator(this->n_agents, this->is_effective_agent);
     iter->reach_end();
 
     return iter;
+}
+
+MultiAgentActionSpace::MultiAgentActionSpace(size_t n_agents, vector<bool> is_effective_agent) {
+    this->n_agents = n_agents;
+    this->is_effective_agent = is_effective_agent;
 }
